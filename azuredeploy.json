@@ -32,7 +32,7 @@
       "metadata": {
         "description": "Your GitHub repo"
       },
-      "defaultValue": "https://github.com/tescales/azure-scaffolding"
+      "defaultValue": "https://raw.githubusercontent.com/tescales/azure-scaffold/master/"
     },
     "aadappname": {
         "type": "string",

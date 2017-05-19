@@ -1,6 +1,6 @@
 ﻿{
     "$schema": "http://schemas.microsoft.org/azure/deploymentTemplate?api-version=2015-01-01#",
-    "contentVersion": "1.0",
+    "contentVersion": "1.0.0.0",
     "parameters": {
       "accountName": {
         "type": "string",
