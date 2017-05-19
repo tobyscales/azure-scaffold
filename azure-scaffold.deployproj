@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|AnyCPU">
+      <Configuration>Debug</Configuration>
+      <Platform>AnyCPU</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|AnyCPU">
+      <Configuration>Release</Configuration>
+      <Platform>AnyCPU</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>549e0c9a-97b0-4640-83e4-cc22b8ff2cbd</ProjectGuid>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetFrameworkIdentifier>Deployment</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>1.0</TargetFrameworkVersion>
+    <PrepareForBuildDependsOn>
+    </PrepareForBuildDependsOn>
+  </PropertyGroup>
+  <Import Condition=" Exists('Deployment.targets') " Project="Deployment.targets" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
+  <!-- vertag<:>start tokens<:>maj.min -->
+  <Import Condition=" Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Deployment\1.1\DeploymentProject.targets') " Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Deployment\1.1\DeploymentProject.targets" />
+  <!-- vertag<:>end -->
+  <ItemGroup>
+    <Content Include="azuredeploy.json" />
+    <Content Include="azuredeploy.parameters.json" />
+    <None Include="Deployment.targets">
+      <Visible>False</Visible>
+    </None>
+    <Content Include="Deploy-AzureResourceGroup.ps1" />
+    <None Include="metadata.json" />
+    <None Include="README.md" />
+    <None Include="references\101-automation-runbook-getvms\azuredeploy.json" />
+    <None Include="references\101-automation-runbook-getvms\azuredeploy.parameters.json" />
+    <None Include="references\101-automation-runbook-getvms\DeployThroughARM.ps1" />
+    <None Include="references\101-automation-runbook-getvms\metadata.json" />
+    <None Include="references\101-automation-runbook-getvms\README.md" />
+    <None Include="references\101-automation-runbook-getvms\Runbooks\Get-AzureVMTutorial.ps1" />
+    <None Include="references\201-encrypt-create-new-vm-gallery-image-managed-disks\azuredeploy.json" />
+    <None Include="references\201-encrypt-create-new-vm-gallery-image-managed-disks\azuredeploy.parameters.json" />
+    <None Include="references\201-encrypt-create-new-vm-gallery-image-managed-disks\metadata.json" />
+    <None Include="references\201-encrypt-create-new-vm-gallery-image-managed-disks\README.md" />
+    <None Include="references\automat\parameters.json" />
+    <None Include="references\automat\template.json" />
+    <None Include="references\azuredeploy.json" />
+    <None Include="references\azuredeploy.parameters.json" />
+    <None Include="references\Deploy-AzureResourceGroup - Copy.ps1" />
+    <None Include="scripts\DeployO365SilentWithVersion.ps1" />
+    <None Include="templates\automation\azuredeploy.json" />
+    <None Include="templates\dsc\azuredeploy.json" />
+    <None Include="templates\keyvault\azuredeploy.json" />
+  </ItemGroup>
+  <Target Name="GetReferenceAssemblyPaths" />
+</Project>
