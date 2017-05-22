@@ -180,7 +180,22 @@
             }
           },
 
-          
+          {
+            "name": "[concat(parameters('accountName'), '/', parameters('runbookjobGuid') )]",
+            "type": "Microsoft.Automation/automationAccounts/jobs",
+            "apiVersion": "2015-10-31",
+            "location": "[parameters('regionId')]",
+            "dependsOn": [
+              "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'))]",
+              "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'), '/runbooks/', variables('newHWVMRunbookName'))]"
+            ],
+            "tags": {},
+            "properties": {
+              "runbook": {
+                "name": "[variables('newHWVMRunbookName').Name]"
+              }
+            }
+          },
 
           {
             "name": "[variables('credentialName')]",
