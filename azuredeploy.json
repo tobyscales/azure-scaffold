@@ -390,6 +390,8 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
+          "adminUsername": { "value": "[parameters('adminUsername')" },
+          "adminPassword": { "value": "[parameters('adminPassword')" },
           "vmName": {
             "value": "[parameters('vmName')]"
           },
