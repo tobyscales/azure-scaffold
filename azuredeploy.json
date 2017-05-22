@@ -7,7 +7,7 @@
       "metadata": {
         "description": "Name of the virtual machine"
       },
-      "defaultValue": "[uniqueString('az')]"
+      "defaultValue": "[uniqueString(subscription().subscriptionId)]"
     },
       "vmName": {
         "type": "string",
