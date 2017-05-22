@@ -95,11 +95,11 @@
               "logProgress": "false",
               "logVerbose": "false",
               "description": "[variables('startRunbookDescription')]",
-                "publishContentLink": {
-                  "uri": "[variables('startRunbookUri')]",
-                  "version": "1.0.0.0"
-                }
+              "publishContentLink": {
+                "uri": "[variables('startRunbookUri')]",
+                "version": "1.0.0.0"
               }
+            }
           },
           {
             "name": "[variables('stopRunbookName')]",
@@ -116,11 +116,11 @@
               "logProgress": "false",
               "logVerbose": "false",
               "description": "[variables('stopRunbookDescription')]",
-               "publishContentLink": {
-                  "uri": "[variables('stopRunbookUri')]",
-                  "version": "1.0.0.0"
-                }
+              "publishContentLink": {
+                "uri": "[variables('stopRunbookUri')]",
+                "version": "1.0.0.0"
               }
+            }
           },
           {
             "name": "[variables('registerDSCRunbookName')]",
@@ -136,12 +136,12 @@
               "runbookType": "[variables('registerDSCRunbookType')]",
               "logProgress": "false",
               "logVerbose": "false",
-              "description": "[variables('registerDSCRunbookDescription')]",        
-                "publishContentLink": {
-                  "uri": "[variables('registerDSCRunbookUri')]",
-                  "version": "1.0.0.0"
-                }
+              "description": "[variables('registerDSCRunbookDescription')]",
+              "publishContentLink": {
+                "uri": "[variables('registerDSCRunbookUri')]",
+                "version": "1.0.0.0"
               }
+            }
           },
           {
             "name": "[variables('newHWVMRunbookName')]",
@@ -158,12 +158,29 @@
               "logProgress": "false",
               "logVerbose": "false",
               "description": "[variables('newHWVMRunbookDescription')]",
-                "publishContentLink": {
-                  "uri": "[variables('newHWVMRunbookUri')]",
-                  "version": "1.0.0.0"
-                }
+              "publishContentLink": {
+                "uri": "[variables('newHWVMRunbookUri')]",
+                "version": "1.0.0.0"
+              }
             }
           },
+
+          {
+            "name": "[concat(parameters('accountName'), '/', variables('newHWVMRunbookName'))]",
+            "type": "Microsoft.Automation/automationAccounts/jobs",
+            "apiVersion": "2015-10-31",
+            "location": "[parameters('regionId')]",
+            "dependsOn": [
+              "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'), '/runbooks/', variables('newHWVMRunbookName')]"
+            ],
+            "tags": {},
+            "properties": {
+              "runbook": {
+                "name": "[variables('newHWVMRunbookName').Name]"
+              }
+            }
+          },
+
           {
             "name": "[variables('credentialName')]",
             "type": "credentials",
