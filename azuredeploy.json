@@ -9,20 +9,6 @@
       },
       "defaultValue": "[ uniqueString('az') ]"
     },
-    "vnName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of the virtual network"
-      },
-      "defaultValue": "vn-default"
-    },
-    "kvName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of the key vault"
-      },
-      "defaultValue": "kv-default"
-    },
     "adminUsername": {
       "type": "string",
       "metadata": {
@@ -195,13 +181,13 @@
       }
     },
     {
-      "name": "[parameters('vnName')]",
+      "name": "[variables('vNetName')]",
       "type": "Microsoft.Network/virtualNetworks",
       "location": "[resourceGroup().location]",
       "apiVersion": "2016-12-01",
       "dependsOn": [],
       "tags": {
-        "displayName": "[parameters('vnName')]"
+        "displayName": "[variables('vNetName')]"
       },
       "properties": {
         "addressSpace": {
@@ -309,7 +295,7 @@
         },
         "parameters": {
           "keyVaultName": {
-            "value": "[parameters('kvName')]"
+            "value": "[variables('keyVaultName')]"
           },
 
           "tenantId": {
@@ -410,7 +396,7 @@
         "parameters": {
           "adminUsername": { "value": "[parameters('adminUsername')" },
           "adminPassword": { "value": "[parameters('adminPassword')" },
-          "virtualNetworkName": { "value": "[parameters('vnName')" },
+          "virtualNetworkName": { "value": "[variables('vNetName')" },
           "subnetName": { "value": "[variables('subnetName')" },
           "vmName": {
             "value": "[parameters('vmName')]"
@@ -422,7 +408,7 @@
             "value": "[parameters('aadClientSecret')]"
           },
           "keyVaultName": {
-            "value": "[parameters('kvName')]"
+            "value": "[variables('keyVaultName')]"
           },
           "keyVaultResourceGroup": {
             "value": "[resourceGroup().name]"

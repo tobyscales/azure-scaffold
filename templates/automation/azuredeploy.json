@@ -95,13 +95,11 @@
               "logProgress": "false",
               "logVerbose": "false",
               "description": "[variables('startRunbookDescription')]",
-              "draft": {
-                "draftContentLink": {
+                "publishContentLink": {
                   "uri": "[variables('startRunbookUri')]",
                   "version": "1.0.0.0"
                 }
               }
-            }
           },
           {
             "name": "[variables('stopRunbookName')]",
@@ -118,13 +116,11 @@
               "logProgress": "false",
               "logVerbose": "false",
               "description": "[variables('stopRunbookDescription')]",
-              "draft": {
-                "draftContentLink": {
+               "publishContentLink": {
                   "uri": "[variables('stopRunbookUri')]",
                   "version": "1.0.0.0"
                 }
               }
-            }
           },
           {
             "name": "[variables('registerDSCRunbookName')]",
@@ -140,14 +136,12 @@
               "runbookType": "[variables('registerDSCRunbookType')]",
               "logProgress": "false",
               "logVerbose": "false",
-              "description": "[variables('registerDSCRunbookDescription')]",
-              "draft": {
-                "draftContentLink": {
+              "description": "[variables('registerDSCRunbookDescription')]",        
+                "publishContentLink": {
                   "uri": "[variables('registerDSCRunbookUri')]",
                   "version": "1.0.0.0"
                 }
               }
-            }
           },
           {
             "name": "[variables('newHWVMRunbookName')]",
