@@ -2,436 +2,443 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "vmName": {
+    "nameRoot" {
       "type": "string",
       "metadata": {
         "description": "Name of the virtual machine"
       },
-      "defaultValue": "[concat('vm-', uniqueString('az') ) ]"
+      "defaultValue": "[uniqueString('az')]",
     },
-    "adminUsername": {
-      "type": "string",
-      "metadata": {
-        "description": "Admin user name for the virtual machine"
-      }
-    },
-    "adminPassword": {
-      "type": "securestring",
-      "metadata": {
-        "description": "Admin user password for virtual machine"
-      }
-    },
-    "subscriptionId": {
-      "type": "string",
-      "metadata": {
-        "description": "your Azure subscription Id"
-      }
-    },
-    "ghURL": {
-      "type": "string",
-      "metadata": {
-        "description": "Your GitHub repo"
-      },
-      "defaultValue": "https://raw.githubusercontent.com/tescales/azure-scaffold/master/"
-    },
-    "aadappname": {
-      "type": "string",
-      "metadata": {
-        "description": "name of aad app"
-      }
-    },
-    "vmSize": {
-      "type": "string",
-      "metadata": {
-        "description": "Desired Size of the VM."
-      },
-      "allowedValues": [
-        "Standard_A2",
-        "Standard_A3",
-        "Standard_A2m_v2",
-        "Standard_A4m_v2",
-        "Standard_NV6",
-        "defaultValue",
-        "Standard_DS2"
-      ],
-      "defaultValue": "Standard_A2m_v2"
-    },
-    "ImagePublisher": {
-      "type": "string",
-      "defaultValue": "MicrosoftVisualStudio",
-      "allowedValues": [ "MicrosoftWindowsServer", "MicrosoftVisualStudio" ]
-    },
-    "vmVisualStudioVersion": {
-      "type": "string",
-      "defaultValue": "VS-2015-Comm-VSU3-AzureSDK-291-WS2012R2",
-      "allowedValues": [
-        "VS-2015-Comm-AzureSDK-2.9-W10T-Win10-N",
-        "VS-2015-Comm-AzureSDK-2.9-WS2012R2",
-        "VS-2015-Comm-VSU3-AzureSDK-291-Win10-N",
-        "VS-2015-Comm-VSU3-AzureSDK-291-WS2012R2",
-        "VS-2015-Ent-AzureSDK-2.9-WS2012R2",
-        "VS-2015-Ent-AzureSDK-29-W10T-Win10-N",
-        "VS-2015-Ent-VSU3-AzureSDK-291-Win10-N",
-        "VS-2015-Ent-VSU3-AzureSDK-291-WS2012R2"
-      ],
-      "metadata": {
-        "description": "Which version of Visual Studio you would like to deploy"
-      }
-    },
-    "aadClientID": {
-      "type": "string",
-      "metadata": {
-        "description": "Client ID of AAD app which has permissions to KeyVault"
-      }
-    },
-    "aadClientSecret": {
-      "type": "securestring",
-      "metadata": {
-        "description": "Client Secret of AAD app which has permissions to KeyVault"
-      }
-    },
-    "aadTenantId": {
-      "type": "string",
-      "metadata": {
-        "description": "AzureAD TenantId"
-      }
-    },
-    "useExistingKek": {
-      "type": "string",
-      "defaultValue": "nokek",
-      "allowedValues": [
-        "nokek",
-        "kek"
-      ],
-      "metadata": {
-        "description": "Select kek if the secret should be encrypted with a key encryption key and pass explicit keyEncryptionKeyURL. For nokek, you can keep keyEncryptionKeyURL empty."
-      }
-    },
-    "keyEncryptionKeyURL": {
-      "type": "string",
-      "defaultValue": "",
-      "metadata": {
-        "description": "URL of the KeyEncryptionKey used to encrypt the volume encryption key"
-      }
-    },
-    "officeVersion": {
-      "type": "string",
-      "defaultValue": "Office2016",
-      "allowedValues": [
-        "Office2016",
-        "Office2013"
-      ],
-      "metadata": {
-        "description": "Which version of Office would you would like to deploy"
-      }
-    },
-    "setupOfficeScriptFileName": {
-      "type": "string",
-      "defaultValue": "DeployO365SilentWithVersion.ps1",
-      "metadata": {
-        "description": "PowerShell script name to execute"
-      }
-    },
-    "_artifactsLocation": {
-      "type": "string",
-      "defaultValue": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/visual-studio-dev-vm-O365/scripts/",
-      "metadata": {
-        "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
-      }
-    }
-  },
-  "variables": {
-    "imagePublisher": "[parameters('ImagePublisher')]",
-    "imageOffer": "WindowsServer",
-    "osSku": "2012-R2-Datacenter",
-    "osDiskName": "[concat('osdisk-', skip(parameters('vmname'), 3) )]",
-    "vNetName": "[concat('vn-',skip(parameters('vmname'), 3) )]",
-    "subnetName": "[concat('sn-',skip(parameters('vmname'), 3) )]",
-    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('vNetName'))]",
-    "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]",
-    "dnsNameForPublicIP": "[toLower(parameters('vmName'))]",
-    "publicIPAddressName": "[toLower(concat('pip-',parameters('vmName')))]",
-    "publicIPAddressType": "Dynamic",
-    "nicName": "[toLower(concat('nic-',skip(parameters('vmname'), 3) ))]",
-    "automationName": "[concat('aa-', skip(parameters('vmname'), 3) )]",
-    "automationUser": "username",
-    "automationPass": "password",
-    "keyVaultName": "[concat('kv-',skip(parameters('vmname'), 3) )]",
-    "keyVaultURL": "[concat('https://', variables('keyVaultName'), '.vault.azure.net/')]",
-    "keyVaultResourceID": "[concat(subscription().id,'/resourceGroups/',resourceGroup().name,'/providers/Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
-    "setupChocolatelyScriptLocation": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/visual-studio-dev-vm-chocolatey/scripts/",
-    "setupChocolateyScriptFileName": "SetupChocolatey.ps1",
-    "chocoPackages": "boxstarter,googlechrome,adobereader,notepadplusplus.install",
-    "chocoScript": "https://chocolatey.org/install.ps1",
-    "chocoScriptFile": "install.ps1"
-  },
-
-  "resources": [
-    {
-      "name": "[variables('automationName')]",
-      "type": "Microsoft.Automation/automationAccounts",
-      "apiVersion": "2015-10-31",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [],
-      "tags": {},
-      "properties": {
-        "sku": {
-          "name": "Free"
-        }
-      }
-    },
-    {
-      "name": "[variables('vNetName')]",
-      "type": "Microsoft.Network/virtualNetworks",
-      "location": "[resourceGroup().location]",
-      "apiVersion": "2016-12-01",
-      "dependsOn": [],
-      "tags": {
-        "displayName": "[variables('vNetName')]"
-      },
-      "properties": {
-        "addressSpace": {
-          "addressPrefixes": [
-            "10.0.0.0/16"
-          ]
+      "vmName": {
+        "type": "string",
+        "metadata": {
+          "description": "Name of the virtual machine"
         },
-        "subnets": [
-          {
-            "name": "[variables('subnetName')]",
-            "properties": {
-              "addressPrefix": "10.0.0.0/24"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "apiVersion": "2016-12-01",
-      "type": "Microsoft.Network/publicIPAddresses",
-      "name": "[variables('publicIPAddressName')]",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
-        "dnsSettings": {
-          "domainNameLabel": "[variables('dnsNameForPublicIP')]"
+        "defaultValue": "[concat('vm-', parameters('nameRoot') ) ]"
+      },
+      "adminUsername": {
+        "type": "string",
+        "metadata": {
+          "description": "Admin user name for the virtual machine"
+        }
+      },
+      "adminPassword": {
+        "type": "securestring",
+        "metadata": {
+          "description": "Admin user password for virtual machine"
+        }
+      },
+      "subscriptionId": {
+        "type": "string",
+        "metadata": {
+          "description": "your Azure subscription Id"
+        }
+      },
+      "ghURL": {
+        "type": "string",
+        "metadata": {
+          "description": "Your GitHub repo"
+        },
+        "defaultValue": "https://raw.githubusercontent.com/tescales/azure-scaffold/master/"
+      },
+      "aadappname": {
+        "type": "string",
+        "metadata": {
+          "description": "name of aad app"
+        }
+      },
+      "vmSize": {
+        "type": "string",
+        "metadata": {
+          "description": "Desired Size of the VM."
+        },
+        "allowedValues": [
+          "Standard_A2",
+          "Standard_A3",
+          "Standard_A2m_v2",
+          "Standard_A4m_v2",
+          "Standard_NV6",
+          "defaultValue",
+          "Standard_DS2"
+        ],
+        "defaultValue": "Standard_A2m_v2"
+      },
+      "ImagePublisher": {
+        "type": "string",
+        "defaultValue": "MicrosoftVisualStudio",
+        "allowedValues": [ "MicrosoftWindowsServer", "MicrosoftVisualStudio" ]
+      },
+      "vmVisualStudioVersion": {
+        "type": "string",
+        "defaultValue": "VS-2015-Comm-VSU3-AzureSDK-291-WS2012R2",
+        "allowedValues": [
+          "VS-2015-Comm-AzureSDK-2.9-W10T-Win10-N",
+          "VS-2015-Comm-AzureSDK-2.9-WS2012R2",
+          "VS-2015-Comm-VSU3-AzureSDK-291-Win10-N",
+          "VS-2015-Comm-VSU3-AzureSDK-291-WS2012R2",
+          "VS-2015-Ent-AzureSDK-2.9-WS2012R2",
+          "VS-2015-Ent-AzureSDK-29-W10T-Win10-N",
+          "VS-2015-Ent-VSU3-AzureSDK-291-Win10-N",
+          "VS-2015-Ent-VSU3-AzureSDK-291-WS2012R2"
+        ],
+        "metadata": {
+          "description": "Which version of Visual Studio you would like to deploy"
+        }
+      },
+      "aadClientID": {
+        "type": "string",
+        "metadata": {
+          "description": "Client ID of AAD app which has permissions to KeyVault"
+        }
+      },
+      "aadClientSecret": {
+        "type": "securestring",
+        "metadata": {
+          "description": "Client Secret of AAD app which has permissions to KeyVault"
+        }
+      },
+      "aadTenantId": {
+        "type": "string",
+        "metadata": {
+          "description": "AzureAD TenantId"
+        }
+      },
+      "useExistingKek": {
+        "type": "string",
+        "defaultValue": "nokek",
+        "allowedValues": [
+          "nokek",
+          "kek"
+        ],
+        "metadata": {
+          "description": "Select kek if the secret should be encrypted with a key encryption key and pass explicit keyEncryptionKeyURL. For nokek, you can keep keyEncryptionKeyURL empty."
+        }
+      },
+      "keyEncryptionKeyURL": {
+        "type": "string",
+        "defaultValue": "",
+        "metadata": {
+          "description": "URL of the KeyEncryptionKey used to encrypt the volume encryption key"
+        }
+      },
+      "officeVersion": {
+        "type": "string",
+        "defaultValue": "Office2016",
+        "allowedValues": [
+          "Office2016",
+          "Office2013"
+        ],
+        "metadata": {
+          "description": "Which version of Office would you would like to deploy"
+        }
+      },
+      "setupOfficeScriptFileName": {
+        "type": "string",
+        "defaultValue": "DeployO365SilentWithVersion.ps1",
+        "metadata": {
+          "description": "PowerShell script name to execute"
+        }
+      },
+      "_artifactsLocation": {
+        "type": "string",
+        "defaultValue": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/visual-studio-dev-vm-O365/scripts/",
+        "metadata": {
+          "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
         }
       }
     },
-    {
-      "apiVersion": "2016-12-01",
-      "type": "Microsoft.Network/networkInterfaces",
-      "name": "[variables('nicName')]",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]"
-      ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "properties": {
-              "privateIPAllocationMethod": "Dynamic",
-              "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
-              },
-              "subnet": {
-                "id": "[variables('subnetRef')]"
+    "variables": {
+      "imagePublisher": "[parameters('ImagePublisher')]",
+      "imageOffer": "WindowsServer",
+      "osSku": "2012-R2-Datacenter",
+      "osDiskName": "[concat('osdisk-', skip(parameters('vmname'), 3) )]",
+      "vNetName": "[concat('vn-',skip(parameters('vmname'), 3) )]",
+      "subnetName": "[concat('sn-',skip(parameters('vmname'), 3) )]",
+      "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('vNetName'))]",
+      "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]",
+      "dnsNameForPublicIP": "[toLower(parameters('vmName'))]",
+      "publicIPAddressName": "[toLower(concat('pip-',parameters('vmName')))]",
+      "publicIPAddressType": "Dynamic",
+      "nicName": "[toLower(concat('nic-',skip(parameters('vmname'), 3) ))]",
+      "automationName": "[concat('aa-', skip(parameters('vmname'), 3) )]",
+      "automationUser": "username",
+      "automationPass": "password",
+      "keyVaultName": "[concat('kv-',skip(parameters('vmname'), 3) )]",
+      "keyVaultURL": "[concat('https://', variables('keyVaultName'), '.vault.azure.net/')]",
+      "keyVaultResourceID": "[concat(subscription().id,'/resourceGroups/',resourceGroup().name,'/providers/Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
+      "setupChocolatelyScriptLocation": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/visual-studio-dev-vm-chocolatey/scripts/",
+      "setupChocolateyScriptFileName": "SetupChocolatey.ps1",
+      "chocoPackages": "boxstarter,googlechrome,adobereader,notepadplusplus.install",
+      "chocoScript": "https://chocolatey.org/install.ps1",
+      "chocoScriptFile": "install.ps1"
+    },
+
+    "resources": [
+      {
+        "name": "[variables('automationName')]",
+        "type": "Microsoft.Automation/automationAccounts",
+        "apiVersion": "2015-10-31",
+        "location": "[resourceGroup().location]",
+        "dependsOn": [],
+        "tags": {},
+        "properties": {
+          "sku": {
+            "name": "Free"
+          }
+        }
+      },
+      {
+        "name": "[variables('vNetName')]",
+        "type": "Microsoft.Network/virtualNetworks",
+        "location": "[resourceGroup().location]",
+        "apiVersion": "2016-12-01",
+        "dependsOn": [],
+        "tags": {
+          "displayName": "[variables('vNetName')]"
+        },
+        "properties": {
+          "addressSpace": {
+            "addressPrefixes": [
+              "10.0.0.0/16"
+            ]
+          },
+          "subnets": [
+            {
+              "name": "[variables('subnetName')]",
+              "properties": {
+                "addressPrefix": "10.0.0.0/24"
               }
             }
-          }
-        ]
-      }
-    },
-    {
-      "apiVersion": "2016-04-30-preview",
-      "type": "Microsoft.Compute/virtualMachines",
-      "name": "[parameters('vmName')]",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
-      ],
-      "properties": {
-        "hardwareProfile": {
-          "vmSize": "[parameters('vmSize')]"
-        },
-        "osProfile": {
-          "computerName": "[parameters('vmName')]",
-          "adminUsername": "[parameters('adminUsername')]",
-          "adminPassword": "[parameters('adminPassword')]"
-        },
-        "storageProfile": {
-          "imageReference": {
-            "publisher": "[variables('imagePublisher')]",
-            "offer": "[variables('imageOffer')]",
-            "sku": "[variables('osSku')]",
-            "version": "latest"
-          },
-          "osDisk": {
-            "name": "[variables('osDiskName')]",
-            "createOption": "FromImage"
-          }
-        },
-        "networkProfile": {
-          "networkInterfaces": [
-            {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
-            }
           ]
         }
       },
-      "resources": [
-
-      ]
-    },
-    {
-      "apiVersion": "2015-01-01",
-      "name": "jobGuid",
-      "type": "Microsoft.Resources/deployments",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "https://raw.githubusercontent.com/davidjrh/azurerm-newguid/master/NewGuid.json",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "seed": { "value": "0" }
+      {
+        "apiVersion": "2016-12-01",
+        "type": "Microsoft.Network/publicIPAddresses",
+        "name": "[variables('publicIPAddressName')]",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
+          "dnsSettings": {
+            "domainNameLabel": "[variables('dnsNameForPublicIP')]"
+          }
         }
-      }
-    },
-    {
-      "name": "DeployKeyVault",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-01-01",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[concat(parameters('ghURL'), '/templates/keyvault/azuredeploy.json')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "keyVaultName": {
-            "value": "[variables('keyVaultName')]"
-          },
-
-          "tenantId": {
-            "value": "[parameters('aadTenantId')]"
-          },
-
-          "accessPolicies": {
-            "value": [
-              {
-                "tenantId": "[parameters('aadTenantId')]",
-                "objectId": "[parameters('aadClientID')]",
-                "displayname": "[parameters('aadappname')]",
-                "permissions": {
-                  "keys": [ "all" ],
-                  "secrets": [ "all" ]
+      },
+      {
+        "apiVersion": "2016-12-01",
+        "type": "Microsoft.Network/networkInterfaces",
+        "name": "[variables('nicName')]",
+        "location": "[resourceGroup().location]",
+        "dependsOn": [
+          "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]"
+        ],
+        "properties": {
+          "ipConfigurations": [
+            {
+              "name": "ipconfig1",
+              "properties": {
+                "privateIPAllocationMethod": "Dynamic",
+                "publicIPAddress": {
+                  "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+                },
+                "subnet": {
+                  "id": "[variables('subnetRef')]"
                 }
               }
-            ]
+            }
+          ]
+        }
+      },
+      {
+        "apiVersion": "2016-04-30-preview",
+        "type": "Microsoft.Compute/virtualMachines",
+        "name": "[parameters('vmName')]",
+        "location": "[resourceGroup().location]",
+        "dependsOn": [
+          "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
+        ],
+        "properties": {
+          "hardwareProfile": {
+            "vmSize": "[parameters('vmSize')]"
           },
-          "secrets": {
-            "value": [
+          "osProfile": {
+            "computerName": "[parameters('vmName')]",
+            "adminUsername": "[parameters('adminUsername')]",
+            "adminPassword": "[parameters('adminPassword')]"
+          },
+          "storageProfile": {
+            "imageReference": {
+              "publisher": "[variables('imagePublisher')]",
+              "offer": "[variables('imageOffer')]",
+              "sku": "[variables('osSku')]",
+              "version": "latest"
+            },
+            "osDisk": {
+              "name": "[variables('osDiskName')]",
+              "createOption": "FromImage"
+            }
+          },
+          "networkProfile": {
+            "networkInterfaces": [
               {
-                "secretName": "ConnectionString",
-                "secretValue": "SecureString1"
+                "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
               }
             ]
-          },
-          "enabledForDeployment": {
-            "value": true
-          },
+          }
+        },
+        "resources": [
 
-          "enabledForTemplateDeployment": {
-            "value": true
+        ]
+      },
+      {
+        "apiVersion": "2015-01-01",
+        "name": "jobGuid",
+        "type": "Microsoft.Resources/deployments",
+        "properties": {
+          "mode": "Incremental",
+          "templateLink": {
+            "uri": "https://raw.githubusercontent.com/davidjrh/azurerm-newguid/master/NewGuid.json",
+            "contentVersion": "1.0.0.0"
           },
-          "enableVaultForVolumeEncryption": {
-            "value": true
+          "parameters": {
+            "seed": { "value": "0" }
+          }
+        }
+      },
+      {
+        "name": "DeployKeyVault",
+        "type": "Microsoft.Resources/deployments",
+        "apiVersion": "2015-01-01",
+        "properties": {
+          "mode": "Incremental",
+          "templateLink": {
+            "uri": "[concat(parameters('ghURL'), '/templates/keyvault/azuredeploy.json')]",
+            "contentVersion": "1.0.0.0"
+          },
+          "parameters": {
+            "keyVaultName": {
+              "value": "[variables('keyVaultName')]"
+            },
+
+            "tenantId": {
+              "value": "[parameters('aadTenantId')]"
+            },
+
+            "accessPolicies": {
+              "value": [
+                {
+                  "tenantId": "[parameters('aadTenantId')]",
+                  "objectId": "[parameters('aadClientID')]",
+                  "displayname": "[parameters('aadappname')]",
+                  "permissions": {
+                    "keys": [ "all" ],
+                    "secrets": [ "all" ]
+                  }
+                }
+              ]
+            },
+            "secrets": {
+              "value": [
+                {
+                  "secretName": "ConnectionString",
+                  "secretValue": "SecureString1"
+                }
+              ]
+            },
+            "enabledForDeployment": {
+              "value": true
+            },
+
+            "enabledForTemplateDeployment": {
+              "value": true
+            },
+            "enableVaultForVolumeEncryption": {
+              "value": true
+            }
+          }
+        }
+      },
+      {
+        "name": "DeployAutomationPacks",
+        "type": "Microsoft.Resources/deployments",
+        "apiVersion": "2015-01-01",
+        "dependsOn": [
+          "[concat('Microsoft.Automation/automationAccounts/', variables('automationName'))]"
+        ],
+        "properties": {
+          "mode": "Incremental",
+          "templateLink": {
+            "uri": "[concat(parameters('ghURL'), '/templates/automation/azuredeploy.json')]",
+            "contentVersion": "1.0.0.0"
+          },
+          "parameters": {
+            "accountName": { "value": "[variables('automationName')]" },
+            "regionId": { "value": "East US 2" },
+            "userName": { "value": "[parameters('aadClientID')]" },
+            "password": { "value": "[parameters('aadClientSecret')]" },
+            "subscriptionIdValue": { "value": "[parameters('subscriptionId')]" },
+            "runbookJobGuid": { "value": "[reference('jobGuid').outputs.guid.value]" },
+            "scheduleLinkGuid": { "value": "[parameters('subscriptionId')]" }
+          }
+        }
+      },
+      {
+        "name": "DeployDSCAutomation",
+        "type": "Microsoft.Resources/deployments",
+        "apiVersion": "2015-01-01",
+        "dependsOn": [
+          "[concat('Microsoft.Automation/automationAccounts/', variables('automationName'))]"
+        ],
+        "properties": {
+          "mode": "Incremental",
+          "templateLink": {
+            "uri": "[concat(parameters('ghURL'), '/templates/dsc/azuredeploy.json')]",
+            "contentVersion": "1.0.0.0"
+          },
+          "parameters": {
+            "accountName": { "value": "[variables('automationName')]" },
+            "configurationName": { "value": "InstallChoco" },
+            "configurationUri": { "value": "https://raw.githubusercontent.com/tescales/devDesktop/master/installChoco.ps1" },
+            "configurationDescription": { "value": "Installs Chocolatey" },
+            "jobId": { "value": "[parameters('aadTenantId')]" }
+          }
+        }
+      },
+      {
+        "name": "UpdateEncryptionSettings",
+        "type": "Microsoft.Resources/deployments",
+        "apiVersion": "2015-01-01",
+        "dependsOn": [
+          "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
+        ],
+        "properties": {
+          "mode": "Incremental",
+          "templateLink": {
+            "uri": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/201-encrypt-create-new-vm-gallery-image-managed-disks/azuredeploy.json",
+            "contentVersion": "1.0.0.0"
+          },
+          "parameters": {
+            "adminUsername": { "value": "[parameters('adminUsername')" },
+            "adminPassword": { "value": "[parameters('adminPassword')" },
+            "virtualNetworkName": { "value": "[variables('vNetName')" },
+            "subnetName": { "value": "[variables('subnetName')" },
+            "vmName": {
+              "value": "[parameters('vmName')]"
+            },
+            "aadClientID": {
+              "value": "[parameters('aadClientID')]"
+            },
+            "aadClientSecret": {
+              "value": "[parameters('aadClientSecret')]"
+            },
+            "keyVaultName": {
+              "value": "[variables('keyVaultName')]"
+            },
+            "keyVaultResourceGroup": {
+              "value": "[resourceGroup().name]"
+            }
           }
         }
       }
-    },
-    {
-      "name": "DeployAutomationPacks",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-01-01",
-      "dependsOn": [
-        "[concat('Microsoft.Automation/automationAccounts/', variables('automationName'))]"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[concat(parameters('ghURL'), '/templates/automation/azuredeploy.json')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "accountName": { "value": "[variables('automationName')]" },
-          "regionId": { "value": "East US 2" },
-          "userName": { "value": "[parameters('aadClientID')]" },
-          "password": { "value": "[parameters('aadClientSecret')]" },
-          "subscriptionIdValue": { "value": "[parameters('subscriptionId')]" },
-          "runbookJobGuid": { "value": "[parameters('subscriptionId')]" },
-          "scheduleLinkGuid": { "value": "[parameters('subscriptionId')]" }
-        }
-      }
-    },
-    {
-      "name": "DeployDSCAutomation",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-01-01",
-      "dependsOn": [
-        "[concat('Microsoft.Automation/automationAccounts/', variables('automationName'))]"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[concat(parameters('ghURL'), '/templates/dsc/azuredeploy.json')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "accountName": { "value": "[variables('automationName')]" },
-          "configurationName": { "value": "InstallChoco" },
-          "configurationUri": { "value": "https://raw.githubusercontent.com/tescales/devDesktop/master/installChoco.ps1" },
-          "configurationDescription": { "value": "Installs Chocolatey" },
-          "jobId": { "value": "[parameters('aadTenantId')]" }
-        }
-      }
-    },
-    {
-      "name": "UpdateEncryptionSettings",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-01-01",
-      "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/201-encrypt-create-new-vm-gallery-image-managed-disks/azuredeploy.json",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "adminUsername": { "value": "[parameters('adminUsername')" },
-          "adminPassword": { "value": "[parameters('adminPassword')" },
-          "virtualNetworkName": { "value": "[variables('vNetName')" },
-          "subnetName": { "value": "[variables('subnetName')" },
-          "vmName": {
-            "value": "[parameters('vmName')]"
-          },
-          "aadClientID": {
-            "value": "[parameters('aadClientID')]"
-          },
-          "aadClientSecret": {
-            "value": "[parameters('aadClientSecret')]"
-          },
-          "keyVaultName": {
-            "value": "[variables('keyVaultName')]"
-          },
-          "keyVaultResourceGroup": {
-            "value": "[resourceGroup().name]"
-          }
-        }
-      }
-    }
-  ]
-    }
+    ]
+  }
