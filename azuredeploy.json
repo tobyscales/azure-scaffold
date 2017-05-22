@@ -372,7 +372,6 @@
           "registrationKey": { "value": "123" },
           "registrationUrl": { "value": "http://test" },
           "nodeConfigurationName": { "value": "InstallChoco" },
-          "configurationMode": { "value": "Installs Chocolatey" },
           "timestamp": { "value": "11/22/2017 1:22:33 PM" }
         }
       }

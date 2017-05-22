@@ -82,7 +82,7 @@
         "resources": [
           {
             "type": "Microsoft.Automation/automationAccounts/connections",
-            "name": "[concat('parameters('accountName'),'/AzureRunAsConnection')]",
+            "name": "[concat(parameters('accountName'),'/AzureRunAsConnection')]",
             "apiVersion": "2015-10-31",
             "properties": {
               "description": null,
