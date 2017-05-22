@@ -166,7 +166,7 @@
           },
 
           {
-            "name": "[concat(parameters('accountName'), '/', variables('aadClientId'))]",
+            "name": "[concat(parameters('accountName'), '/', parameters('subscriptionIdValue'))]",
             "type": "Microsoft.Automation/automationAccounts/jobs",
             "apiVersion": "2015-10-31",
             "location": "[parameters('regionId')]",
