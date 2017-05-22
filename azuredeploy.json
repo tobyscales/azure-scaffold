@@ -355,28 +355,6 @@
       }
     },
     {
-      "name": "RegisterDSCAutomation",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-01-01",
-      "dependsOn": [
-        "[concat('Microsoft.Automation/automationAccounts/', variables('automationName'))]"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/dsc-extension-azure-automation-pullserver/azuredeploy.json",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "vmname": {"value": "variables['vmname']"},
-          "registrationKey": { "value": "123" },
-          "registrationUrl": { "value": "http://test" },
-          "nodeConfigurationName": { "value": "InstallChoco" },
-          "timestamp": { "value": "11/22/2017 1:22:33 PM" }
-        }
-      }
-    },
-    {
       "name": "DeployDSCAutomation",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
