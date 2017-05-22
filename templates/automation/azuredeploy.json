@@ -171,7 +171,7 @@
             "apiVersion": "2015-10-31",
             "location": "[parameters('regionId')]",
             "dependsOn": [
-              "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'), '/runbooks/', variables('newHWVMRunbookName')]"
+              "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'), '/runbooks/', variables('newHWVMRunbookName'))]"
             ],
             "tags": {},
             "properties": {
