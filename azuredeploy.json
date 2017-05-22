@@ -16,6 +16,13 @@
       },
       "defaultValue": "vn-default"
     },
+    "kvName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the key vault"
+      },
+      "defaultValue": "kv-default"
+    },
     "adminUsername": {
       "type": "string",
       "metadata": {
@@ -302,7 +309,7 @@
         },
         "parameters": {
           "keyVaultName": {
-            "value": "[variables('keyVaultName')]"
+            "value": "[parameters('kvName')]"
           },
 
           "tenantId": {
@@ -414,7 +421,7 @@
             "value": "[parameters('aadClientSecret')]"
           },
           "keyVaultName": {
-            "value": "[variables('keyVaultName')]"
+            "value": "[parameters('kvName')]"
           },
           "keyVaultResourceGroup": {
             "value": "[resourceGroup().name]"
