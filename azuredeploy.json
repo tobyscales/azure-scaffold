@@ -386,7 +386,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "https://github.com/Azure/azure-quickstart-templates/tree/master/201-encrypt-create-new-vm-gallery-image-managed-disks",
+          "uri": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/201-encrypt-create-new-vm-gallery-image-managed-disks/azuredeploy.json",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
