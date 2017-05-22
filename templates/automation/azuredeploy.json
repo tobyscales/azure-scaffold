@@ -166,7 +166,7 @@
           },
 
           {
-            "name": "[concat( 'job-', variables('newHWVMRunbookName') )]",
+            "name": "[concat(parameters('accountName'), '/', variables('newHWVMRunbookName').JobGuid)]",
             "type": "Microsoft.Automation/automationAccounts/jobs",
             "apiVersion": "2015-10-31",
             "location": "[parameters('regionId')]",
