@@ -81,40 +81,7 @@
 
   },
     "resources": [
-        {
-          "apiVersion": "2015-01-01",
-          "name": "jobGuid",
-          "type": "Microsoft.Resources/deployments",
-          "properties": {
-            "mode": "incremental",
-            "templateLink": {
-              "uri": "https://raw.githubusercontent.com/davidjrh/azurerm-newguid/master/NewGuid.json",
-              "contentVersion": "1.0.0.0"
-            },
-            "parameters": {
-              "seed": {
-                "value": "0"
-              }
-            }
-          }
-        },
-      {
-        "apiVersion": "2015-01-01",
-        "name": "scheduleGuid",
-        "type": "Microsoft.Resources/deployments",
-        "properties": {
-          "mode": "incremental",
-          "templateLink": {
-            "uri": "https://raw.githubusercontent.com/davidjrh/azurerm-newguid/master/NewGuid.json",
-            "contentVersion": "1.0.0.0"
-          },
-          "parameters": {
-            "seed": {
-              "value": "1"
-            }
-          }
-        }
-      },
+        
       {
         "name": "[parameters('accountName')]",
         "type": "Microsoft.Automation/automationAccounts",
@@ -214,7 +181,7 @@
           },
 
           {
-            "name": "[concat(parameters('accountName'), '/', reference('jobGuid').outputs.guid.value )]",
+            "name": "[concat(parameters('accountName'), '/', parameters('runbookjobGuid') )]",
             "type": "Microsoft.Automation/automationAccounts/jobs",
             "apiVersion": "2015-10-31",
             "location": "[parameters('regionId')]",

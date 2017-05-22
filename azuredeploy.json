@@ -354,7 +354,9 @@
           "regionId": { "value": "East US 2" },
           "userName": { "value": "[parameters('aadClientID')]" },
           "password": { "value": "[parameters('aadClientSecret')]" },
-          "subscriptionIdValue": { "value": "[parameters('subscriptionId')]" }
+          "subscriptionIdValue": { "value": "[parameters('subscriptionId')]" },
+          "runbookJobGuid": { "value": "[parameters('subscriptionId')]" }
+
         }
       }
     },
