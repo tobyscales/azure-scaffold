@@ -392,6 +392,7 @@
         "parameters": {
           "adminUsername": { "value": "[parameters('adminUsername')" },
           "adminPassword": { "value": "[parameters('adminPassword')" },
+          "vnetName": { "value": "[variables('vNetName')" },
           "vmName": {
             "value": "[parameters('vmName')]"
           },
