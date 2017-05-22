@@ -193,11 +193,6 @@
               "runbook": {
                 "name": "[variables('newHWVMRunbookName').Name]"
               }
-            },
-            "parameters": {
-              "targetSubscriptionId": "[parameters('subscriptionIdValue')]",
-              "resourcegroup": "[resourceGroup().name]",
-              "automationaccount": "[parameters('accountName')]"
             }
           },
 
