@@ -284,6 +284,21 @@
       ]
     },
     {
+      "apiVersion": "2015-01-01",
+      "name": "jobGuid",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "https://raw.githubusercontent.com/davidjrh/azurerm-newguid/master/NewGuid.json",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "seed": { "value": "0" }
+        }
+      }
+    },
+    {
       "name": "DeployKeyVault",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
@@ -355,8 +370,8 @@
           "userName": { "value": "[parameters('aadClientID')]" },
           "password": { "value": "[parameters('aadClientSecret')]" },
           "subscriptionIdValue": { "value": "[parameters('subscriptionId')]" },
-          "runbookJobGuid": { "value": "[parameters('subscriptionId')]" }
-
+          "runbookJobGuid": { "value": "[parameters('subscriptionId')]" },
+          "scheduleLinkGuid": { "value": "[parameters('subscriptionId')]" }
         }
       }
     },
