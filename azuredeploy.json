@@ -411,6 +411,7 @@
           "adminUsername": { "value": "[parameters('adminUsername')" },
           "adminPassword": { "value": "[parameters('adminPassword')" },
           "virtualNetworkName": { "value": "[parameters('vnName')" },
+          "subnetName": { "value": "[variables('subnetName')" },
           "vmName": {
             "value": "[parameters('vmName')]"
           },
