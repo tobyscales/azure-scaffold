@@ -2,12 +2,12 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "nameRoot" {
+    "nameRoot": {
       "type": "string",
       "metadata": {
         "description": "Name of the virtual machine"
       },
-      "defaultValue": "[uniqueString('az')]",
+      "defaultValue": "[uniqueString('az')]"
     },
       "vmName": {
         "type": "string",
