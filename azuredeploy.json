@@ -9,6 +9,13 @@
       },
       "defaultValue": "[ uniqueString('az') ]"
     },
+    "vnName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the virtual network"
+      },
+      "defaultValue": "vn-default"
+    },
     "adminUsername": {
       "type": "string",
       "metadata": {
@@ -35,10 +42,10 @@
       "defaultValue": "https://raw.githubusercontent.com/tescales/azure-scaffold/master/"
     },
     "aadappname": {
-        "type": "string",
-        "metadata": {
-          "description": "name of aad app"
-        }
+      "type": "string",
+      "metadata": {
+        "description": "name of aad app"
+      }
     },
     "vmSize": {
       "type": "string",
@@ -56,7 +63,11 @@
       ],
       "defaultValue": "Standard_A2m_v2"
     },
-    "ImagePublisher":  {"type": "string", "defaultValue": "MicrosoftVisualStudio", "allowedValues": ["MicrosoftWindowsServer", "MicrosoftVisualStudio"]},
+    "ImagePublisher": {
+      "type": "string",
+      "defaultValue": "MicrosoftVisualStudio",
+      "allowedValues": [ "MicrosoftWindowsServer", "MicrosoftVisualStudio" ]
+    },
     "vmVisualStudioVersion": {
       "type": "string",
       "defaultValue": "VS-2015-Comm-VSU3-AzureSDK-291-WS2012R2",
@@ -87,7 +98,7 @@
       }
     },
     "aadTenantId": {
-    "type": "string",
+      "type": "string",
       "metadata": {
         "description": "AzureAD TenantId"
       }
@@ -177,13 +188,13 @@
       }
     },
     {
-      "name": "[variables('vNetName')]",
+      "name": "[parameters('vnName')]",
       "type": "Microsoft.Network/virtualNetworks",
       "location": "[resourceGroup().location]",
       "apiVersion": "2016-12-01",
       "dependsOn": [],
       "tags": {
-        "displayName": "[variables('vNetName')]"
+        "displayName": "[parameters('vnName')]"
       },
       "properties": {
         "addressSpace": {
@@ -392,7 +403,7 @@
         "parameters": {
           "adminUsername": { "value": "[parameters('adminUsername')" },
           "adminPassword": { "value": "[parameters('adminPassword')" },
-          "vnetName": { "value": "[variables('vNetName')" },
+          "vnetName": { "value": "[parameters('vnName')" },
           "vmName": {
             "value": "[parameters('vmName')]"
           },
