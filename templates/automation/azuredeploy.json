@@ -1,45 +1,59 @@
 ﻿{
     "$schema": "http://schemas.microsoft.org/azure/deploymentTemplate?api-version=2015-01-01-preview#",
     "contentVersion": "1.0.0.0",
-    "parameters": {
-        "accountName": {
-            "type": "string",
-          "metadata": {
-            "description": "The name of the Azure Automation account to deploy to."
-          }
-        },
-        "regionId": {
-            "type": "string",
-            "allowedValues": [
-                "Japan East",
-                "East US 2",
-                "West Europe",
-                "Southeast Asia",
-                "South Central US"
-            ],
-            "metadata": {
-                "description": "The region to deploy the Automation account in."
-            }
-        },
-        "userName": {
-            "type": "string",
-            "metadata": {
-                "description": "The username for the Azure Automation credential."
-            }
-        },
-        "password": {
-            "type": "secureString",
-            "metadata": {
-                "description": "The password for the Azure Automation credential."
-            }
-        },
-        "subscriptionIdValue": {
-            "type": "string",
-            "metadata": {
-                "description": "Your Azure subscription ID."
-            }
-        }
+  "parameters": {
+    "accountName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the Azure Automation account to deploy to."
+      }
     },
+    "regionId": {
+      "type": "string",
+      "allowedValues": [
+        "Japan East",
+        "East US 2",
+        "West Europe",
+        "Southeast Asia",
+        "South Central US"
+      ],
+      "metadata": {
+        "description": "The region to deploy the Automation account in."
+      }
+    },
+    "userName": {
+      "type": "string",
+      "metadata": {
+        "description": "The username for the Azure Automation credential."
+      }
+    },
+    "password": {
+      "type": "secureString",
+      "metadata": {
+        "description": "The password for the Azure Automation credential."
+      }
+    },
+    "scheduleLinkGuid": {
+      "type": "string",
+      "metadata": {
+        "description": "GUID for the schedule link to runbook.",
+        "control": "guid"
+      }
+    },
+    "runbookJobGuid": {
+      "type": "string",
+      "metadata": {
+        "description": "GUID for the runbook job.",
+        "control": "guid"
+      }
+    },
+    "subscriptionIdValue": {
+      "type": "string",
+      "metadata": {
+        "description": "Your Azure subscription ID."
+      }
+    }
+  },
   "variables": {
     "pricingTier": "Free",
 
@@ -68,6 +82,40 @@
   },
     "resources": [
       {
+        {
+          "apiVersion": "2015-01-01",
+          "name": "jobGuid",
+          "type": "Microsoft.Resources/deployments",
+          "properties": {
+            "mode": "incremental",
+            "templateLink": {
+              "uri": "https://raw.githubusercontent.com/davidjrh/azurerm-newguid/master/NewGuid.json",
+              "contentVersion": "1.0.0.0"
+            },
+            "parameters": {
+              "seed": {
+                "value": "0"
+              }
+            }
+          }
+        },
+        {
+          "apiVersion": "2015-01-01",
+          "name": "scheduleGuid",
+          "type": "Microsoft.Resources/deployments",
+          "properties": {
+            "mode": "incremental",
+            "templateLink": {
+              "uri": "https://raw.githubusercontent.com/davidjrh/azurerm-newguid/master/NewGuid.json",
+              "contentVersion": "1.0.0.0"
+            },
+            "parameters": {
+              "seed": {
+                "value": "1"
+              }
+            }
+          }
+        },
         "name": "[parameters('accountName')]",
         "type": "Microsoft.Automation/automationAccounts",
         "apiVersion": "2015-01-01-preview",
@@ -166,7 +214,7 @@
           },
 
           {
-            "name": "[concat(parameters('accountName'), '/', parameters('subscriptionIdValue') )]",
+            "name": "[concat(parameters('accountName'), '/', reference('jobGuid').outputs.guid.value )]",
             "type": "Microsoft.Automation/automationAccounts/jobs",
             "apiVersion": "2015-10-31",
             "location": "[parameters('regionId')]",
@@ -178,6 +226,11 @@
               "runbook": {
                 "name": "[variables('newHWVMRunbookName').Name]"
               }
+            },
+            "parameters": {
+              "targetSubscriptionId": "[parameters('subscriptionIdValue')]",
+              "resourcegroup": "[resourceGroup().name]",
+              "automationaccount": "[parameters('accountName')]"
             }
           },
 
