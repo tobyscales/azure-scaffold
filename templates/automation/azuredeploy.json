@@ -56,6 +56,12 @@
   },
   "variables": {
     "pricingTier": "Free",
+    "modules": [
+      {
+        "name": "cChoco",
+        "uri": "https://devopsgallerystorage.blob.core.windows.net/armtemplates/cChoco%5C2.3.1.0"
+      }
+    ],
     "runbooks": [
       {
         "name": "StartAzureV2VMs",
@@ -147,7 +153,18 @@
             "name": "deployScripts",
             "count": "[length(variables('runbooks'))]"
           }
-
+        },
+        {
+          "name": "[variables('modules').name]",
+          "type": "jobs",
+          "apiVersion": "2015-01-01-preview",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'))]"
+          ],
+          "properties": {
+            "contentLink": { "uri": "[variables('modules').name]" }
+          }
         },
         {
           "name": "[parameters('runbookJobGuid')]",
