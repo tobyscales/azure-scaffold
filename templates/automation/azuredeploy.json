@@ -181,22 +181,38 @@
         },
 
         {
-          "name": "[concat(parameters('accountName'), '/', parameters('runbookjobGuid') )]",
-          "type": "Microsoft.Automation/automationAccounts/jobs",
-          "apiVersion": "2015-10-31",
-          "location": "[parameters('regionId')]",
+          "name": "[parameters('runbookJobGuid')]",
+          "type": "jobs",
+          "apiVersion": "2015-01-01-preview",
+          "location": "[resourceGroup().location]",
           "dependsOn": [
             "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'))]",
-            "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'), '/runbooks/', variables('newHWVMRunbookName'))]"
+            "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'), '/runbooks/',variables('newHWVMRunbookName'))]"
           ],
-          "tags": {},
+          "tags": {
+            "key": "value"
+          },
           "properties": {
             "runbook": {
               "name": "[variables('newHWVMRunbookName')]"
             }
           }
         },
-
+        {
+          "name": "AzureRunAsConnection",
+          "type": "Microsoft.Automation/automationAccounts/connections",
+          "apiVersion": "2015-10-31",
+          "properties": {
+            "description": null,
+            "fieldDefinitionValues": null,
+            "connectionType": {
+              "name": "AzureServicePrincipal"
+            }
+          },
+          "dependsOn": [
+            "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'))]"
+          ]
+        },
         {
           "name": "[variables('credentialName')]",
           "type": "credentials",
