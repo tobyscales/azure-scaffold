@@ -157,7 +157,7 @@
     "publicIPAddressName": "[toLower(concat('pip-',skip(parameters('vmname'), 3)))]",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('vNetName'))]",
     "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]",
-    "dnsNameForPublicIP": "[toLower(parameters('vmName'))]",
+    "dnsNameForPublicIP": "[concat('dns-', skip(parameters('vmname'), 3) )]",
     "publicIPAddressType": "Dynamic",
     "nicName": "[toLower(concat('nic-',skip(parameters('vmname'), 3) ))]",
     "automationName": "[concat('aa-', skip(parameters('vmname'), 3) )]",
@@ -359,7 +359,7 @@
         }
       },
       {
-        "name": "DeployAutomationPacks",
+        "name": "DeployAutomationPS",
         "type": "Microsoft.Resources/deployments",
         "apiVersion": "2015-01-01",
         "dependsOn": [
