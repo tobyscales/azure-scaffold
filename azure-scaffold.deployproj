@@ -49,9 +49,14 @@
     <None Include="references\azuredeploy.parameters.json" />
     <None Include="references\Deploy-AzureResourceGroup - Copy.ps1" />
     <None Include="scripts\DeployO365SilentWithVersion.ps1" />
-    <None Include="templates\automation\azuredeploy.json" />
+    <Content Include="templates\automation\azuredeploy.json" />
     <None Include="templates\dsc\azuredeploy.json" />
     <None Include="templates\keyvault\azuredeploy.json" />
   </ItemGroup>
   <Target Name="GetReferenceAssemblyPaths" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties azuredeploy_1json__JSONSchema="http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json" templates_4dsc_4azuredeploy_1json__JSONSchema="http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json" templates_4automation_4azuredeploy_1json__JSONSchema="http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>

@@ -147,31 +147,31 @@
         }
       }
     },
-    "variables": {
-      "imagePublisher": "[parameters('ImagePublisher')]",
-      "imageOffer": "WindowsServer",
-      "osSku": "2012-R2-Datacenter",
-      "osDiskName": "[concat('osdisk-', skip(parameters('vmname'), 3) )]",
-      "vNetName": "[concat('vn-',skip(parameters('vmname'), 3) )]",
-      "subnetName": "[concat('sn-',skip(parameters('vmname'), 3) )]",
-      "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('vNetName'))]",
-      "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]",
-      "dnsNameForPublicIP": "[toLower(parameters('vmName'))]",
-      "publicIPAddressName": "[toLower(concat('pip-',parameters('vmName')))]",
-      "publicIPAddressType": "Dynamic",
-      "nicName": "[toLower(concat('nic-',skip(parameters('vmname'), 3) ))]",
-      "automationName": "[concat('aa-', skip(parameters('vmname'), 3) )]",
-      "automationUser": "username",
-      "automationPass": "password",
-      "keyVaultName": "[concat('kv-',skip(parameters('vmname'), 3) )]",
-      "keyVaultURL": "[concat('https://', variables('keyVaultName'), '.vault.azure.net/')]",
-      "keyVaultResourceID": "[concat(subscription().id,'/resourceGroups/',resourceGroup().name,'/providers/Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
-      "setupChocolatelyScriptLocation": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/visual-studio-dev-vm-chocolatey/scripts/",
-      "setupChocolateyScriptFileName": "SetupChocolatey.ps1",
-      "chocoPackages": "boxstarter,googlechrome,adobereader,notepadplusplus.install",
-      "chocoScript": "https://chocolatey.org/install.ps1",
-      "chocoScriptFile": "install.ps1"
-    },
+  "variables": {
+    "imagePublisher": "[parameters('ImagePublisher')]",
+    "imageOffer": "WindowsServer",
+    "osSku": "2012-R2-Datacenter",
+    "osDiskName": "[concat('osdisk-', skip(parameters('vmname'), 3) )]",
+    "vNetName": "[concat('vn-',skip(parameters('vmname'), 3) )]",
+    "subnetName": "[concat('sn-',skip(parameters('vmname'), 3) )]",
+    "publicIPAddressName": "[toLower(concat('pip-',skip(parameters('vmname'), 3)))]",
+    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('vNetName'))]",
+    "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]",
+    "dnsNameForPublicIP": "[toLower(parameters('vmName'))]",
+    "publicIPAddressType": "Dynamic",
+    "nicName": "[toLower(concat('nic-',skip(parameters('vmname'), 3) ))]",
+    "automationName": "[concat('aa-', skip(parameters('vmname'), 3) )]",
+    "automationUser": "username",
+    "automationPass": "password",
+    "keyVaultName": "[concat('kv-',skip(parameters('vmname'), 3) )]",
+    "keyVaultURL": "[concat('https://', variables('keyVaultName'), '.vault.azure.net/')]",
+    "keyVaultResourceID": "[concat(subscription().id,'/resourceGroups/',resourceGroup().name,'/providers/Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
+    "setupChocolatelyScriptLocation": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/visual-studio-dev-vm-chocolatey/scripts/",
+    "setupChocolateyScriptFileName": "SetupChocolatey.ps1",
+    "chocoPackages": "boxstarter,googlechrome,adobereader,notepadplusplus.install",
+    "chocoScript": "https://chocolatey.org/install.ps1",
+    "chocoScriptFile": "install.ps1"
+  },
 
     "resources": [
       {
@@ -301,7 +301,7 @@
             "contentVersion": "1.0.0.0"
           },
           "parameters": {
-            "seed": { "value": "0" }
+            "seed": { "value": "123" }
           }
         }
       },
@@ -377,8 +377,8 @@
             "userName": { "value": "[parameters('aadClientID')]" },
             "password": { "value": "[parameters('aadClientSecret')]" },
             "subscriptionIdValue": { "value": "[parameters('subscriptionId')]" },
-            "runbookJobGuid": { "value": "[concat('rjg', skip(reference('jobGuid').outputs.guid.value, 3)]" },
-            "scheduleLinkGuid": { "value": "[concat('sli', skip(reference('jobGuid').outputs.guid.value, 3)]" }
+            "runbookJobGuid": { "value": "[concat('rjg', skip(reference('jobGuid').outputs.guid.value, 3))]" },
+            "scheduleLinkGuid": { "value": "[concat('sli', skip(reference('jobGuid').outputs.guid.value, 3))]" }
           }
         }
       },
@@ -400,7 +400,7 @@
             "configurationName": { "value": "InstallChoco" },
             "configurationUri": { "value": "https://raw.githubusercontent.com/tescales/devDesktop/master/installChoco.ps1" },
             "configurationDescription": { "value": "Installs Chocolatey" },
-            "jobId": { "value": "[concat('dsc', skip(reference('jobGuid').outputs.guid.value, 3)]" }
+            "jobId": { "value": "[concat('dsc', skip(reference('jobGuid').outputs.guid.value, 3))]" }
           }
         }
       },
