@@ -54,7 +54,13 @@
   },
   "variables": {
     "pricingTier": "Free",
-    "dscOverwrite": "true"
+    "dscOverwrite": "true",
+    "modules": [
+      {
+        "name": "cChoco",
+        "uri": "https://devopsgallerystorage.blob.core.windows.net/armtemplates/cChoco%5C2.3.1.0"
+      }
+    ]
   },
   "resources": [
     {
@@ -91,6 +97,18 @@
           }
         },
         {
+          "name": "[variables('modules').name]",
+          "type": "jobs",
+          "apiVersion": "2015-01-01-preview",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'))]"
+          ],
+          "properties": {
+            "contentLink": { "uri": "[variables('modules').name]" }
+          }
+        },
+        {
           "name": "[parameters('jobId')]",
           "type": "Compilationjobs",
           "apiVersion": "2015-01-01-preview",
@@ -106,7 +124,7 @@
             }
           }
         }
-          ]
+      ]
         }
       ],
   "outputs": {}
