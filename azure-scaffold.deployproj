@@ -27,6 +27,7 @@
   <ItemGroup>
     <Content Include="azuredeploy.json" />
     <Content Include="azuredeploy.parameters.json" />
+    <Content Include="vm\azuredeploy.parameters.json" />
     <None Include="Deployment.targets">
       <Visible>False</Visible>
     </None>
@@ -52,6 +53,7 @@
     <Content Include="templates\automation\azuredeploy.json" />
     <None Include="templates\dsc\azuredeploy.json" />
     <None Include="templates\keyvault\azuredeploy.json" />
+    <None Include="vm\azuredeploy.json" />
   </ItemGroup>
   <Target Name="GetReferenceAssemblyPaths" />
   <ProjectExtensions>
