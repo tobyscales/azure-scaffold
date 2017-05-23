@@ -377,7 +377,7 @@
             "userName": { "value": "[parameters('aadClientID')]" },
             "password": { "value": "[parameters('aadClientSecret')]" },
             "subscriptionIdValue": { "value": "[parameters('subscriptionId')]" },
-            "runbookJobGuid": { "value": "[parameters('subscriptionId')]" },
+            "runbookJobGuid": { "value": "[reference('jobGuid').outputs.guid.value]" },
             "scheduleLinkGuid": { "value": "[parameters('subscriptionId')]" }
           }
         }
