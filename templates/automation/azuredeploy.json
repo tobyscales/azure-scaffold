@@ -56,7 +56,35 @@
   },
   "variables": {
     "pricingTier": "Free",
-
+    "runbooks": [
+      {
+        "name": "StartAzureV2VMs",
+        "type": "Graph",
+        "Uri": "https://gallery.technet.microsoft.com/scriptcenter/Start-Azure-ARM-VMs-66fb875d/file/162482/1/StartAzureV2Vm.graphrunbook",
+        "description": "This Graphical PowerShell runbook connects to Azure using an Automation Run As account and starts all V2 VMs in an Azure subscription or in a resource group or a single named V2 VM. You can attach a recurring schedule to this runbook to run it at a specific time."
+      },
+      {
+        "name": "StopAzureV2VMs",
+        "type": "Graph",
+        "Uri": "https://gallery.technet.microsoft.com/scriptcenter/Stop-Azure-ARM-VMs-1ba96d5b/file/162480/1/StopAzureV2Vm.graphrunbook",
+        "description": "This Graphical PowerShell runbook connects to Azure using an Automation Run As account and stops all V2 VMs in an Azure subscription or in a resource group or a single named V2 VM. You can attach a recurring schedule to this runbook to run it at a specific time."
+      },
+      {
+        "name": "Register-VMDSC",
+        "type": "Graph",
+        "Uri": "https://gallery.technet.microsoft.com/scriptcenter/Registers-Azure-resource-31979771/file/160035/1/Register-VMDSC.graphrunbook",
+        "description": "This runbook registers Azure resource manager virtual machines with automation DSC service. These can either be Windows or Linux virtual machines that are supported with DSC. You can specify the whole subscription, a specific resource group, or an individual VM."
+      },
+      {
+        "name": "New-HybridWorkerAndAzureVM",
+        "type": "PowerShell",
+        "Uri": "https://raw.githubusercontent.com/azureautomation/runbooks/master/Utility/ARM/New-HybridWorkerAndAzureVM.ps1",
+        "description": "This Azure/OMS Automation runbook creates a new VM and onboards it as a hybrid worker.",
+        "credentialName": "AzureCredential",
+        "variableName": "AzureSubscriptionId",
+        "variableType": "string"
+      } 
+    ],
     "startRunbookName": "StartAzureV2VMs",
     "startRunbookUri": "https://gallery.technet.microsoft.com/scriptcenter/Start-Azure-ARM-VMs-66fb875d/file/162482/1/StartAzureV2Vm.graphrunbook",
     "startRunbookType": "Graph",
@@ -96,7 +124,7 @@
       },
       "resources": [
         {
-          "name": "[variables('startRunbookName')]",
+          "name": "[variables('runbooks')[copyIndex()].name]",
           "type": "runbooks",
           "apiVersion": "2015-01-01-preview",
           "location": "[parameters('regionId')]",
@@ -106,80 +134,21 @@
           "tags": {
           },
           "properties": {
-            "runbookType": "[variables('startRunbookType')]",
+            "runbookType": "[variables('runbooks')[copyIndex()].type]",
             "logProgress": "false",
             "logVerbose": "false",
-            "description": "[variables('startRunbookDescription')]",
+            "description": "[variables('runbooks')[copyIndex()].description]",
             "publishContentLink": {
-              "uri": "[variables('startRunbookUri')]",
+              "uri": "[variables('runbooks')[copyIndex()].Uri]",
               "version": "1.0.0.0"
             }
-          }
-        },
-        {
-          "name": "[variables('stopRunbookName')]",
-          "type": "runbooks",
-          "apiVersion": "2015-01-01-preview",
-          "location": "[parameters('regionId')]",
-          "dependsOn": [
-            "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'))]"
-          ],
-          "tags": {
           },
-          "properties": {
-            "runbookType": "[variables('stopRunbookType')]",
-            "logProgress": "false",
-            "logVerbose": "false",
-            "description": "[variables('stopRunbookDescription')]",
-            "publishContentLink": {
-              "uri": "[variables('stopRunbookUri')]",
-              "version": "1.0.0.0"
-            }
+          "copy": {
+            "name": "deployScripts",
+            "count": "[length(variables('runbooks'))]"
           }
-        },
-        {
-          "name": "[variables('registerDSCRunbookName')]",
-          "type": "runbooks",
-          "apiVersion": "2015-01-01-preview",
-          "location": "[parameters('regionId')]",
-          "dependsOn": [
-            "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'))]"
-          ],
-          "tags": {
-          },
-          "properties": {
-            "runbookType": "[variables('registerDSCRunbookType')]",
-            "logProgress": "false",
-            "logVerbose": "false",
-            "description": "[variables('registerDSCRunbookDescription')]",
-            "publishContentLink": {
-              "uri": "[variables('registerDSCRunbookUri')]",
-              "version": "1.0.0.0"
-            }
-          }
-        },
-        {
-          "name": "[variables('newHWVMRunbookName')]",
-          "type": "runbooks",
-          "apiVersion": "2015-01-01-preview",
-          "location": "[parameters('regionId')]",
-          "dependsOn": [
-            "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'))]"
-          ],
-          "tags": {
-          },
-          "properties": {
-            "runbookType": "[variables('newHWVMRunbookType')]",
-            "logProgress": "false",
-            "logVerbose": "false",
-            "description": "[variables('newHWVMRunbookDescription')]",
-            "publishContentLink": {
-              "uri": "[variables('newHWVMRunbookUri')]",
-              "version": "1.0.0.0"
-            }
-          }
-        },
 
+        },
         {
           "name": "[parameters('runbookJobGuid')]",
           "type": "jobs",
@@ -197,21 +166,6 @@
               "name": "[variables('newHWVMRunbookName')]"
             }
           }
-        },
-        {
-          "name": "AzureRunAsConnection",
-          "type": "Microsoft.Automation/automationAccounts/connections",
-          "apiVersion": "2015-10-31",
-          "properties": {
-            "description": null,
-            "fieldDefinitionValues": null,
-            "connectionType": {
-              "name": "AzureServicePrincipal"
-            }
-          },
-          "dependsOn": [
-            "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'))]"
-          ]
         },
         {
           "name": "[variables('credentialName')]",
