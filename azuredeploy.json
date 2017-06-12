@@ -16,13 +16,13 @@
       },
       "defaultValue": "[subscription().subscriptionId]"
     },
-      "ghURL": {
-        "type": "string",
-        "metadata": {
-          "description": "Your GitHub repo"
-        },
-        "defaultValue": "https://raw.githubusercontent.com/tescales/azure-scaffold/master/"
+    "ghURL": {
+      "type": "string",
+      "metadata": {
+        "description": "Your GitHub repo"
       },
+      "defaultValue": "https://sascript.file.core.windows.net/repos/Repos/azure-scaffold/"
+    },
       "aadappname": {
         "type": "string",
         "metadata": {
