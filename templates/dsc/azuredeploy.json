@@ -50,17 +50,18 @@
       "metadata": {
         "description": "the job id to compile the configuration"
       }
+    },
+    "modules": {
+      "type": "object",
+      "defaultValue": {
+            "name": "cChoco",
+            "uri": "https://github.com/chocolatey/cChoco"
+      }
     }
-  },
+    },
   "variables": {
     "pricingTier": "Free",
-    "dscOverwrite": "true",
-    "modules": [
-      {
-        "name": "cChoco",
-        "uri": "https://github.com/chocolatey/cChoco"
-      }
-    ]
+    "dscOverwrite": "true"
   },
   "resources": [
     {
@@ -97,7 +98,7 @@
           }
         },
         {
-          "name": "[variables('modules').name]",
+          "name": "[parameters('modules').name]",
           "type": "jobs",
           "apiVersion": "2015-01-01-preview",
           "location": "[resourceGroup().location]",
