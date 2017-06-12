@@ -106,7 +106,7 @@
             "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'))]"
           ],
           "properties": {
-            "contentLink": { "uri": "[variables('modules').name]" }
+            "contentLink": { "uri": "[parameters('modules').name]" }
           }
         },
         {
