@@ -136,7 +136,7 @@
       },
       {
         "name": "[parameters('runbooks')[copyIndex()].name]",
-        "type": "runbooks",
+        "type": "Microsoft.Automation/automationAccounts/runbooks",
         "apiVersion": "2015-10-31",
         "location": "[parameters('regionId')]",
         "dependsOn": [
