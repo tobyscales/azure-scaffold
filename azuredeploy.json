@@ -21,7 +21,7 @@
       "metadata": {
         "description": "Your GitHub repo"
       },
-      "defaultValue": "https://sascript.file.core.windows.net/repos/Repos/azure-scaffold/"
+      "defaultValue": "https://raw.githubusercontent.com/tescales/azure-scaffold/master/"
     },
       "aadappname": {
         "type": "string",
