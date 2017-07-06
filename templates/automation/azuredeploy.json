@@ -100,7 +100,7 @@
           }
         },
         "resources": [
-
+          
           {
             "name": "[variables('credentialName')]",
             "type": "credentials",
@@ -131,33 +131,33 @@
               "type": "[variables('variableType')]",
               "value": "[concat('\"',parameters('subscriptionIdValue'),'\"')]"
             }
-          },
-          {
-            "name": "[parameters('runbooks')[copyIndex()].name]",
-            "type": "Microsoft.Automation/automationAccounts/runbooks",
-            "apiVersion": "2015-10-31",
-            "location": "[parameters('regionId')]",
-            "dependsOn": [
-              "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'))]"
-            ],
-            "tags": {
-            },
-            "properties": {
-              "runbookType": "[parameters('runbooks')[copyIndex()].runboookType]",
-              "description": "[parameters('runbooks')[copyIndex()].description]",
-              "publishedContentLink": {
-                "uri": "[parameters('runbooks')[copyIndex()].Uri]",
-                "version": "1.0.0.0"
-              }
-            },
-
-            "copy": {
-              "name": "deployScripts",
-              "count": "[length(parameters('runbooks'))]"
-            }
           }
         ]
+      },
+      {
+        "name": "[concat( parameters('accountName'), '/', parameters('runbooks')[copyIndex()].name)]",
+        "type": "Microsoft.Automation/automationAccounts/runbooks",
+        "apiVersion": "2015-10-31",
+        "location": "[parameters('regionId')]",
+        "dependsOn": [
+          "[parameters('accountName')]"
+        ],
+        "tags": {
+        },
+        "properties": {
+          "runbookType": "[parameters('runbooks')[copyIndex()].runboookType]",
+          "description": "[parameters('runbooks')[copyIndex()].description]",
+          "publishedContentLink": {
+            "uri": "[parameters('runbooks')[copyIndex()].Uri]",
+            "version": "1.0.0.0"
+          }
+        },
+
+        "copy": {
+          "name": "deployScripts",
+          "count": "[length(parameters('runbooks'))]"
+        }
       }
-      ],
+    ],
     "outputs": {}
   }
