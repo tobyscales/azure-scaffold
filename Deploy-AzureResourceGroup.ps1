@@ -147,6 +147,9 @@ if ($UploadArtifacts) {
 
 
 #$OptionalParameters["aadappname"] = $aadClientID
+if (Get-AzureRmResourcegroup -Name "$resourcegroupname" -Location $resourcegrouplocation) {
+Remove-AzureRmResourceGroup -Name "$resourcegroupname" -Confirm $false
+}
 
 # Create or update the resource group using the specified template file and template parameters file
 New-AzureRmResourceGroup -Name $ResourceGroupName -Location $ResourceGroupLocation -Verbose -Force

@@ -100,24 +100,7 @@
           }
         },
         "resources": [
-          {
-            "name": "[parameters('runbookJobGuid')]",
-            "type": "jobs",
-            "apiVersion": "2015-01-01-preview",
-            "location": "[resourceGroup().location]",
-            "dependsOn": [
-              "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'))]",
-              "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'), '/runbooks/',variables('newHWVMRunbookName'))]"
-            ],
-            "tags": {
-              "key": "value"
-            },
-            "properties": {
-              "runbook": {
-                "name": "[variables('newHWVMRunbookName')]"
-              }
-            }
-          },
+          
           {
             "name": "[variables('credentialName')]",
             "type": "credentials",
@@ -152,7 +135,7 @@
         ]
       },
       {
-        "name": "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'), '/', parameters('runbooks')[copyIndex()].name)]",
+        "name": "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'), '/runbooks/', parameters('runbooks')[copyIndex()].name)]",
         "type": "Microsoft.Automation/automationAccounts/runbooks",
         "apiVersion": "2015-10-31",
         "location": "[parameters('regionId')]",
