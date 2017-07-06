@@ -213,7 +213,7 @@
           "subscriptionIdValue": { "value": "[parameters('subscriptionId')]" },
           "runbookJobGuid": { "value": "[reference('newHWVMGuid').outputs.guid.value]" },
           "scheduleLinkGuid": { "value": "[reference('slGuid').outputs.guid.value]" },
-          "runbooks": {
+          "runbooks": { "value": 
             [
               {
                 "name": "StartAzureV2VMs",
