@@ -71,9 +71,6 @@
       "apiVersion": "2015-01-01",
       "name": "nestedTemplateModule",
       "type": "Microsoft.Resources/deployments",
-      "dependsOn": [
-        "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'))]"
-      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -97,9 +94,6 @@
       "apiVersion": "2015-01-01",
       "name": "nestedDSCconfiguration",
       "type": "Microsoft.Resources/deployments",
-      "dependsOn": [
-        "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'))]"
-      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -129,9 +123,6 @@
       "apiVersion": "2015-01-01",
       "name": "nestedTemplateCompilationjob",
       "type": "Microsoft.Resources/deployments",
-      "dependsOn": [
-        "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'))]"
-      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
