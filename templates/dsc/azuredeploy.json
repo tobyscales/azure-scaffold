@@ -75,7 +75,7 @@
         "mode": "Incremental",
         "templateLink": {
           "uri": "[variables('moduleTemplate')]",
-          "contentVersion": "1.0.0.0"
+          "contentVersion": "1.0"
         },
         "parameters": {
           "accountName": {
@@ -98,7 +98,7 @@
         "mode": "Incremental",
         "templateLink": {
           "uri": "[variables('configurationTemplate')]",
-          "contentVersion": "1.0.0.0"
+          "contentVersion": "1.0"
         },
         "parameters": {
           "accountName": {
@@ -127,7 +127,7 @@
         "mode": "Incremental",
         "templateLink": {
           "uri": "[variables('compilationjobTemplate')]",
-          "contentVersion": "1.0.0.0"
+          "contentVersion": "1.0"
         },
         "parameters": {
           "accountName": {
