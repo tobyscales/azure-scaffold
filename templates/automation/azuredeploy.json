@@ -147,7 +147,7 @@
         "properties": {
           "runbookType": "[parameters('runbooks')[copyIndex()].runboookType]",
           "description": "[parameters('runbooks')[copyIndex()].description]",
-          "publishedContentLink": {
+          "publishContentLink": {
             "uri": "[parameters('runbooks')[copyIndex()].Uri]",
             "version": "1.0.0.0"
           }
