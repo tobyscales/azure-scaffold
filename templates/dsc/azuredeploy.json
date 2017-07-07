@@ -30,6 +30,10 @@
         "description": "The name of the DSC Configuration. The name must match the name in the URI."
       }
     },
+    "configurations": {
+      "type": "array",
+      "defaultvalue": []
+    },
     "configurationURI": {
       "type": "string",
       "defaultValue": "https://raw.githubusercontent.com/azureautomation/automation-packs/master/201-Deploy-And-Compile-DSC-Configuration/Configurations/webrolefull.ps1",
@@ -106,8 +110,12 @@
     },
     {
       "apiVersion": "2015-01-01",
-      "name": "nestedDSCconfiguration",
+      "name": "[concat('installDSCConfig-', copyIndex())]",
       "type": "Microsoft.Resources/deployments",
+      "copy": {
+        "name": "installConfigs",
+        "count": "[length(parameters('configurations'))]"
+      },
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -122,22 +130,45 @@
             "value": "[parameters('regionId')]"
           },
           "configurationName": {
-            "value": "[parameters('configurationName')]"
+            "value": "[parameters('configurations')[copyIndex()].name]"
           },
           "configurationDescription": {
-            "value": "[parameters('configurationDescription')]"
+            "value": "[parameters('configurations')[copyIndex()].description]"
           },
           "configurationURI": {
-            "value": "[parameters('configurationURI')]"
+            "value": "[parameters('configurations')[copyIndex()].uri]"
           }
         }
       }
     },
     {
       "apiVersion": "2015-01-01",
-      "name": "nestedTemplateCompilationjob",
+      "name": "[concat('getGuid-', copyIndex())]",
       "type": "Microsoft.Resources/deployments",
-      "dependson": [ "installModules" ],
+      "copy": {
+        "name": "getGuids",
+        "count": "[length(parameters('configurations'))]"
+      },
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "https://raw.githubusercontent.com/davidjrh/azurerm-newguid/master/NewGuid.json",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "seed": { "value": "parameters('configurations')[copyIndex()].name" }
+        }
+      }
+    },
+    {
+      "apiVersion": "2015-01-01",
+      "name": "[concat('installCompilationJob-', copyIndex())]",
+      "type": "Microsoft.Resources/deployments",
+      "copy": {
+        "name": "deployJobs",
+        "count": "[length(parameters('configurations'))]"
+      },
+      "dependson": [ "installModules", "getGuids", "installConfigs" ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -155,7 +186,7 @@
             "value": "[parameters('configurationName')]"
           },
           "jobId": {
-            "value": "[parameters('jobId')]"
+            "value": "[reference(concat('getGuid-',copyIndex()).outputs.guid.value)]"
           }
         }
       }

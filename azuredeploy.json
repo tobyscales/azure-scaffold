@@ -96,21 +96,6 @@
     },
     {
       "apiVersion": "2015-01-01",
-      "name": "dscGuid",
-      "type": "Microsoft.Resources/deployments",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "https://raw.githubusercontent.com/davidjrh/azurerm-newguid/master/NewGuid.json",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "seed": { "value": "dsc" }
-        }
-      }
-    },
-    {
-      "apiVersion": "2015-01-01",
       "name": "newHWVMGuid",
       "type": "Microsoft.Resources/deployments",
       "properties": {
@@ -266,16 +251,26 @@
           "configurationUri": { "value": "https://raw.githubusercontent.com/tescales/azure-scaffold/master/configurations/installChoco.ps1" },
           "configurationDescription": { "value": "Installs Chocolatey" },
           "jobId": { "value": "[reference('slGuid').outputs.guid.value]" },
-          "modules": {
+          "configurations": {
             "value": [
               {
-                "name": "cChoco",
-                "uri": "https://devopsgallerystorage.blob.core.windows.net/packages/cchoco.2.3.1.nupkg"
+                "name": "InstallChoco",
+                "description":  "Installs Chocolatey",
+                "uri": "https://raw.githubusercontent.com/tescales/azure-scaffold/master/configurations/installChoco.ps1"
               }
             ]
+          },
+          "modules",
+              {
+                "value": [
+                  {
+                    "name": "cChoco",
+                    "uri": "https://devopsgallerystorage.blob.core.windows.net/packages/cchoco.2.3.1.nupkg"
+                  }
+                ]
+              }
           }
         }
-      }
     }
   ],
   "outputs": {}
