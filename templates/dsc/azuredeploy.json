@@ -162,13 +162,13 @@
     },
     {
       "apiVersion": "2015-01-01",
-      "name": "[concat('installCompilationJob-', copyIndex())]",
+      "name": "[concat('installJob-', copyIndex())]",
       "type": "Microsoft.Resources/deployments",
       "copy": {
         "name": "deployJobs",
         "count": "[length(parameters('configurations'))]"
       },
-      "dependson": [ "installModules", "getGuids", "installConfigs" ],
+      "dependson": [ "installModules", "installConfigs", "getGuids" ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
