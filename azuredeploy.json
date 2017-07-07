@@ -270,7 +270,7 @@
             "value": [
               {
                 "name": "cChoco",
-                "uri": "https://github.com/chocolatey/cChoco"
+                "uri": "https://github.com/chocolatey/cChoco/archive/development.zip"
               }
             ]
           }
