@@ -136,6 +136,7 @@
       "apiVersion": "2015-01-01",
       "name": "nestedTemplateCompilationjob",
       "type": "Microsoft.Resources/deployments",
+      "dependson": "[resourceId('Microsoft.Resources/deployments/', 'nestedTemplateModule')]",
       "properties": {
         "mode": "Incremental",
         "templateLink": {

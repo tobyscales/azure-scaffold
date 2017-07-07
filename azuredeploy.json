@@ -270,7 +270,7 @@
             "value": [
               {
                 "name": "cChoco",
-                "uri": "https://github.com/chocolatey/cChoco/archive/development.zip"
+                "uri": "https://devopsgallerystorage.blob.core.windows.net/packages/cchoco.2.3.1.nupkg"
               }
             ]
           }
