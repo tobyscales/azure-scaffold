@@ -84,6 +84,12 @@
       "dependsOn": [
         "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'))]"
       ],
+      "copy": {
+        "name": "installModules",
+        "count": "[length(parameters('modules'))]",
+        "mode": "serial",
+        "batchSize": 2
+      },
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -95,10 +101,10 @@
             "value": "[parameters('accountName')]"
           },
           "moduleName": {
-            "value": "[parameters('modules')[0].name]"
+            "value": "[parameters('modules')[copyIndex()].name]"
           },
           "moduleUri": {
-            "value": "[parameters('modules')[0].Uri]"
+            "value": "[parameters('modules')[copyIndex()].Uri]"
           }
         }
       }
@@ -136,7 +142,7 @@
       "apiVersion": "2015-01-01",
       "name": "nestedTemplateCompilationjob",
       "type": "Microsoft.Resources/deployments",
-      "dependson": "[resourceId('Microsoft.Resources/deployments/', 'nestedTemplateModule')]",
+      "dependson": ["installModules"],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
