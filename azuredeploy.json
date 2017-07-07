@@ -23,49 +23,49 @@
       },
       "defaultValue": "https://raw.githubusercontent.com/tescales/azure-scaffold/master/"
     },
-      "aadappname": {
-        "type": "string",
-        "metadata": {
-          "description": "name of aad app"
-        }
-      },
-      "aadClientID": {
-        "type": "string",
-        "metadata": {
-          "description": "Client ID of AAD app which has permissions to KeyVault"
-        }
-      },
-      "aadClientSecret": {
-        "type": "securestring",
-        "metadata": {
-          "description": "Client Secret of AAD app which has permissions to KeyVault"
-        }
-      },
-      "aadTenantId": {
-        "type": "string",
-        "metadata": {
-          "description": "AzureAD TenantId"
-        }
-      },
-      "useExistingKek": {
-        "type": "string",
-        "defaultValue": "nokek",
-        "allowedValues": [
-          "nokek",
-          "kek"
-        ],
-        "metadata": {
-          "description": "Select kek if the secret should be encrypted with a key encryption key and pass explicit keyEncryptionKeyURL. For nokek, you can keep keyEncryptionKeyURL empty."
-        }
-      },
-      "keyEncryptionKeyURL": {
-        "type": "string",
-        "defaultValue": "",
-        "metadata": {
-          "description": "URL of the KeyEncryptionKey used to encrypt the volume encryption key"
-        }
+    "aadappname": {
+      "type": "string",
+      "metadata": {
+        "description": "name of aad app"
       }
     },
+    "aadClientID": {
+      "type": "string",
+      "metadata": {
+        "description": "Client ID of AAD app which has permissions to KeyVault"
+      }
+    },
+    "aadClientSecret": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Client Secret of AAD app which has permissions to KeyVault"
+      }
+    },
+    "aadTenantId": {
+      "type": "string",
+      "metadata": {
+        "description": "AzureAD TenantId"
+      }
+    },
+    "useExistingKek": {
+      "type": "string",
+      "defaultValue": "nokek",
+      "allowedValues": [
+        "nokek",
+        "kek"
+      ],
+      "metadata": {
+        "description": "Select kek if the secret should be encrypted with a key encryption key and pass explicit keyEncryptionKeyURL. For nokek, you can keep keyEncryptionKeyURL empty."
+      }
+    },
+    "keyEncryptionKeyURL": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "URL of the KeyEncryptionKey used to encrypt the volume encryption key"
+      }
+    }
+  },
   "variables": {
     "automationName": "[parameters('nameRoot')]",
     "automationUser": "username",
@@ -213,8 +213,8 @@
           "subscriptionIdValue": { "value": "[parameters('subscriptionId')]" },
           "runbookJobGuid": { "value": "[reference('newHWVMGuid').outputs.guid.value]" },
           "scheduleLinkGuid": { "value": "[reference('slGuid').outputs.guid.value]" },
-          "runbooks": { "value": 
-            [
+          "runbooks": {
+            "value": [
               {
                 "name": "StartAzureV2VMs",
                 "runboookType": "Graph",
@@ -277,5 +277,6 @@
         }
       }
     }
-          ]
-        }
+  ],
+  "outputs": {}
+}

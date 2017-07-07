@@ -103,61 +103,61 @@
         }
       }
     },
-      {
-        "apiVersion": "2015-01-01",
-        "name": "nestedDSCconfiguration",
-        "type": "Microsoft.Resources/deployments",
-        "properties": {
-          "mode": "Incremental",
-          "templateLink": {
-            "uri": "[variables('configurationTemplate')]",
-            "contentVersion": "1.0"
+    {
+      "apiVersion": "2015-01-01",
+      "name": "nestedDSCconfiguration",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('configurationTemplate')]",
+          "contentVersion": "1.0"
+        },
+        "parameters": {
+          "accountName": {
+            "value": "[parameters('accountName')]"
           },
-          "parameters": {
-            "accountName": {
-              "value": "[parameters('accountName')]"
-            },
-            "location": {
-              "value": "[parameters('regionId')]"
-            },
-            "configurationName": {
-              "value": "[parameters('configurationName')]"
-            },
-            "configurationDescription": {
-              "value": "[parameters('configurationDescription')]"
-            },
-            "configurationURI": {
-              "value": "[parameters('configurationURI')]"
-            }
+          "location": {
+            "value": "[parameters('regionId')]"
+          },
+          "configurationName": {
+            "value": "[parameters('configurationName')]"
+          },
+          "configurationDescription": {
+            "value": "[parameters('configurationDescription')]"
+          },
+          "configurationURI": {
+            "value": "[parameters('configurationURI')]"
           }
         }
-      },
-      {
-        "apiVersion": "2015-01-01",
-        "name": "nestedTemplateCompilationjob",
-        "type": "Microsoft.Resources/deployments",
-        "properties": {
-          "mode": "Incremental",
-          "templateLink": {
-            "uri": "[variables('compilationjobTemplate')]",
-            "contentVersion": "1.0"
+      }
+    },
+    {
+      "apiVersion": "2015-01-01",
+      "name": "nestedTemplateCompilationjob",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('compilationjobTemplate')]",
+          "contentVersion": "1.0"
+        },
+        "parameters": {
+          "accountName": {
+            "value": "[parameters('accountName')]"
           },
-          "parameters": {
-            "accountName": {
-              "value": "[parameters('accountName')]"
-            },
-            "location": {
-              "value": "[parameters('regionId')]"
-            },
-            "configurationName": {
-              "value": "[parameters('configurationName')]"
-            },
-            "jobId": {
-              "value": "[parameters('jobId')]"
-            }
+          "location": {
+            "value": "[parameters('regionId')]"
+          },
+          "configurationName": {
+            "value": "[parameters('configurationName')]"
+          },
+          "jobId": {
+            "value": "[parameters('jobId')]"
           }
         }
-      },
-
+      }
+    }
+  ],
       "outputs": {}
     }
