@@ -52,13 +52,10 @@
       }
     },
     "modules": {
-      "type": "object",
-      "defaultValue": {
-            "name": "cChoco",
-            "uri": "https://github.com/chocolatey/cChoco"
-      }
+      "type": "array",
+      "defaultvalue": []
     }
-    },
+  },
   "variables": {
     "pricingTier": "Free",
     "dscOverwrite": "true",
@@ -82,10 +79,10 @@
             "value": "[parameters('accountName')]"
           },
           "moduleName": {
-            "value": "[parameters('modules').name]"
+            "value": "[parameters('modules')[0].name]"
           },
           "moduleUri": {
-            "value": "[parameters('modules').Uri]"
+            "value": "[parameters('modules')[0].Uri]"
           }
         }
       }
