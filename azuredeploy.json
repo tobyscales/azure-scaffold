@@ -265,7 +265,7 @@
           "configurationName": { "value": "InstallChoco" },
           "configurationUri": { "value": "https://raw.githubusercontent.com/tescales/devDesktop/master/installChoco.ps1" },
           "configurationDescription": { "value": "Installs Chocolatey" },
-          "jobId": { "value": "[reference('dscGuid').outputs.guid.value]" },
+          "jobId": { "value": "[reference('slGuid').outputs.guid.value]" },
           "modules": {
             "value": [
               {

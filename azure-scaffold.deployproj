@@ -28,6 +28,7 @@
     <Content Include="azuredeploy.json" />
     <Content Include="azuredeploy.parameters.json" />
     <Content Include="vm\azuredeploy.parameters.json" />
+    <None Include="configurations\installChoco.ps1" />
     <None Include="Deployment.targets">
       <Visible>False</Visible>
     </None>
