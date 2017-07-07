@@ -86,9 +86,7 @@
       ],
       "copy": {
         "name": "installModules",
-        "count": "[length(parameters('modules'))]",
-        "mode": "serial",
-        "batchSize": 2
+        "count": "[length(parameters('modules'))]"
       },
       "properties": {
         "mode": "Incremental",
