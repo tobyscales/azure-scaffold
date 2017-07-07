@@ -260,8 +260,7 @@
               }
             ]
           },
-          "modules",
-              {
+          "modules" : {
                 "value": [
                   {
                     "name": "cChoco",
