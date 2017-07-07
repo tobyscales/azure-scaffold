@@ -1,0 +1,29 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "accountName": {
+      "value": "myAutom8"
+    },
+    "regionId": {
+      "value": "East US 2"
+    },
+    "configurations": {
+      "value": [
+        {
+          "name": "InstallChoco",
+          "description": "Installs Chocolatey",
+          "uri": "https://raw.githubusercontent.com/tescales/azure-scaffold/master/configurations/installChoco.ps1"
+        }
+      ]
+    },
+    "modules": {
+      "value": [
+        {
+          "name": "cChoco",
+          "uri": "https://devopsgallerystorage.blob.core.windows.net/packages/cchoco.2.3.1.nupkg"
+        }
+      ]
+    }
+  }
+}

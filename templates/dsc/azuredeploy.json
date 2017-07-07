@@ -23,37 +23,9 @@
         "description": "The region the Automation account is located in."
       }
     },
-    "configurationName": {
-      "type": "string",
-      "defaultValue": "webrolefull",
-      "metadata": {
-        "description": "The name of the DSC Configuration. The name must match the name in the URI."
-      }
-    },
     "configurations": {
       "type": "array",
       "defaultvalue": []
-    },
-    "configurationURI": {
-      "type": "string",
-      "defaultValue": "https://raw.githubusercontent.com/azureautomation/automation-packs/master/201-Deploy-And-Compile-DSC-Configuration/Configurations/webrolefull.ps1",
-
-      "metadata": {
-        "description": "The URI for the DSC configuration "
-      }
-    },
-    "configurationDescription": {
-      "type": "string",
-      "defaultValue": "test",
-      "metadata": {
-        "description": "The description of the configuration."
-      }
-    },
-    "jobId": {
-      "type": "string",
-      "metadata": {
-        "description": "the job id to compile the configuration"
-      }
     },
     "modules": {
       "type": "array",
@@ -65,7 +37,8 @@
     "dscOverwrite": "true",
     "moduleTemplate": "https://raw.githubusercontent.com/azureautomation/automation-packs/master/000-base-automation-resource-templates/deploy-module/DeployModule.json",
     "configurationTemplate": "https://raw.githubusercontent.com/azureautomation/automation-packs/master/000-base-automation-resource-templates/deploy-configuration/deployConfiguration.json",
-    "compilationjobTemplate": "https://raw.githubusercontent.com/azureautomation/automation-packs/master/000-base-automation-resource-templates/deploy-compilationjob/deployCompilationjob.json"
+    "compilationjobTemplate": "https://raw.githubusercontent.com/azureautomation/automation-packs/master/000-base-automation-resource-templates/deploy-compilationjob/deployCompilationjob.json",
+    "guidCount": "[length(parameters('modules'))]"
   },
   "resources": [
     {
@@ -166,9 +139,9 @@
       "type": "Microsoft.Resources/deployments",
       "copy": {
         "name": "deployJobs",
-        "count": "[length(parameters('configurations'))]"
+        "count": "[variables('guidCount')]"
       },
-      "dependson": [ "installModules", "installConfigs", "getGuids" ],
+      "dependson": [ "installConfigs"],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -183,10 +156,10 @@
             "value": "[parameters('regionId')]"
           },
           "configurationName": {
-            "value": "[parameters('configurationName')]"
+            "value": "[parameters('configurations')[copyIndex()].name]"
           },
           "jobId": {
-            "value": "[reference(concat('getGuid-',copyIndex()).outputs.guid.value)]"
+            "value": "[reference(concat('getGuid-',copyIndex())).outputs.guid.value]"
           }
         }
       }
