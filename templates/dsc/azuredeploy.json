@@ -79,11 +79,8 @@
     },
     {
       "apiVersion": "2015-01-01",
-      "name": "nestedTemplateModule",
+      "name": "[concat('installDSCModule-', copyIndex())]",
       "type": "Microsoft.Resources/deployments",
-      "dependsOn": [
-        "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'))]"
-      ],
       "copy": {
         "name": "installModules",
         "count": "[length(parameters('modules'))]"
@@ -140,7 +137,7 @@
       "apiVersion": "2015-01-01",
       "name": "nestedTemplateCompilationjob",
       "type": "Microsoft.Resources/deployments",
-      "dependson": ["installModules"],
+      "dependson": [ "installModules" ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
