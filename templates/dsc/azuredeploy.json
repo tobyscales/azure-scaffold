@@ -65,9 +65,25 @@
   },
   "resources": [
     {
+      "name": "[parameters('accountName')]",
+      "type": "Microsoft.Automation/automationAccounts",
+      "apiVersion": "2015-10-31",
+      "location": "[parameters('regionId')]",
+      "dependsOn": [],
+      "tags": {},
+      "properties": {
+        "sku": {
+          "name": "[variables('pricingTier')]"
+        }
+      }
+    },
+    {
       "apiVersion": "2015-01-01",
       "name": "nestedTemplateModule",
       "type": "Microsoft.Resources/deployments",
+      "dependsOn": [
+        "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'))]"
+      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -87,61 +103,61 @@
         }
       }
     },
-    {
-      "apiVersion": "2015-01-01",
-      "name": "nestedDSCconfiguration",
-      "type": "Microsoft.Resources/deployments",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('configurationTemplate')]",
-          "contentVersion": "1.0"
-        },
-        "parameters": {
-          "accountName": {
-            "value": "[parameters('accountName')]"
+      {
+        "apiVersion": "2015-01-01",
+        "name": "nestedDSCconfiguration",
+        "type": "Microsoft.Resources/deployments",
+        "properties": {
+          "mode": "Incremental",
+          "templateLink": {
+            "uri": "[variables('configurationTemplate')]",
+            "contentVersion": "1.0"
           },
-          "location": {
-            "value": "[parameters('regionId')]"
-          },
-          "configurationName": {
-            "value": "[parameters('configurationName')]"
-          },
-          "configurationDescription": {
-            "value": "[parameters('configurationDescription')]"
-          },
-          "configurationURI": {
-            "value": "[parameters('configurationURI')]"
+          "parameters": {
+            "accountName": {
+              "value": "[parameters('accountName')]"
+            },
+            "location": {
+              "value": "[parameters('regionId')]"
+            },
+            "configurationName": {
+              "value": "[parameters('configurationName')]"
+            },
+            "configurationDescription": {
+              "value": "[parameters('configurationDescription')]"
+            },
+            "configurationURI": {
+              "value": "[parameters('configurationURI')]"
+            }
           }
         }
-      }
-    },
-    {
-      "apiVersion": "2015-01-01",
-      "name": "nestedTemplateCompilationjob",
-      "type": "Microsoft.Resources/deployments",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('compilationjobTemplate')]",
-          "contentVersion": "1.0"
-        },
-        "parameters": {
-          "accountName": {
-            "value": "[parameters('accountName')]"
+      },
+      {
+        "apiVersion": "2015-01-01",
+        "name": "nestedTemplateCompilationjob",
+        "type": "Microsoft.Resources/deployments",
+        "properties": {
+          "mode": "Incremental",
+          "templateLink": {
+            "uri": "[variables('compilationjobTemplate')]",
+            "contentVersion": "1.0"
           },
-          "location": {
-            "value": "[parameters('regionId')]"
-          },
-          "configurationName": {
-            "value": "[parameters('configurationName')]"
-          },
-          "jobId": {
-            "value": "[parameters('jobId')]"
+          "parameters": {
+            "accountName": {
+              "value": "[parameters('accountName')]"
+            },
+            "location": {
+              "value": "[parameters('regionId')]"
+            },
+            "configurationName": {
+              "value": "[parameters('configurationName')]"
+            },
+            "jobId": {
+              "value": "[parameters('jobId')]"
+            }
           }
         }
-      }
+      },
+
+      "outputs": {}
     }
-  ],
-    "outputs": {}
-}
