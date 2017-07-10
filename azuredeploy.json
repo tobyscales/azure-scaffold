@@ -95,36 +95,6 @@
       }
     },
     {
-      "apiVersion": "2015-01-01",
-      "name": "newHWVMGuid",
-      "type": "Microsoft.Resources/deployments",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "https://raw.githubusercontent.com/davidjrh/azurerm-newguid/master/NewGuid.json",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "seed": { "value": "hwvm" }
-        }
-      }
-    },
-    {
-      "apiVersion": "2015-01-01",
-      "name": "slGuid",
-      "type": "Microsoft.Resources/deployments",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "https://raw.githubusercontent.com/davidjrh/azurerm-newguid/master/NewGuid.json",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "seed": { "value": "sl" }
-        }
-      }
-    },
-    {
       "name": "DeployKeyVault",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
@@ -178,7 +148,7 @@
       }
     },
     {
-      "name": "DeployAutomationPS",
+      "name": "DeployAutomationAcct",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
       "dependsOn": [
@@ -195,9 +165,7 @@
           "regionId": { "value": "East US 2" },
           "userName": { "value": "[parameters('aadClientID')]" },
           "password": { "value": "[parameters('aadClientSecret')]" },
-          "subscriptionIdValue": { "value": "[parameters('subscriptionId')]" },
-          "runbookJobGuid": { "value": "[reference('newHWVMGuid').outputs.guid.value]" },
-          "scheduleLinkGuid": { "value": "[reference('slGuid').outputs.guid.value]" },
+          "subscriptionId": { "value": "[parameters('subscriptionId')]" },
           "runbooks": {
             "value": [
               {

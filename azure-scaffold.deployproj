@@ -27,6 +27,7 @@
   <ItemGroup>
     <Content Include="azuredeploy.json" />
     <Content Include="azuredeploy.parameters.json" />
+    <Content Include="templates\automation\azuredeploy.parameters.json" />
     <Content Include="templates\dsc\azuredeploy.parameters.json" />
     <Content Include="vm\azuredeploy.parameters.json" />
     <None Include="configurations\installChoco.ps1" />

@@ -1,0 +1,53 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "accountName": {
+      "value": "myAutom8"
+    },
+    "regionId": {
+      "value": "East US 2"
+    },
+    "subscriptionId": {
+      "value": "128650d3-04c4-419f-b1d0-73ae5952621d"
+    },
+    "username": {
+      "value": "1fbe66cc-3752-41e0-ac52-4426c5a873a6"
+    },
+    "password": {
+      "value": "PBgEJVk7FJTj7gcTZfjkKn1HubRAjbTZdoieFfWDgtM="
+    },
+    "runbooks": {
+      "value": [
+        {
+          "name": "StartAzureV2VMs",
+          "runboookType": "Graph",
+          "Uri": "https://gallery.technet.microsoft.com/scriptcenter/Start-Azure-ARM-VMs-66fb875d/file/162482/1/StartAzureV2Vm.graphrunbook",
+          "description": "This Graphical PowerShell runbook connects to Azure using an Automation Run As account and starts all V2 VMs in an Azure subscription or in a resource group or a single named V2 VM. You can attach a recurring schedule to this runbook to run it at a specific time."
+        },
+        {
+          "name": "StopAzureV2VMs",
+          "runboookType": "Graph",
+          "Uri": "https://gallery.technet.microsoft.com/scriptcenter/Stop-Azure-ARM-VMs-1ba96d5b/file/162480/1/StopAzureV2Vm.graphrunbook",
+          "description": "This Graphical PowerShell runbook connects to Azure using an Automation Run As account and stops all V2 VMs in an Azure subscription or in a resource group or a single named V2 VM. You can attach a recurring schedule to this runbook to run it at a specific time."
+        },
+        {
+          "name": "Register-VMDSC",
+          "runboookType": "Graph",
+          "Uri": "https://gallery.technet.microsoft.com/scriptcenter/Registers-Azure-resource-31979771/file/160035/1/Register-VMDSC.graphrunbook",
+          "description": "This runbook registers Azure resource manager virtual machines with automation DSC service. These can either be Windows or Linux virtual machines that are supported with DSC. You can specify the whole subscription, a specific resource group, or an individual VM."
+        }
+      ]
+    },
+    "runnowbooks": {
+      "value": [
+        {
+          "name": "AutoTagResources-generic",
+          "runboookType": "Script",
+          "Uri": "https://gallery.technet.microsoft.com/scriptcenter/Automatically-Azure-fc5f1443/file/165796/1/AutoTagResources-generic.ps1",
+          "description": "An Azure Automation Runbook, to automatically tag Azure Resource Groups with the owner alias."
+        }
+      ]
+    }
+  }
+}
