@@ -116,7 +116,7 @@
     },
     {
       "apiVersion": "2015-01-01",
-      "name": "[concat('getGuid-', copyIndex())]",
+      "name": "[concat('getDSCGuid-', copyIndex())]",
       "type": "Microsoft.Resources/deployments",
       "copy": {
         "name": "getGuids",
