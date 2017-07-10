@@ -55,6 +55,7 @@
     "credentialName": "AzureCredential",
     "variableName": "AzureSubscriptionId",
     "variableType": "string",
+    "jobLink": "https://raw.githubusercontent.com/tescales/azure-scaffold/master/templates/automation/jobs/azuredeploy.json",
     "scheduleTemplate": "https://raw.githubusercontent.com/azureautomation/automation-packs/master/000-base-automation-resource-templates/deploy-schedule/deployRunbookOnSchedule.json",
     "runbookTemplate": "https://raw.githubusercontent.com/azureautomation/automation-packs/master/000-base-automation-resource-templates/deploy-runbooks/deployPublishedRunbook.json"
   },
@@ -190,11 +191,11 @@
       }
     },
     {
-      "apiVersion": "2015-10-31",
-      "name": "myAutom8/73248332-b444-3248-323b-44732483323b",
-      "type": "Microsoft.Automation/automationAccounts/jobs",
+      "apiVersion": "2015-01-01",
+      "type": "Microsoft.Resources/deployments",
+      "name": "[concat('installJob-', copyIndex())]",
       "copy": {
-        "name": "installJobs",
+        "name": "installRunNowJobs",
         "count": "[length(parameters('runnowbooks'))]"
       },
       "dependsOn": [
@@ -202,14 +203,32 @@
         "installRunNowBooks"
       ],
       "properties": {
-        "jobId": "73248332-b444-3248-323b-44732483323b",
-        "name": "jobname",
-        "runbook": {
-          "name": "AutoTagResources-generic"
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('jobLink')]",
+          "contentVersion": "1.0.0.0"
         },
-        "parameters": "[parameters('accountName')]"
+        "parameters": {
+          "accountName": {
+            "value": "[parameters('accountName')]"
+          },
+          "regionId": {
+            "value": "[parameters('regionId')]"
+          },
+          "runbookName": {
+            "value": "[parameters('runnowbooks')[copyIndex()].name]"
+          },
+          "jobId": {
+            "value": "[reference(concat('getGuid-',copyIndex())).outputs.guid.value]"
+          },
+          "runbook-parameters": {
+            "value": {
+              "TO": "test"
+            }
+          }
+        }
       }
     }
   ],
-    "outputs": {}
-  }
+      "outputs": {}
+    }
