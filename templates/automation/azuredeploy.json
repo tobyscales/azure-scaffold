@@ -191,7 +191,7 @@
     },
     {
       "apiVersion": "2015-10-31",
-      "name": "[reference(concat('getGuid-',copyIndex())).outputs.guid.value]",
+      "name": "[concat('JobId-',copyIndex())]",
       "type": "Microsoft.Automation/automationAccounts/jobs",
       "copy": {
         "name": "installJobs",

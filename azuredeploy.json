@@ -196,6 +196,16 @@
                 "variableType": "string"
               }
             ]
+          },
+          "runnowbooks": {
+            "value": [
+              {
+                "name": "AutoTagResources-generic",
+                "runboookType": "Script",
+                "Uri": "https://gallery.technet.microsoft.com/scriptcenter/Automatically-Azure-fc5f1443/file/165796/1/AutoTagResources-generic.ps1",
+                "description": "An Azure Automation Runbook, to automatically tag Azure Resource Groups with the owner alias."
+              }
+            ]
           }
         }
       }
@@ -215,10 +225,6 @@
         },
         "parameters": {
           "accountName": { "value": "[variables('automationName')]" },
-          "configurationName": { "value": "InstallChoco" },
-          "configurationUri": { "value": "https://raw.githubusercontent.com/tescales/azure-scaffold/master/configurations/installChoco.ps1" },
-          "configurationDescription": { "value": "Installs Chocolatey" },
-          "jobId": { "value": "[reference('slGuid').outputs.guid.value]" },
           "configurations": {
             "value": [
               {
