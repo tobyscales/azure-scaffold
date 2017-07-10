@@ -222,7 +222,7 @@
             "value": "[reference(concat('getGuid-',copyIndex())).outputs.guid.value]"
           },
           "jobName": {
-            "value": "[parameters('runnowbooks')[copyIndex()].name]"
+            "value": "[reference(concat('getGuid-',copyIndex())).outputs.guid.value]"
           },
           "runbook-parameters": {
             "value": {
