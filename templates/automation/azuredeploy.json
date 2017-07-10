@@ -212,14 +212,17 @@
           "accountName": {
             "value": "[parameters('accountName')]"
           },
-          "regionId": {
+          "location": {
             "value": "[parameters('regionId')]"
           },
-          "runbookName": {
+          "runbook": {
             "value": "[parameters('runnowbooks')[copyIndex()].name]"
           },
           "jobId": {
             "value": "[reference(concat('getGuid-',copyIndex())).outputs.guid.value]"
+          },
+          "jobName": {
+            "value": "[parameters('runnowbooks')[copyIndex()].name]"
           },
           "runbook-parameters": {
             "value": {
