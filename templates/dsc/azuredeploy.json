@@ -141,7 +141,7 @@
         "name": "deployJobs",
         "count": "[variables('guidCount')]"
       },
-      "dependson": [ "installConfigs"],
+      "dependson": [ "installConfigs", "installModules"],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
