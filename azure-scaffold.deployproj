@@ -56,6 +56,8 @@
     <Content Include="templates\automation\azuredeploy.json" />
     <None Include="templates\dsc\azuredeploy-orig.json" />
     <None Include="templates\dsc\azuredeploy.json" />
+    <None Include="templates\jobs\azuredeploy.json" />
+    <None Include="templates\jobs\deployjob.parameters.json" />
     <None Include="templates\keyvault\azuredeploy.json" />
     <None Include="vm\azuredeploy.json" />
   </ItemGroup>

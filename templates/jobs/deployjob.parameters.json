@@ -1,0 +1,22 @@
+﻿{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.2",
+  "parameters": {
+    "name": {
+      "value": "myAutom8/73248332-b444-3248-323b-44732483323b"
+    },
+    "jobId": {
+    "value": "73248332-b444-3248-323b-44732483323b"
+    },
+    "runbook": {
+      "value": "AutoTagResources-generic"
+    },
+    "runbook-parameters": {
+      "value": [
+        {
+          "TO": "myAutom8"
+        }
+      ]
+    }
+    }
+}

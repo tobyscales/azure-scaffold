@@ -191,22 +191,23 @@
     },
     {
       "apiVersion": "2015-10-31",
-      "name": "[concat('JobId-',copyIndex())]",
+      "name": "myAutom8/73248332-b444-3248-323b-44732483323b",
       "type": "Microsoft.Automation/automationAccounts/jobs",
       "copy": {
         "name": "installJobs",
         "count": "[length(parameters('runnowbooks'))]"
       },
       "dependsOn": [
-        "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'))]"
+        "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'))]",
+        "installRunNowBooks"
       ],
       "properties": {
-        "jobId": {
-          "value": "[reference(concat('getGuid-',copyIndex())).outputs.guid.value]"
-        },
+        "jobId": "73248332-b444-3248-323b-44732483323b",
+        "name": "jobname",
         "runbook": {
-          "name": "parameters('runnowbooks')[copyIndex()].name"
-        }
+          "name": "AutoTagResources-generic"
+        },
+        "parameters": "[parameters('accountName')]"
       }
     }
   ],

@@ -1,0 +1,56 @@
+﻿{
+  "$schema": "http://schema.management.azure.com/schemas/2015-10-31/Microsoft.Automation.json",
+  "contentVersion": "1.0",
+  "parameters": {
+    "accountName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the Azure Automation account to deploy the configuration in."
+      }
+    },
+    "location": {
+      "type": "string",
+      "metadata": {
+        "description": "The location of the Azure Automation account."
+      }
+    },
+    "jobName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the Azure Automation job."
+      }
+    },
+    "jobId": {
+      "type": "string",
+      "metadata": {
+        "description": "The job id to compile the configuration"
+      }
+    },
+    "runbook": {
+      "type": "string",
+      "description": "The name of the runbook to deploy.",
+    },
+    "runbook-parameters": {
+      "type": "object",
+      "description":  "Parameters for the runbook."
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "name": "[concat(parameters('accountName'), '/', parameters('jobId'))]",
+      "type": "Microsoft.Automation/AutomationAccounts/jobs",
+      "apiVersion": "2015-10-31",
+      "location": "parameters('location')]",
+      "tags": {},
+      "properties": {
+        "jobId": "[parameters('jobId')]",
+        "runbook": {
+          "name": "[parameters('runbook')]"
+        },
+        "parameters": "[parameters('runbook-parameters')]"
+      }
+    }
+  ],
+  "outputs": {}
+}
