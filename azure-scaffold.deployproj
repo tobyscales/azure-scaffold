@@ -28,6 +28,7 @@
     <Content Include="azuredeploy.json" />
     <Content Include="azuredeploy.parameters.json" />
     <Content Include="templates\automation\azuredeploy.parameters.json" />
+    <Content Include="templates\automation\jobs\azuredeploy.json" />
     <Content Include="templates\dsc\azuredeploy.parameters.json" />
     <Content Include="vm\azuredeploy.parameters.json" />
     <None Include="configurations\installChoco.ps1" />
@@ -54,10 +55,9 @@
     <None Include="references\Deploy-AzureResourceGroup - Copy.ps1" />
     <None Include="scripts\DeployO365SilentWithVersion.ps1" />
     <Content Include="templates\automation\azuredeploy.json" />
+    <None Include="templates\automation\jobs\azuredeploy.parameters.json" />
     <None Include="templates\dsc\azuredeploy-orig.json" />
     <None Include="templates\dsc\azuredeploy.json" />
-    <None Include="templates\jobs\azuredeploy.json" />
-    <None Include="templates\jobs\azuredeploy.parameters.json" />
     <None Include="templates\keyvault\azuredeploy.json" />
     <None Include="vm\azuredeploy.json" />
   </ItemGroup>

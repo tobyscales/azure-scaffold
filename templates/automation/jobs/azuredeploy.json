@@ -1,6 +1,6 @@
 ﻿{
-  "$schema": "http://schema.management.azure.com/schemas/2015-10-31/Microsoft.Automation.json",
-  "contentVersion": "1.0",
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+  "contentVersion": "1.0.0.2",
   "parameters": {
     "accountName": {
       "type": "string",
@@ -28,11 +28,15 @@
     },
     "runbook": {
       "type": "string",
-      "description": "The name of the runbook to deploy.",
+      "metadata": {
+        "description": "The name of the runbook to deploy."
+      }
     },
     "runbook-parameters": {
       "type": "object",
-      "description":  "Parameters for the runbook."
+      "metadata": {
+        "description": "Parameters for the runbook."
+      }
     }
   },
   "variables": {},
