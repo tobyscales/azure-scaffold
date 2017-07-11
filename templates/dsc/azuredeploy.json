@@ -159,7 +159,7 @@
             "value": "[parameters('configurations')[copyIndex()].name]"
           },
           "jobId": {
-            "value": "[reference(concat('getGuid-',copyIndex())).outputs.guid.value]"
+            "value": "[reference(concat('getDSCGuid-',copyIndex())).outputs.guid.value]"
           }
         }
       }
