@@ -10,13 +10,6 @@
     },
     "regionId": {
       "type": "string",
-      "allowedValues": [
-        "Japan East",
-        "East US 2",
-        "West Europe",
-        "Southeast Asia",
-        "South Central US"
-      ],
       "metadata": {
         "description": "The region to deploy the Automation account in."
       }

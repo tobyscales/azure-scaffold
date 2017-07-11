@@ -12,13 +12,6 @@
     "regionId": {
       "type": "string",
       "defaultValue": "East US 2",
-      "allowedValues": [
-        "Japan East",
-        "East US 2",
-        "West Europe",
-        "Southeast Asia",
-        "South Central US"
-      ],
       "metadata": {
         "description": "The region the Automation account is located in."
       }
