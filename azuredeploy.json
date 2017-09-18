@@ -73,6 +73,7 @@
     "keyVaultName": "[parameters('nameRoot')]",
     "keyVaultURL": "[concat('https://', variables('keyVaultName'), '.vault.azure.net/')]",
     "keyVaultResourceID": "[concat(subscription().id,'/resourceGroups/',resourceGroup().name,'/providers/Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
+    "regionId": "East US 2",
     "setupChocolatelyScriptLocation": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/visual-studio-dev-vm-chocolatey/scripts/",
     "setupChocolateyScriptFileName": "SetupChocolatey.ps1",
     "chocoPackages": "boxstarter,googlechrome,adobereader,notepadplusplus.install",
@@ -162,7 +163,7 @@
         },
         "parameters": {
           "accountName": { "value": "[variables('automationName')]" },
-          "regionId": { "value": "[resourceGroup().location]" },
+          "regionId": { "value": "[variables('regionid')]" },
           "userName": { "value": "[parameters('aadClientID')]" },
           "password": { "value": "[parameters('aadClientSecret')]" },
           "subscriptionId": { "value": "[parameters('subscriptionId')]" },
@@ -239,6 +240,10 @@
                   {
                     "name": "cChoco",
                     "uri": "https://devopsgallerystorage.blob.core.windows.net/packages/cchoco.2.3.1.nupkg"
+                  },
+                  {
+                    "name": "AzureRM.KeyVault",
+                    "uri": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.keyvault.3.1.0.nupkg"
                   }
                 ]
               }

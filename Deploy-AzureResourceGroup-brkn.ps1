@@ -1,28 +1,26 @@
 #Requires -Version 3.0
 #Requires -Module AzureRM.Resources
 #Requires -Module Azure.Storage
-#Requires -Module @{ModuleName="AzureRm.Profile";ModuleVersion="3.0"}
-
 
 Param(
-    [string] [Parameter(Mandatory=$true)] $ArtifactStagingDirectory,
     [string] [Parameter(Mandatory=$true)] $ResourceGroupLocation,
-    [string] $ResourceGroupName = $ArtifactStagingDirectory.replace('.\',''), #remove .\ if present
+    [string] $ResourceGroupName = 'devVM',
     [switch] $UploadArtifacts,
     [string] $StorageAccountName,
     [string] $StorageContainerName = $ResourceGroupName.ToLowerInvariant() + '-stageartifacts',
-    [string] $TemplateFile = $ArtifactStagingDirectory + '\azuredeploy.json',
-    [string] $TemplateParametersFile = $ArtifactStagingDirectory + '.\azuredeploy.parameters.json',
-    [string] $DSCSourceFolder = $ArtifactStagingDirectory + '.\DSC',
-    [switch] $ValidateOnly,
-    [string] $DebugOptions = "None"
+    [string] $TemplateFile = 'azuredeploy.json',
+    [string] $TemplateParametersFile = 'azuredeploy.parameters.json',
+    [string] $ArtifactStagingDirectory = '.',
+    [string] $DSCSourceFolder = 'DSC',
+    [switch] $ValidateOnly
+	#[string] [Parameter(Mandatory = $true)] $subscriptionId
 )
 
 try {
-    [Microsoft.Azure.Common.Authentication.AzureSession]::ClientFactory.AddUserAgent("VSAzureTools-$UI$($host.name)".replace(" ","_"), "AzureRMSamples")
+    [Microsoft.Azure.Common.Authentication.AzureSession]::ClientFactory.AddUserAgent("VSAzureTools-$UI$($host.name)".replace(' ','_'), '2.9.6')
 } catch { }
 
-$ErrorActionPreference = 'Stop'
+#$ErrorActionPreference = 'Stop'
 Set-StrictMode -Version 3
 
 function Format-ValidationOutput {
@@ -31,14 +29,17 @@ function Format-ValidationOutput {
     return @($ValidationOutput | Where-Object { $_ -ne $null } | ForEach-Object { @('  ' * $Depth + ': ' + $_.Message) + @(Format-ValidationOutput @($_.Details) ($Depth + 1)) })
 }
 
+ #try {
+ #       Select-AzureRmSubscription -SubscriptionId $subscriptionId;
+ #       } catch {
+           
+ #           Write-Host 'Please log into Azure now' -foregroundcolor Green;
+ #           Login-AzureRmAccount -ErrorAction "Stop" 1> $null;
+ #       }
 $OptionalParameters = New-Object -TypeName Hashtable
-
-if (!$ValidateOnly) {
-    $OptionalParameters.Add('DeploymentDebugLogLevel', $DebugOptions)
-}
-
 $TemplateFile = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, $TemplateFile))
 $TemplateParametersFile = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, $TemplateParametersFile))
+$uploadArtifacts = $false;
 
 if ($UploadArtifacts) {
     # Convert relative paths to absolute paths if needed
@@ -52,8 +53,8 @@ if ($UploadArtifacts) {
     }
     $ArtifactsLocationName = '_artifactsLocation'
     $ArtifactsLocationSasTokenName = '_artifactsLocationSasToken'
-    $OptionalParameters[$ArtifactsLocationName] = $JsonParameters | Select-Object -Expand $ArtifactsLocationName -ErrorAction Ignore | Select-Object -Expand 'value' -ErrorAction Ignore
-    $OptionalParameters[$ArtifactsLocationSasTokenName] = $JsonParameters | Select-Object -Expand $ArtifactsLocationSasTokenName -ErrorAction Ignore | Select-Object -Expand 'value' -ErrorAction Ignore
+    $OptionalParameters[$ArtifactsLocationName] = $JsonParameters | Select -Expand $ArtifactsLocationName -ErrorAction Ignore | Select -Expand 'value' -ErrorAction Ignore
+    $OptionalParameters[$ArtifactsLocationSasTokenName] = $JsonParameters | Select -Expand $ArtifactsLocationSasTokenName -ErrorAction Ignore | Select -Expand 'value' -ErrorAction Ignore
 
     # Create DSC configuration archive
     if (Test-Path $DSCSourceFolder) {
@@ -66,7 +67,7 @@ if ($UploadArtifacts) {
 
     # Create a storage account name if none was provided
     if ($StorageAccountName -eq '') {
-        $StorageAccountName = 'stage' + ((Get-AzureRmContext).Subscription.Id).Replace('-', '').substring(0, 19)
+        $StorageAccountName = 'stage' + ((Get-AzureRmContext).Subscription.SubscriptionId).Replace('-', '').substring(0, 19)
     }
 
     $StorageAccount = (Get-AzureRmStorageAccount | Where-Object{$_.StorageAccountName -eq $StorageAccountName})
@@ -88,8 +89,10 @@ if ($UploadArtifacts) {
 
     $ArtifactFilePaths = Get-ChildItem $ArtifactStagingDirectory -Recurse -File | ForEach-Object -Process {$_.FullName}
     foreach ($SourcePath in $ArtifactFilePaths) {
-       Set-AzureStorageBlobContent -File $SourcePath -Blob $SourcePath.Substring($ArtifactStagingDirectory.length + 1) -Container $StorageContainerName -Context $StorageAccount.Context -Force
+        Set-AzureStorageBlobContent -File $SourcePath -Blob $SourcePath.Substring($ArtifactStagingDirectory.length + 1) `
+            -Container $StorageContainerName -Context $StorageAccount.Context -Force
     }
+
     # Generate a 4 hour SAS token for the artifacts location if one was not provided in the parameters file
     if ($OptionalParameters[$ArtifactsLocationSasTokenName] -eq $null) {
         $OptionalParameters[$ArtifactsLocationSasTokenName] = ConvertTo-SecureString -AsPlainText -Force `
@@ -97,8 +100,59 @@ if ($UploadArtifacts) {
     }
 }
 
+#    $JsonParameters = Get-Content $TemplateParametersFile -Raw | ConvertFrom-Json
+#    if (($JsonParameters | Get-Member -Type NoteProperty 'parameters') -ne $null) {
+#        $JsonParameters = $JsonParameters.parameters
+#    }
+
+#########################################################################################################################
+##region Section2:  Create AAD app . Fill in $aadClientSecret variable if AAD app was already created
+#########################################################################################################################
+
+#$tenantID = (Get-AzureRmContext).Subscription.SubscriptionId
+#$aadAppName = $JsonParameters | Select -Expand "aadAppName" -ErrorAction Ignore | Select -Expand 'value' -ErrorAction Ignore
+
+    # Check if AAD app with $aadAppName was already created
+  #  $SvcPrincipals = (Get-AzureRmADServicePrincipal -SearchString $aadAppName);
+   # if(-not $SvcPrincipals)
+   # {
+   #     # Create a new AD application if not created before
+   #     $identifierUri = [string]::Format("http://localhost:8080/{0}",[Guid]::NewGuid().ToString("N"));
+   #     $defaultHomePage = "http://$resourceGroupName";
+   #     $now = [System.DateTime]::Now;
+   #     $oneYearFromNow = $now.AddYears(1);
+   #     $aadClientSecret = [Guid]::NewGuid();
+
+   #     Write-Host "Creating new AAD application ($aadAppName)";
+   #     $ADApp = New-AzureRmADApplication -DisplayName $aadAppName -HomePage $defaultHomePage -IdentifierUris $identifierUri  -StartDate $now -EndDate $oneYearFromNow -Password $aadClientSecret;
+   #     $servicePrincipal = New-AzureRmADServicePrincipal -ApplicationId $ADApp.ApplicationId;
+   #     $SvcPrincipals = (Get-AzureRmADServicePrincipal -SearchString $aadAppName);
+   #     if(-not $SvcPrincipals)
+   #     {
+   #         # AAD app wasn't created 
+   #         Write-Error "Failed to create AAD app $aadAppName. Please log in to Azure using Login-AzureRmAccount and try again";
+   #         return;
+   #     }
+   #     $aadClientID = $servicePrincipal.ApplicationId;
+   #     Write-Host "Created a new AAD Application ($aadAppName) with ID: $aadClientID ";
+   # }
+   # else
+   # {
+   ##    
+   ##     $aadClientSecret = $env:aadclientsecret
+   #     $aadClientID = $SvcPrincipals[0].ApplicationId;
+   # }
+
+#endregion Section2
+
+
+#$OptionalParameters["aadappname"] = $aadClientID
+if (Get-AzureRmResourcegroup -Name "$resourcegroupname" -Location $resourcegrouplocation) {
+Remove-AzureRmResourceGroup -Name "$resourcegroupname" -Confirm $false
+}
+
 # Create or update the resource group using the specified template file and template parameters file
-New-AzureRmResourceGroup -Name $ResourceGroupName -Location $ResourceGroupLocation -Verbose -Force -ErrorAction Stop 
+New-AzureRmResourceGroup -Name $ResourceGroupName -Location $ResourceGroupLocation -Verbose -Force
 
 if ($ValidateOnly) {
     $ErrorMessages = Format-ValidationOutput (Test-AzureRmResourceGroupDeployment -ResourceGroupName $ResourceGroupName `

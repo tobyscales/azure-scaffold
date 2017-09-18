@@ -32,10 +32,12 @@
     <Content Include="templates\dsc\azuredeploy.parameters.json" />
     <Content Include="vm\azuredeploy.parameters.json" />
     <None Include="configurations\installChoco.ps1" />
+    <None Include="Deploy-AzureResourceGroup-brkn.ps1" />
+    <Content Include="Deploy-AzureResourceGroup.ps1" />
     <None Include="Deployment.targets">
       <Visible>False</Visible>
     </None>
-    <Content Include="Deploy-AzureResourceGroup.ps1" />
+    <Content Include="Deploy-AzureResourceGroup-new.ps1" />
     <None Include="metadata.json" />
     <None Include="README.md" />
     <None Include="references\101-automation-runbook-getvms\azuredeploy.json" />
