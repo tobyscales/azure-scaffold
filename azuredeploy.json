@@ -1,5 +1,5 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
     "nameRoot": {
@@ -7,12 +7,12 @@
       "metadata": {
         "description": "Name of the virtual machine"
       },
-      "defaultValue": "[uniqueString(resourceGroup().name)]"
+      "defaultValue": "[concat('vm-', take(resourceGroup().name,12))]"
     },
     "subscriptionId": {
       "type": "string",
       "metadata": {
-        "description": "your Azure subscription Id"
+        "description": "Your Azure Subscription Id"
       },
       "defaultValue": "[subscription().subscriptionId]"
     },
@@ -21,73 +21,125 @@
       "metadata": {
         "description": "Your GitHub repo"
       },
-      "defaultValue": "https://raw.githubusercontent.com/tescales/azure-scaffold/master/"
+      "defaultValue": "tescales/azure-scaffold"
     },
-    "aadappname": {
+    "userObjectId": {
       "type": "string",
       "metadata": {
-        "description": "name of aad app"
-      }
-    },
-    "aadClientID": {
-      "type": "string",
-      "metadata": {
-        "description": "Client ID of AAD app which has permissions to KeyVault"
-      }
-    },
-    "aadClientSecret": {
-      "type": "securestring",
-      "metadata": {
-        "description": "Client Secret of AAD app which has permissions to KeyVault"
+        "description": "Your User ObjectId"
       }
     },
     "aadTenantId": {
       "type": "string",
       "metadata": {
-        "description": "AzureAD TenantId"
-      }
-    },
-    "useExistingKek": {
-      "type": "string",
-      "defaultValue": "nokek",
-      "allowedValues": [
-        "nokek",
-        "kek"
-      ],
-      "metadata": {
-        "description": "Select kek if the secret should be encrypted with a key encryption key and pass explicit keyEncryptionKeyURL. For nokek, you can keep keyEncryptionKeyURL empty."
-      }
-    },
-    "keyEncryptionKeyURL": {
-      "type": "string",
-      "defaultValue": "",
-      "metadata": {
-        "description": "URL of the KeyEncryptionKey used to encrypt the volume encryption key"
-      }
+        "description": "Your AzureAD TenantId"
+      },
+      "defaultValue": "[subscription().tenantId]"
     }
   },
   "variables": {
+    "storageAccountName": "[take(toLower( replace( concat( resourceGroup().name, 'scrt'), '-', '') ),23)]",
+    "storageAccountShare": "scripts",
     "automationName": "[parameters('nameRoot')]",
     "automationUser": "username",
     "automationPass": "password",
     "keyVaultName": "[parameters('nameRoot')]",
+    "keyVaultDeployUri": "[concat('https://raw.githubusercontent.com/', parameters('ghURL'), '/master/templates/keyvault/azuredeploy.json')]",
     "keyVaultURL": "[concat('https://', variables('keyVaultName'), '.vault.azure.net/')]",
     "keyVaultResourceID": "[concat(subscription().id,'/resourceGroups/',resourceGroup().name,'/providers/Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
-    "regionId": "East US 2",
+    "regionId": "[resourceGroup().location]",
+    "automationAcctDeployUri": "[concat('https://raw.githubusercontent.com/', parameters('ghURL'), '/master/templates/automation/azuredeploy.json')]",
+    "dscDeployUri": "[concat('https://raw.githubusercontent.com/', parameters('ghURL'), '/master/templates/dsc/azuredeploy.json')]",
     "setupChocolatelyScriptLocation": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/visual-studio-dev-vm-chocolatey/scripts/",
     "setupChocolateyScriptFileName": "SetupChocolatey.ps1",
     "chocoPackages": "boxstarter,googlechrome,adobereader,notepadplusplus.install",
     "chocoScript": "https://chocolatey.org/install.ps1",
     "chocoScriptFile": "install.ps1"
   },
-
   "resources": [
+    {
+      "name": "[variables('StorageAccountName')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2018-02-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "description": "Used for Script Storage"
+      },
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "StorageV2",
+      "properties": {}
+    },
+    {
+      "name": "az-cli",
+      "type": "Microsoft.ContainerInstance/containerGroups",
+      "apiVersion": "2018-07-01",
+      "location": "[resourcegroup().location]",
+      "dependsOn": [
+        "[variables('storageAccountName')]"
+      ],
+      "comments": "",
+      "properties": {
+        "containers": [
+          { 
+            "name": "create-aad-app",
+            "properties": {
+              "image": "microsoft/azure-cli",
+              "command": [
+                "az",
+                "ad",
+                "sp",
+                "create-for-rbac",
+                "-n",
+                "[concat('app-', take(resourceGroup().name,12))]",
+                "> ~/secrets/rbac.json"
+              ],
+              "volumeMounts": [
+                {
+                  "name": "ext-storage",
+                  "mountPath": "/home/secrets"
+                }
+              ],
+              "environmentVariables": [
+                {
+                  "name": "AZURE_STORAGE_KEY",
+                  "securevalue": "[listKeys(variables('storageAccountName'),'2017-10-01').keys[0].value]"
+                },
+                {
+                  "name": "AZURE_STORAGE_ACCOUNT",
+                  "value": "[variables('storageAccountName')]"
+                }
+              ],
+              "resources": {
+                "requests": {
+                  "cpu": "1",
+                  "memoryInGb": "1"
+                }
+              }
+            }
+          }
+        ],
+        "restartPolicy": "OnFailure",
+        "osType": "Linux",
+        "volumes": [
+          {
+            "name": "ext-storage",
+            "azureFile": {
+              "shareName": "[variables('StorageAccountShare')]",
+              "readOnly": false,
+              "storageAccountName": "[variables('StorageAccountName')]",
+              "storageAccountKey": "[listKeys(variables('storageAccountName'),'2017-10-01').keys[0].value]"
+            }
+          }
+        ]
+      }
+    },
     {
       "name": "[variables('automationName')]",
       "type": "Microsoft.Automation/automationAccounts",
       "apiVersion": "2015-10-31",
       "location": "[resourceGroup().location]",
-      "dependsOn": [],
       "tags": {},
       "properties": {
         "sku": {
@@ -102,48 +154,49 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('ghURL'), '/templates/keyvault/azuredeploy.json')]",
+          "uri": "[variables('keyVaultDeployUri')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
           "keyVaultName": {
             "value": "[variables('keyVaultName')]"
           },
-
           "tenantId": {
             "value": "[parameters('aadTenantId')]"
           },
-
           "accessPolicies": {
             "value": [
               {
                 "tenantId": "[parameters('aadTenantId')]",
-                "objectId": "[parameters('aadClientID')]",
-                "displayname": "[parameters('aadappname')]",
+                "objectId": "[parameters('userObjectId')]",
+                "displayname": "deployedByUser",
                 "permissions": {
-                  "keys": [ "all" ],
-                  "secrets": [ "all" ]
+                  "keys": [
+                    "all"
+                  ],
+                  "secrets": [
+                    "all"
+                  ]
                 }
-              }
-            ]
-          },
-          "secrets": {
-            "value": [
-              {
-                "secretName": "ConnectionString",
-                "secretValue": "SecureString1"
               }
             ]
           },
           "enabledForDeployment": {
             "value": true
           },
-
           "enabledForTemplateDeployment": {
             "value": true
           },
           "enableVaultForVolumeEncryption": {
             "value": true
+          },
+          "secrets": {
+            "value": [
+              {
+                "secretName": "deployer",
+                "secretValue": "SecureString1"
+              }
+            ]
           }
         }
       }
@@ -153,20 +206,28 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
       "dependsOn": [
-        "[concat('Microsoft.Automation/automationAccounts/', variables('automationName'))]"
+        "[concat('Microsoft.Automation/automationAccounts/', variables('automationName'))]",
+        "[variables('keyVaultName')]"
       ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('ghURL'), '/templates/automation/azuredeploy.json')]",
+          "uri": "[variables('automationAcctDeployUri')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "accountName": { "value": "[variables('automationName')]" },
-          "regionId": { "value": "[variables('regionid')]" },
-          "userName": { "value": "[parameters('aadClientID')]" },
-          "password": { "value": "[parameters('aadClientSecret')]" },
-          "subscriptionId": { "value": "[parameters('subscriptionId')]" },
+          "accountName": {
+            "value": "[variables('automationName')]"
+          },
+          "userName": {
+            "value": "[parameters('userObjectId')]"
+          },
+          "password": {
+            "value": "secret"
+          },
+          "subscriptionId": {
+            "value": "[parameters('subscriptionId')]"
+          },
           "runbooks": {
             "value": [
               {
@@ -221,34 +282,32 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('ghURL'), '/templates/dsc/azuredeploy.json')]",
+          "uri": "[variables('dscDeployUri')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "accountName": { "value": "[variables('automationName')]" },
+          "accountName": {
+            "value": "[variables('automationName')]"
+          },
           "configurations": {
             "value": [
               {
                 "name": "InstallChoco",
-                "description":  "Installs Chocolatey",
+                "description": "Installs Chocolatey",
                 "uri": "https://raw.githubusercontent.com/tescales/azure-scaffold/master/configurations/installChoco.ps1"
               }
             ]
           },
-          "modules" : {
-                "value": [
-                  {
-                    "name": "cChoco",
-                    "uri": "https://devopsgallerystorage.blob.core.windows.net/packages/cchoco.2.3.1.nupkg"
-                  },
-                  {
-                    "name": "AzureRM.KeyVault",
-                    "uri": "https://devopsgallerystorage.blob.core.windows.net/packages/azurerm.keyvault.3.1.0.nupkg"
-                  }
-                ]
+          "modules": {
+            "value": [
+              {
+                "name": "cChoco",
+                "uri": "https://devopsgallerystorage.blob.core.windows.net/packages/cchoco.2.3.1.nupkg"
               }
+            ]
           }
         }
+      }
     }
   ],
   "outputs": {}
