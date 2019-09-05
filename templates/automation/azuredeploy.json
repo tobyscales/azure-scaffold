@@ -1,4 +1,4 @@
-﻿{
+{
   "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
   "contentVersion": "1.0.0.0",
   "parameters": {
@@ -8,13 +8,6 @@
         "description": "The name of the Azure Automation account to deploy to."
       }
     },
-    "regionId": {
-      "type": "string",
-      "metadata": {
-        "description": "The region to deploy the Automation account in."
-      }
-    },
-
     "userName": {
       "type": "string",
       "metadata": {
@@ -58,7 +51,7 @@
       "name": "[parameters('accountName')]",
       "type": "Microsoft.Automation/automationAccounts",
       "apiVersion": "2015-10-31",
-      "location": "[parameters('regionId')]",
+      "location": "[resourceGroup().location]",
       "dependsOn": [],
       "tags": {},
       "properties": {
@@ -72,7 +65,7 @@
           "name": "[variables('credentialName')]",
           "type": "credentials",
           "apiVersion": "2015-01-01-preview",
-          "location": "[parameters('regionId')]",
+          "location": "[resourceGroup().location]",
           "dependsOn": [
             "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'))]"
           ],
@@ -86,7 +79,7 @@
           "name": "[variables('variableName')]",
           "type": "variables",
           "apiVersion": "2015-01-01-preview",
-          "location": "[parameters('regionId')]",
+          "location": "[resourceGroup().location]",
           "dependsOn": [
             "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'))]"
           ],
@@ -105,7 +98,7 @@
       "name": "[concat(parameters('accountName'), '/', parameters('runbooks')[copyIndex()].name)]",
       "type": "Microsoft.Automation/automationAccounts/runbooks",
       "apiVersion": "2015-10-31",
-      "location": "[parameters('regionId')]",
+      "location": "[resourceGroup().location]",
       "dependsOn": [
         "[resourceId('Microsoft.Automation/automationAccounts/', parameters('accountName'))]"
       ],
@@ -147,7 +140,7 @@
             "value": "[parameters('accountName')]"
           },
           "regionId": {
-            "value": "[parameters('regionId')]"
+            "value": "[resourceGroup().location]"
           },
           "runbookName": {
             "value": "[parameters('runnowbooks')[copyIndex()].name]"
@@ -206,7 +199,7 @@
             "value": "[parameters('accountName')]"
           },
           "location": {
-            "value": "[parameters('regionId')]"
+            "value": "[resourceGroup().location]"
           },
           "runbook": {
             "value": "[parameters('runnowbooks')[copyIndex()].name]"
