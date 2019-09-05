@@ -83,22 +83,18 @@
       "properties": {
         "containers": [
           { 
-            "name": "create-aad-app",
+            "name": "bootstrapper",
             "properties": {
               "image": "microsoft/azure-cli",
               "command": [
-                "az",
-                "ad",
-                "sp",
-                "create-for-rbac",
-                "-n",
-                "[concat('app-', take(resourceGroup().name,12))]",
-                "> ~/secrets/rbac.json"
+                "bash",
+                "-c",
+                "~/code/bootstrap.sh"
               ],
               "volumeMounts": [
                 {
-                  "name": "ext-storage",
-                  "mountPath": "/home/secrets"
+                  "name": "gitRepo",
+                  "mountPath": "/home/code"
                 }
               ],
               "environmentVariables": [
@@ -124,12 +120,9 @@
         "osType": "Linux",
         "volumes": [
           {
-            "name": "ext-storage",
-            "azureFile": {
-              "shareName": "[variables('StorageAccountShare')]",
-              "readOnly": false,
-              "storageAccountName": "[variables('StorageAccountName')]",
-              "storageAccountKey": "[listKeys(variables('storageAccountName'),'2017-10-01').keys[0].value]"
+            "name": "gitRepo",
+            "gitRepo": {
+              "repository": "[concat('https://github.com/', parameters('ghURL'))]"
             }
           }
         ]
@@ -144,60 +137,6 @@
       "properties": {
         "sku": {
           "name": "Free"
-        }
-      }
-    },
-    {
-      "name": "DeployKeyVault",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-01-01",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('keyVaultDeployUri')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "keyVaultName": {
-            "value": "[variables('keyVaultName')]"
-          },
-          "tenantId": {
-            "value": "[parameters('aadTenantId')]"
-          },
-          "accessPolicies": {
-            "value": [
-              {
-                "tenantId": "[parameters('aadTenantId')]",
-                "objectId": "[parameters('userObjectId')]",
-                "displayname": "deployedByUser",
-                "permissions": {
-                  "keys": [
-                    "all"
-                  ],
-                  "secrets": [
-                    "all"
-                  ]
-                }
-              }
-            ]
-          },
-          "enabledForDeployment": {
-            "value": true
-          },
-          "enabledForTemplateDeployment": {
-            "value": true
-          },
-          "enableVaultForVolumeEncryption": {
-            "value": true
-          },
-          "secrets": {
-            "value": [
-              {
-                "secretName": "deployer",
-                "secretValue": "SecureString1"
-              }
-            ]
-          }
         }
       }
     },

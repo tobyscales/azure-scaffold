@@ -1,0 +1,40 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "accessPolicies": {
+            "value": [
+                {
+                    "tenantId": "[parameters('aadTenantId')]",
+                    "objectId": "[parameters('userObjectId')]",
+                    "displayname": "deployedByUser",
+                    "permissions": {
+                        "keys": [
+                            "all"
+                        ],
+                        "secrets": [
+                            "all"
+                        ]
+                    }
+                }
+            ]
+        },
+        "enabledForDeployment": {
+            "value": true
+        },
+        "enabledForTemplateDeployment": {
+            "value": true
+        },
+        "enableVaultForVolumeEncryption": {
+            "value": true
+        },
+        "secrets": {
+            "value": [
+                {
+                    "secretName": "deployer",
+                    "secretValue": "SecureString1"
+                }
+            ]
+        }
+    }
+}
