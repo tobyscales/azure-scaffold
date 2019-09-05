@@ -10,12 +10,17 @@ upn=$(az account show --query user.name --output tsv)
 userid=$(az ad user show --id $upn --query objectId)
 #$userid = (iex "az ad user show --id $upn --query objectId")
 
+az login --identity
+az configure --defaults location=$location group=$resourceGroup
+
 az group create --name $resourceGroup --location $location
 az keyvault create --resource-group $resourceGroup --name $keyVaultName --enabled-for-deployment true --enabled-for-template-deployment true 
 az ad sp create-for-rbac -n "deploy.$resourceGroup" > rbac.json
 jq -r '"appId --value \(.appId),tenantId --value \(.tenant),password --value \(.password)"' rbac.json | xargs -t -d, -I {} bash -c 'az keyvault secret set --vault-name $keyVaultName -n {}' 
 
 az group deployment create --resource-group $resourceGroup --template-file ~/code/azuredeploy.json --parameters userObjectId=$userid
+
+#                "chmod +x /code/$GITHUB_REPO/bootstrap/bootstrap.sh; /code/$GITHUB_REPO/bootstrap/bootstrap.sh"
 
 
 #jq -r '"appId --value \(.appId),tenantId --value \(.tenant),password --value \(.password)"' rbac.json | xargs -t -d, -I {} bash -c 'az keyvault secret set --vault-name dnd-azurekv -n {}'

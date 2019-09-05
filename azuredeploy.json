@@ -47,7 +47,10 @@
   "variables": {
     "ghURL": "[concat('https://raw.githubusercontent.com/', parameters('gitHubUser'), '/', parameters('gitHubRepo'), '/master')]",
     "storageAccountName": "[take(toLower( replace( concat( resourceGroup().name, 'scrt'), '-', '') ),23)]",
+    "contributorRoleDefinitionId": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
+    "roleAssignmentId": "[guid(resourceGroup().id)]",
     "storageAccountShare": "scripts",
+    "bootStrapCmd": "az ad sp create-for-rbac -n app-$RESOURCE_GROUP > rbac.json; jq -r 'appId --value \\(.appId),tenantId --value \\(.tenant),password --value \\(.password)' rbac.json",
     "automationName": "[parameters('nameRoot')]",
     "automationUser": "username",
     "automationPass": "password",
@@ -88,18 +91,19 @@
         "[variables('storageAccountName')]"
       ],
       "comments": "",
+      "identity": {
+        "type": "SystemAssigned"
+      },
       "properties": {
         "containers": [
-          { 
+          {
             "name": "bootstrapper",
             "properties": {
               "image": "microsoft/azure-cli",
               "command": [
-                "chmod",
-                "+x",
-                "[concat('/code/', parameters('gitHubRepo'), '/bootstrap/bootstrap.sh')]",
-                "&&",
-                "[concat('/code/', parameters('gitHubRepo'), '/bootstrap/bootstrap.sh')]"
+                "/bin/bash",
+                "-c",
+                "chmod +x /code/$GITHUB_REPO/bootstrap/bootstrap.sh; /code/$GITHUB_REPO/bootstrap/bootstrap.sh"
               ],
               "volumeMounts": [
                 {
@@ -115,6 +119,14 @@
                 {
                   "name": "AZURE_STORAGE_ACCOUNT",
                   "value": "[variables('storageAccountName')]"
+                },
+                {
+                  "name": "GITHUB_REPO",
+                  "value": "[parameters('gitHubRepo')]"
+                },
+                {
+                  "name": "RESOURCE_GROUP",
+                  "value": "[resourceGroup().name]"
                 }
               ],
               "resources": {
@@ -126,7 +138,7 @@
             }
           }
         ],
-        "restartPolicy": "OnFailure",
+        "restartPolicy": "Never",
         "osType": "Linux",
         "volumes": [
           {
@@ -139,123 +151,16 @@
       }
     },
     {
-      "name": "[variables('automationName')]",
-      "type": "Microsoft.Automation/automationAccounts",
-      "apiVersion": "2015-10-31",
-      "location": "[resourceGroup().location]",
-      "tags": {},
-      "properties": {
-        "sku": {
-          "name": "Free"
-        }
-      }
-    },
-    {
-      "name": "DeployAutomationAcct",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-01-01",
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2017-09-01",
+      "name": "[variables('roleAssignmentId')]",
       "dependsOn": [
-        "[concat('Microsoft.Automation/automationAccounts/', variables('automationName'))]",
-        "[variables('keyVaultName')]"
+          "Microsoft.ContainerInstance/containerGroups/az-cli"
       ],
       "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('automationAcctDeployUri')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "accountName": {
-            "value": "[variables('automationName')]"
-          },
-          "userName": {
-            "value": "[parameters('userObjectId')]"
-          },
-          "password": {
-            "value": "secret"
-          },
-          "subscriptionId": {
-            "value": "[parameters('subscriptionId')]"
-          },
-          "runbooks": {
-            "value": [
-              {
-                "name": "StartAzureV2VMs",
-                "runboookType": "Graph",
-                "Uri": "https://gallery.technet.microsoft.com/scriptcenter/Start-Azure-ARM-VMs-66fb875d/file/162482/1/StartAzureV2Vm.graphrunbook",
-                "description": "This Graphical PowerShell runbook connects to Azure using an Automation Run As account and starts all V2 VMs in an Azure subscription or in a resource group or a single named V2 VM. You can attach a recurring schedule to this runbook to run it at a specific time."
-              },
-              {
-                "name": "StopAzureV2VMs",
-                "runboookType": "Graph",
-                "Uri": "https://gallery.technet.microsoft.com/scriptcenter/Stop-Azure-ARM-VMs-1ba96d5b/file/162480/1/StopAzureV2Vm.graphrunbook",
-                "description": "This Graphical PowerShell runbook connects to Azure using an Automation Run As account and stops all V2 VMs in an Azure subscription or in a resource group or a single named V2 VM. You can attach a recurring schedule to this runbook to run it at a specific time."
-              },
-              {
-                "name": "Register-VMDSC",
-                "runboookType": "Graph",
-                "Uri": "https://gallery.technet.microsoft.com/scriptcenter/Registers-Azure-resource-31979771/file/160035/1/Register-VMDSC.graphrunbook",
-                "description": "This runbook registers Azure resource manager virtual machines with automation DSC service. These can either be Windows or Linux virtual machines that are supported with DSC. You can specify the whole subscription, a specific resource group, or an individual VM."
-              },
-              {
-                "name": "New-HybridWorkerAndAzureVM",
-                "runboookType": "PowerShell",
-                "Uri": "https://raw.githubusercontent.com/azureautomation/runbooks/master/Utility/ARM/New-HybridWorkerAndAzureVM.ps1",
-                "description": "This Azure/OMS Automation runbook creates a new VM and onboards it as a hybrid worker.",
-                "credentialName": "AzureCredential",
-                "variableName": "AzureSubscriptionId",
-                "variableType": "string"
-              }
-            ]
-          },
-          "runnowbooks": {
-            "value": [
-              {
-                "name": "AutoTagResources-generic",
-                "runboookType": "Script",
-                "Uri": "https://gallery.technet.microsoft.com/scriptcenter/Automatically-Azure-fc5f1443/file/165796/1/AutoTagResources-generic.ps1",
-                "description": "An Azure Automation Runbook, to automatically tag Azure Resource Groups with the owner alias."
-              }
-            ]
-          }
-        }
-      }
-    },
-    {
-      "name": "DeployDSCAutomation",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-01-01",
-      "dependsOn": [
-        "[concat('Microsoft.Automation/automationAccounts/', variables('automationName'))]"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('dscDeployUri')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "accountName": {
-            "value": "[variables('automationName')]"
-          },
-          "configurations": {
-            "value": [
-              {
-                "name": "InstallChoco",
-                "description": "Installs Chocolatey",
-                "uri": "https://raw.githubusercontent.com/tescales/azure-scaffold/master/configurations/installChoco.ps1"
-              }
-            ]
-          },
-          "modules": {
-            "value": [
-              {
-                "name": "cChoco",
-                "uri": "https://devopsgallerystorage.blob.core.windows.net/packages/cchoco.2.3.1.nupkg"
-              }
-            ]
-          }
-        }
+        "roleDefinitionId": "[variables('contributorRoleDefinitionId')]",
+        "principalId": "[reference(concat('Microsoft.ContainerInstance/containerGroups/', 'az-cli'), '2017-03-30', 'Full').identity.principalId]",
+        "scope": "[resourceGroup().id]"
       }
     }
   ],
