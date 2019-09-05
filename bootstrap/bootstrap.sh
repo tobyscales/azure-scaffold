@@ -1,9 +1,9 @@
 #!/bin/bash
 #comments are PS equivalents
 
-$resourceGroup="devopsmgmt"
-$location="South Central US"
-$keyVaultName="kv-$resourceGroup"
+resourceGroup="devopsmgmt"
+location="South Central US"
+keyVaultName="kv-$resourceGroup"
 
 upn=$(az account show --query user.name --output tsv)
 #$upn=(iex "az account show --query user.name --output tsv") //pwsh
@@ -16,9 +16,6 @@ az ad sp create-for-rbac -n "deploy.$resourceGroup" > rbac.json
 jq -r '"appId --value \(.appId),tenantId --value \(.tenant),password --value \(.password)"' rbac.json | xargs -t -d, -I {} bash -c 'az keyvault secret set --vault-name $keyVaultName -n {}' 
 
 az group deployment create --resource-group $resourceGroup --template-file ~/code/azuredeploy.json --parameters userObjectId=$userid
-
-
-
 
 
 #jq -r '"appId --value \(.appId),tenantId --value \(.tenant),password --value \(.password)"' rbac.json | xargs -t -d, -I {} bash -c 'az keyvault secret set --vault-name dnd-azurekv -n {}'

@@ -95,8 +95,10 @@
             "properties": {
               "image": "microsoft/azure-cli",
               "command": [
-                "bash",
-                "-c",
+                "chmod",
+                "+x",
+                "[concat('/code/', parameters('gitHubRepo'), '/bootstrap/bootstrap.sh')]",
+                "&&",
                 "[concat('/code/', parameters('gitHubRepo'), '/bootstrap/bootstrap.sh')]"
               ],
               "volumeMounts": [
