@@ -16,12 +16,19 @@
       },
       "defaultValue": "[subscription().subscriptionId]"
     },
-    "ghURL": {
+    "gitHubUser": {
       "type": "string",
       "metadata": {
-        "description": "Your GitHub repo"
+        "description": "Your GitHub username"
       },
-      "defaultValue": "tescales/azure-scaffold"
+      "defaultValue": "tescales"
+    },
+    "gitHubRepo": {
+      "type": "string",
+      "metadata": {
+        "description": "Your GitHub username"
+      },
+      "defaultValue": "azure-scaffold"
     },
     "userObjectId": {
       "type": "string",
@@ -38,18 +45,19 @@
     }
   },
   "variables": {
+    "ghURL": "[concat('https://raw.githubusercontent.com/', parameters('gitHubUser'), '/', parameters('gitHubRepo'), '/master')]",
     "storageAccountName": "[take(toLower( replace( concat( resourceGroup().name, 'scrt'), '-', '') ),23)]",
     "storageAccountShare": "scripts",
     "automationName": "[parameters('nameRoot')]",
     "automationUser": "username",
     "automationPass": "password",
     "keyVaultName": "[parameters('nameRoot')]",
-    "keyVaultDeployUri": "[concat('https://raw.githubusercontent.com/', parameters('ghURL'), '/master/templates/keyvault/azuredeploy.json')]",
+    "keyVaultDeployUri": "[concat(variables('ghURL'), '/templates/keyvault/azuredeploy.json')]",
     "keyVaultURL": "[concat('https://', variables('keyVaultName'), '.vault.azure.net/')]",
     "keyVaultResourceID": "[concat(subscription().id,'/resourceGroups/',resourceGroup().name,'/providers/Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
     "regionId": "[resourceGroup().location]",
-    "automationAcctDeployUri": "[concat('https://raw.githubusercontent.com/', parameters('ghURL'), '/master/templates/automation/azuredeploy.json')]",
-    "dscDeployUri": "[concat('https://raw.githubusercontent.com/', parameters('ghURL'), '/master/templates/dsc/azuredeploy.json')]",
+    "automationAcctDeployUri": "[concat(variables('ghURL'), '/templates/automation/azuredeploy.json')]",
+    "dscDeployUri": "[concat(variables('ghURL'), '/templates/dsc/azuredeploy.json')]",
     "setupChocolatelyScriptLocation": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/visual-studio-dev-vm-chocolatey/scripts/",
     "setupChocolateyScriptFileName": "SetupChocolatey.ps1",
     "chocoPackages": "boxstarter,googlechrome,adobereader,notepadplusplus.install",
@@ -89,12 +97,12 @@
               "command": [
                 "bash",
                 "-c",
-                "~/code/bootstrap.sh"
+                "[concat('/code/', parameters('gitHubRepo'), '/bootstrap/bootstrap.sh')]"
               ],
               "volumeMounts": [
                 {
-                  "name": "gitRepo",
-                  "mountPath": "/home/code"
+                  "name": "git-volume",
+                  "mountPath": "/code"
                 }
               ],
               "environmentVariables": [
@@ -120,9 +128,9 @@
         "osType": "Linux",
         "volumes": [
           {
-            "name": "gitRepo",
+            "name": "git-volume",
             "gitRepo": {
-              "repository": "[concat('https://github.com/', parameters('ghURL'))]"
+              "repository": "[concat('https://github.com/', parameters('gitHubUser'), '/', parameters('gitHubRepo'))]"
             }
           }
         ]
