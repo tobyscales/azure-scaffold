@@ -49,7 +49,7 @@
     "storageAccountName": "[take(toLower( replace( concat( resourceGroup().name, 'scrt'), '-', '') ),23)]",
     "contributorRoleDefinitionId": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
     "roleAssignmentId": "[guid(resourceGroup().id)]",
-    "cgName": "[concat('deploy', take(toLower( replace( concat( resourceGroup().name, 'scrt'), '-', '') ),23))]",
+    "cgName": "[concat('deploy', take(toLower( replace( concat( resourceGroup().name, 'cg'), '-', '') ),23))]",
     "storageAccountShare": "scripts",
     "bootStrapCmd": "az ad sp create-for-rbac -n app-$RESOURCE_GROUP > rbac.json; jq -r 'appId --value \\(.appId),tenantId --value \\(.tenant),password --value \\(.password)' rbac.json",
     "automationName": "[parameters('nameRoot')]",
@@ -70,27 +70,10 @@
   },
   "resources": [
     {
-      "name": "[variables('StorageAccountName')]",
-      "type": "Microsoft.Storage/storageAccounts",
-      "apiVersion": "2018-02-01",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "description": "Used for Script Storage"
-      },
-      "sku": {
-        "name": "Standard_LRS"
-      },
-      "kind": "StorageV2",
-      "properties": {}
-    },
-    {
       "name": "[variables('cgName')]",
       "type": "Microsoft.ContainerInstance/containerGroups",
       "apiVersion": "2018-10-01",
       "location": "[resourcegroup().location]",
-      "dependsOn": [
-        "[variables('storageAccountName')]"
-      ],
       "comments": "",
       "identity": {
         "type": "SystemAssigned"
@@ -113,14 +96,6 @@
                 }
               ],
               "environmentVariables": [
-                {
-                  "name": "AZURE_STORAGE_KEY",
-                  "securevalue": "[listKeys(variables('storageAccountName'),'2017-10-01').keys[0].value]"
-                },
-                {
-                  "name": "AZURE_STORAGE_ACCOUNT",
-                  "value": "[variables('storageAccountName')]"
-                },
                 {
                   "name": "GITHUB_REPO",
                   "value": "[parameters('gitHubRepo')]"

@@ -7,8 +7,8 @@ echo location: $AZURE_LOCATION
 echo Resourcegroup: $AZURE_RESOURCE_GROUP
 
 az login --identity
-az configure --defaults location="$AZURE_LOCATION"
-az configure --defaults group="$AZURE_RESOURCE_GROUP"
+az configure --defaults location=$AZURE_LOCATION
+az configure --defaults group=$AZURE_RESOURCE_GROUP
 
 #group=$resourceGroup
 
@@ -17,9 +17,7 @@ az configure --defaults group="$AZURE_RESOURCE_GROUP"
 #userid=$(az ad user show --id $upn --query objectId)
 #$userid = (iex "az ad user show --id $upn --query objectId")
 
-az group create
-#--name $resourceGroup --location $location
-#az keyvault create --resource-group $resourceGroup --name $keyVaultName --enabled-for-deployment true --enabled-for-template-deployment true 
+az keyvault create --name $keyVaultName --enabled-for-deployment true --enabled-for-template-deployment true 
 #az ad sp create-for-rbac -n "deploy.$resourceGroup" > rbac.json
 #jq -r '"appId --value \(.appId),tenantId --value \(.tenant),password --value \(.password)"' rbac.json | xargs -t -d, -I {} bash -c 'az keyvault secret set --vault-name $keyVaultName -n {}' 
 
