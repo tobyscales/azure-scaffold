@@ -49,6 +49,7 @@
     "storageAccountName": "[take(toLower( replace( concat( resourceGroup().name, 'scrt'), '-', '') ),23)]",
     "contributorRoleDefinitionId": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
     "roleAssignmentId": "[guid(resourceGroup().id)]",
+    "cgName": "[concat('deploy', take(toLower( replace( concat( resourceGroup().name, 'scrt'), '-', '') ),23))]",
     "storageAccountShare": "scripts",
     "bootStrapCmd": "az ad sp create-for-rbac -n app-$RESOURCE_GROUP > rbac.json; jq -r 'appId --value \\(.appId),tenantId --value \\(.tenant),password --value \\(.password)' rbac.json",
     "automationName": "[parameters('nameRoot')]",
@@ -83,9 +84,9 @@
       "properties": {}
     },
     {
-      "name": "az-cli",
+      "name": "[variables('cgName')]",
       "type": "Microsoft.ContainerInstance/containerGroups",
-      "apiVersion": "2018-07-01",
+      "apiVersion": "2018-10-01",
       "location": "[resourcegroup().location]",
       "dependsOn": [
         "[variables('storageAccountName')]"
@@ -155,12 +156,12 @@
       "apiVersion": "2017-09-01",
       "name": "[variables('roleAssignmentId')]",
       "dependsOn": [
-          "Microsoft.ContainerInstance/containerGroups/az-cli"
+          "[concat('Microsoft.ContainerInstance/containerGroups/', variables('cgName'))]"
       ],
       "properties": {
         "roleDefinitionId": "[variables('contributorRoleDefinitionId')]",
-        "principalId": "[reference(concat('Microsoft.ContainerInstance/containerGroups/', 'az-cli'), '2017-03-30', 'Full').identity.principalId]",
-        "scope": "[resourceGroup().id]"
+        "principalId": "[reference(concat('Microsoft.ContainerInstance/containerGroups/', variables('cgName')), '2018-10-01', 'Full').identity.principalId]",
+        "scope": "[concat('subscriptions/', subscription().id)]"
       }
     }
   ],
