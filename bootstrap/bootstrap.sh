@@ -2,24 +2,25 @@
 #comments are PS equivalents
 
 resourceGroup="devopsmgmt"
-location="South Central US"
+location="westus2"
 keyVaultName="kv-$resourceGroup"
 
 echo location: $location
 echo Resourcegroup: $resourceGroup
 
 az login --identity
-az configure --defaults location=$location
-az configure --defaults group=$resourceGroup
+az configure --defaults location="$location"
+az configure --defaults group="$resourceGroup"
 
 #group=$resourceGroup
 
-upn=$(az account show --query user.name --output tsv)
+#upn=$(az account show --query user.name --output tsv)
 #$upn=(iex "az account show --query user.name --output tsv") //pwsh
-userid=$(az ad user show --id $upn --query objectId)
+#userid=$(az ad user show --id $upn --query objectId)
 #$userid = (iex "az ad user show --id $upn --query objectId")
 
-az group create --name $resourceGroup --location $location
+az group create
+#--name $resourceGroup --location $location
 #az keyvault create --resource-group $resourceGroup --name $keyVaultName --enabled-for-deployment true --enabled-for-template-deployment true 
 #az ad sp create-for-rbac -n "deploy.$resourceGroup" > rbac.json
 #jq -r '"appId --value \(.appId),tenantId --value \(.tenant),password --value \(.password)"' rbac.json | xargs -t -d, -I {} bash -c 'az keyvault secret set --vault-name $keyVaultName -n {}' 
