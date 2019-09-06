@@ -48,8 +48,8 @@
     "ghURL": "[concat('https://raw.githubusercontent.com/', parameters('gitHubUser'), '/', parameters('gitHubRepo'), '/master')]",
     "storageAccountName": "[take(toLower( replace( concat( resourceGroup().name, 'scrt'), '-', '') ),23)]",
     "contributorRoleDefinitionId": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
-    "roleAssignmentId": "[guid(resourceGroup().id)]",
-    "cgName": "[concat('deploy', take(toLower( replace( concat( resourceGroup().name, 'cg'), '-', '') ),23))]",
+    "roleAssignmentId": "[guid(resourceGroup().name)]",
+    "cgName": "[concat('deploy', take(toLower( replace( resourceGroup().name, '-', '') ),23))]",
     "storageAccountShare": "scripts",
     "bootStrapCmd": "az ad sp create-for-rbac -n app-$RESOURCE_GROUP > rbac.json; jq -r 'appId --value \\(.appId),tenantId --value \\(.tenant),password --value \\(.password)' rbac.json",
     "automationName": "[parameters('nameRoot')]",
@@ -106,7 +106,7 @@
                 },
                 {
                   "name": "AZURE_LOCATION",
-                  "value": "[resourceGroup().name]"
+                  "value": "[resourceGroup().location]"
                 }
               ],
               "resources": {
@@ -118,7 +118,7 @@
             }
           }
         ],
-        "restartPolicy": "Never",
+        "restartPolicy": "OnFailure",
         "osType": "Linux",
         "volumes": [
           {
