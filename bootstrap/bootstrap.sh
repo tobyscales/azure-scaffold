@@ -5,13 +5,16 @@ resourceGroup="devopsmgmt"
 location="South Central US"
 keyVaultName="kv-$resourceGroup"
 
+az login --identity
+az configure --defaults location=$location group=$resourceGroup
+
+echo location: $location
+echo Resourcegroup: $resourceGroup
+
 upn=$(az account show --query user.name --output tsv)
 #$upn=(iex "az account show --query user.name --output tsv") //pwsh
 userid=$(az ad user show --id $upn --query objectId)
 #$userid = (iex "az ad user show --id $upn --query objectId")
-
-az login --identity
-az configure --defaults location=$location group=$resourceGroup
 
 az group create --name $resourceGroup --location $location
 #az keyvault create --resource-group $resourceGroup --name $keyVaultName --enabled-for-deployment true --enabled-for-template-deployment true 
