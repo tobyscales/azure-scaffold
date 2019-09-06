@@ -1,16 +1,14 @@
 #!/bin/bash
 #comments are PS equivalents
 
-resourceGroup="devopsmgmt"
-location="westus2"
-keyVaultName="kv-$resourceGroup"
+keyVaultName="kv-$AZURE_RESOURCE_GROUP"
 
-echo location: $location
-echo Resourcegroup: $resourceGroup
+echo location: $AZURE_LOCATION
+echo Resourcegroup: $AZURE_RESOURCE_GROUP
 
 az login --identity
-az configure --defaults location="$location"
-az configure --defaults group="$resourceGroup"
+az configure --defaults location="$AZURE_LOCATION"
+az configure --defaults group="$AZURE_RESOURCE_GROUP"
 
 #group=$resourceGroup
 

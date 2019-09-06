@@ -126,7 +126,11 @@
                   "value": "[parameters('gitHubRepo')]"
                 },
                 {
-                  "name": "RESOURCE_GROUP",
+                  "name": "AZURE_RESOURCE_GROUP",
+                  "value": "[resourceGroup().name]"
+                },
+                {
+                  "name": "AZURE_LOCATION",
                   "value": "[resourceGroup().name]"
                 }
               ],
