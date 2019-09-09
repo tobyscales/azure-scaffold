@@ -9,13 +9,6 @@
         "description": "The name of the Automation account to use.  If this account exists, check the SKU and tags to make sure they match the exisitng account."
       }
     },
-    "regionId": {
-      "type": "string",
-      "defaultValue": "East US 2",
-      "metadata": {
-        "description": "The region the Automation account is located in."
-      }
-    },
     "configurations": {
       "type": "array",
       "defaultvalue": []

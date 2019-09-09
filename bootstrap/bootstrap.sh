@@ -1,39 +1,18 @@
 #!/bin/bash
-#comments are PS equivalents
-
-keyVaultName="kv-$AZURE_RESOURCE_GROUP"
-
-echo location: $AZURE_LOCATION
-echo Resourcegroup: $AZURE_RESOURCE_GROUP
+# additional environment variables available: $AZURE_SUBSCRIPTION_ID, $AZURE_AADTENANT_ID and $AZURE_KEYVAULT
+echo Location: $AZURE_LOCATION
+echo Resource Group: $AZURE_RESOURCE_GROUP
 
 az login --identity
 az configure --defaults location=$AZURE_LOCATION
 az configure --defaults group=$AZURE_RESOURCE_GROUP
 
-#group=$resourceGroup
+## sample keyvault secret set/get operations
+az keyvault secret set --vault-name $AZURE_KEYVAULT --name "mySecret" --value "mySecretValue"  > secret.json
+jq -r '"secretUrl: \(.id)"' secret.json
 
-#upn=$(az account show --query user.name --output tsv)
-#$upn=(iex "az account show --query user.name --output tsv") //pwsh
-#userid=$(az ad user show --id $upn --query objectId)
-#$userid = (iex "az ad user show --id $upn --query objectId")
+az keyvault secret show --vault-name $AZURE_KEYVAULT --name "mySecret" > value.json
+jq -r '"secretValue: \(.value)"' value.json
 
-az keyvault create --name $keyVaultName --enabled-for-deployment true --enabled-for-template-deployment true 
-#az ad sp create-for-rbac -n "deploy.$resourceGroup" > rbac.json
-#jq -r '"appId --value \(.appId),tenantId --value \(.tenant),password --value \(.password)"' rbac.json | xargs -t -d, -I {} bash -c 'az keyvault secret set --vault-name $keyVaultName -n {}' 
-
-#az group deployment create --resource-group $resourceGroup --template-file ~/code/azuredeploy.json --parameters userObjectId=$userid
-
-#                "chmod +x /code/$GITHUB_REPO/bootstrap/bootstrap.sh; /code/$GITHUB_REPO/bootstrap/bootstrap.sh"
-
-
-#jq -r '"appId --value \(.appId),tenantId --value \(.tenant),password --value \(.password)"' rbac.json | xargs -t -d, -I {} bash -c 'az keyvault secret set --vault-name dnd-azurekv -n {}'
-# jq '.appId, .password, .tenant' rbac.json | xargs -I {} -P 3 -t az keyvault secret set --vault-name dnd-azurekv -n "{}" --value "{}" | jq '. | .id' > urls.txt
-
-#// curl https://www.opscode.com/chef/install.sh | sudo bash 
-
-#"reference": {
-#              "keyVault": {
-#                  "id": "[variables('keyVaultResourceID')]"
-#              },
-#              "secretName": "spSecret"
-#          }
+## uncomment the below statement to troubleshoot your startup script interactively in ACI (on the Connect tab)
+#tail -f /dev/null
