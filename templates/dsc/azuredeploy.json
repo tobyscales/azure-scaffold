@@ -31,7 +31,7 @@
       "name": "[parameters('accountName')]",
       "type": "Microsoft.Automation/automationAccounts",
       "apiVersion": "2015-10-31",
-      "location": "[parameters('regionId')]",
+      "location": "[resourcegroup().location]",
       "dependsOn": [],
       "tags": {},
       "properties": {
@@ -86,7 +86,7 @@
             "value": "[parameters('accountName')]"
           },
           "location": {
-            "value": "[parameters('regionId')]"
+            "value": "[resourcegroup().location]"
           },
           "configurationName": {
             "value": "[parameters('configurations')[copyIndex()].name]"
@@ -139,7 +139,7 @@
             "value": "[parameters('accountName')]"
           },
           "location": {
-            "value": "[parameters('regionId')]"
+            "value": "[resourcegroup().location]"
           },
           "configurationName": {
             "value": "[parameters('configurations')[copyIndex()].name]"
