@@ -201,29 +201,30 @@
           }
         },
         "resources": []
-      },
-      {
-        "name": "DeployEncryption",
-        "type": "Microsoft.Resources/deployments",
-        "apiVersion": "2015-01-01",
-        "properties": {
-          "mode": "Incremental",
-          "templateLink": {
-            "uri": "[variables('encryptVMTemplateUrl')]",
-            "contentVersion": "1.0.0.0"
+      }
+    },
+    {
+      "name": "DeployEncryption",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('encryptVMTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vmName": {
+            "value": "[parameters('vmName')]"
           },
-          "parameters": {
-            "vmName": {
-              "value": "[parameters('vmName')]"
-            },
-            "keyVaultName": {
-              "value": "[parameters('keyVaultName')]"
-            },
-            "keyVaultResourceGroup": {
-              "value": "[resourceGroup().name]"
-            }
+          "keyVaultName": {
+            "value": "[parameters('keyVaultName')]"
+          },
+          "keyVaultResourceGroup": {
+            "value": "[resourceGroup().name]"
           }
         }
       }
-    ]
-  }
+    }
+  ]
+}
