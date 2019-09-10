@@ -16,12 +16,6 @@
       },
       "defaultValue": "winadmin"
     },
-    "adminPassword": {
-      "type": "securestring",
-      "metadata": {
-        "description": "Admin user password for virtual machine"
-      }
-    },
     "vmSize": {
       "type": "string",
       "metadata": {
@@ -178,52 +172,58 @@
         "osProfile": {
           "computerName": "[parameters('vmName')]",
           "adminUsername": "[parameters('adminUsername')]",
-          "adminPassword": "[parameters('adminPassword')]"
-        },
-        "storageProfile": {
-          "imageReference": {
-            "publisher": "[variables('imagePublisher')]",
-            "offer": "[variables('imageOffer')]",
-            "sku": "[variables('osSku')]",
-            "version": "latest"
+          "adminPassword": {
+            "reference": {
+              "keyVault": {
+                "id": "[resourceId('Microsoft.KeyVault/vaults',parameters('keyVaultName'))]"
+              },
+              "secretName": "adminPassword"
+            }
           },
-          "osDisk": {
-            "name": "[variables('osDiskName')]",
-            "createOption": "FromImage"
+          "storageProfile": {
+            "imageReference": {
+              "publisher": "[variables('imagePublisher')]",
+              "offer": "[variables('imageOffer')]",
+              "sku": "[variables('osSku')]",
+              "version": "latest"
+            },
+            "osDisk": {
+              "name": "[variables('osDiskName')]",
+              "createOption": "FromImage"
+            }
+          },
+          "networkProfile": {
+            "networkInterfaces": [
+              {
+                "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
+              }
+            ]
           }
         },
-        "networkProfile": {
-          "networkInterfaces": [
-            {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
-            }
-          ]
-        }
+        "resources": []
       },
-      "resources": []
-    },
-    {
-      "name": "DeployEncryption",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-01-01",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('encryptVMTemplateUrl')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "vmName": {
-            "value": "[parameters('vmName')]"
+      {
+        "name": "DeployEncryption",
+        "type": "Microsoft.Resources/deployments",
+        "apiVersion": "2015-01-01",
+        "properties": {
+          "mode": "Incremental",
+          "templateLink": {
+            "uri": "[variables('encryptVMTemplateUrl')]",
+            "contentVersion": "1.0.0.0"
           },
-          "keyVaultName": {
-            "value": "[parameters('keyVaultName')]"
-          },
-          "keyVaultResourceGroup": {
-            "value": "[resourceGroup().name]"
+          "parameters": {
+            "vmName": {
+              "value": "[parameters('vmName')]"
+            },
+            "keyVaultName": {
+              "value": "[parameters('keyVaultName')]"
+            },
+            "keyVaultResourceGroup": {
+              "value": "[resourceGroup().name]"
+            }
           }
         }
       }
-    }
-  ]
-}
+    ]
+  }
