@@ -190,16 +190,15 @@
           "osDisk": {
             "name": "[variables('osDiskName')]",
             "createOption": "FromImage"
-          },
-          "networkProfile": {
-            "networkInterfaces": [
-              {
-                "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
-              }
-            ]
           }
         },
-        "resources": []
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
+            }
+          ]
+        }
       }
     },
     {
