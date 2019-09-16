@@ -254,7 +254,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
       "dependsOn": [
-        "[concat('Microsoft.Resources/deployments/', 'Deploy', variables('keyVaultName'))]"
+        "[concat('Microsoft.Resources/deployments/', 'Deploy_', variables('keyVaultName'))]"
       ],
       "properties": {
         "mode": "Incremental",
@@ -324,7 +324,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
       "dependsOn": [
-        "[concat('Microsoft.Resources/deployments/', 'Deploy', variables('keyVaultName'))]"
+        "[concat('Microsoft.Resources/deployments/', 'Deploy_', variables('keyVaultName'))]"
       ],
       "properties": {
         "mode": "Incremental",

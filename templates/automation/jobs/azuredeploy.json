@@ -1,6 +1,6 @@
 ﻿{
   "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
-  "contentVersion": "1.0.0.2",
+  "contentVersion": "1.0.0.0",
   "parameters": {
     "accountName": {
       "type": "string",
@@ -31,7 +31,7 @@
   "resources": [
     {
       "name": "[concat(parameters('accountName'), '/', parameters('jobId'))]",
-      "type": "Microsoft.Automation/AutomationAccounts/jobs",
+      "type": "Microsoft.Automation/automationAccounts/jobs",
       "apiVersion": "2015-10-31",
       "location": "parameters('location')]",
       "tags": {},
