@@ -56,10 +56,12 @@
     "ghURL": "[concat('https://raw.githubusercontent.com/', parameters('gitHubUser'), '/', parameters('gitHubRepo'), '/master')]",
     "keyVaultDeployUri": "[concat(variables('ghURL'), '/templates/keyvault/azuredeploy.json')]",
     "automationAcctDeployUri": "[concat(variables('ghURL'), '/templates/automation/azuredeploy.json')]",
+    "workspaceDeployUri": "[concat(variables('ghURL'), '/templates/automation/workspace/azuredeploy.json')]",
     "vmDeployUri": "[concat(variables('ghURL'), '/templates/vm/azuredeploy.json')]",
     "dscDeployUri": "[concat(variables('ghURL'), '/templates/dsc/azuredeploy.json')]",
     "keyVaultName": "[concat('kv-', resourcegroup().name)]",
     "automationAcctName": "[concat('aa-', resourcegroup().name)]",
+    "workspaceName": "[concat('logs-', resourcegroup().name)]",
     "vmName": "[concat('vm-', resourceGroup().name)]",
     "roleAssignmentId": "[guid(resourceGroup().name)]",
     "cgName": "[concat('deploy', take(toLower( replace( resourceGroup().name, '-', '') ),23))]",
@@ -250,6 +252,59 @@
       }
     },
     {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
+      "name": "[concat('Deploy_',variables('workspaceName'))]",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('workspaceDeployUri')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "workspaceName": {
+            "value": "[variables('workspaceName')]"
+          },
+          "workspaceRegion": {
+            "value": "[resourceGroup().location]"
+          },
+          "solutionName": {
+            "value": "AzureAutomation"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
+      "name": "LinkAccountWithWorkspace",
+      "dependsOn": [
+        "[concat('Microsoft.Resources/deployments/', 'Deploy_', variables('workspaceName'))]",
+        "[concat('Microsoft.Resources/deployments/', 'Deploy_', variables('automationAcctName'))]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "https://raw.githubusercontent.com/azureautomation/automation-packs/master/managed-vm/linked-templates/linkedworkspaceaccount.json",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "accountName": {
+            "value": "[variables('automationAcctName')]"
+          },
+          "accountResourceGroupName": {
+            "value": "[resourceGroup().name]"
+          },
+          "workspaceName": {
+            "value": "[variables('workspaceName')]"
+          },
+          "workspaceRegion": {
+            "value": "[resourceGroup().location]"
+          }
+        }
+      }
+    },
+    {
       "name": "[concat('Deploy_', variables('automationAcctName'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
@@ -347,6 +402,25 @@
               "secretName": "adminPassword"
             }
           }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "apiVersion": "2017-03-30",
+      "name": "[concat(variables('vmName'),'/Microsoft.Monitoring')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "publisher": "Microsoft.EnterpriseCloud.Monitoring",
+        "type": "MicrosoftMonitoringAgent",
+        "typeHandlerVersion": "1.0",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "workspaceId": "[reference(resourceId(resourceGroup().name, 'Microsoft.OperationalInsights/workspaces/', variables('workspaceName')), '2015-11-01-preview').customerId]",
+          "azureResourceId": "[resourceId(resourceGroup().name, 'Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+        },
+        "protectedSettings": {
+          "workspaceKey": "[listKeys(resourceId(resourceGroup().name, 'Microsoft.OperationalInsights/workspaces/', variables('workspaceName')), '2015-11-01-preview').primarySharedKey]"
         }
       }
     }

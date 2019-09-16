@@ -1,0 +1,39 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "extensions_Microsoft.Insights.VMDiagnosticsSettings_xmlCfg": {
+            "value": null
+        },
+        "extensions_Microsoft.Insights.VMDiagnosticsSettings_storageAccountName": {
+            "value": null
+        },
+        "extensions_Microsoft.Insights.VMDiagnosticsSettings_storageAccountKey": {
+            "value": null
+        },
+        "extensions_Microsoft.Insights.VMDiagnosticsSettings_storageAccountEndPoint": {
+            "value": null
+        },
+        "extensions_Microsoft.Powershell.DSC_modulesUrl": {
+            "value": null
+        },
+        "extensions_Microsoft.Powershell.DSC_configurationFunction": {
+            "value": null
+        },
+        "virtualMachines_wvd_o365_name": {
+            "value": null
+        },
+        "availabilitySets_DND_W10_LAB1995985745000_externalid": {
+            "value": null
+        },
+        "disks_wvd_o365_externalid": {
+            "value": null
+        },
+        "disks_wvd_o365_datadisk_externalid": {
+            "value": null
+        },
+        "networkInterfaces_wvd_o365_externalid": {
+            "value": null
+        }
+    }
+}

@@ -1,0 +1,194 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "extensions_Microsoft.Insights.VMDiagnosticsSettings_xmlCfg": {
+            "defaultValue": null,
+            "type": "SecureString"
+        },
+        "extensions_Microsoft.Insights.VMDiagnosticsSettings_storageAccountName": {
+            "defaultValue": null,
+            "type": "SecureString"
+        },
+        "extensions_Microsoft.Insights.VMDiagnosticsSettings_storageAccountKey": {
+            "defaultValue": null,
+            "type": "SecureString"
+        },
+        "extensions_Microsoft.Insights.VMDiagnosticsSettings_storageAccountEndPoint": {
+            "defaultValue": null,
+            "type": "SecureString"
+        },
+        "extensions_Microsoft.Powershell.DSC_modulesUrl": {
+            "defaultValue": null,
+            "type": "SecureString"
+        },
+        "extensions_Microsoft.Powershell.DSC_configurationFunction": {
+            "defaultValue": null,
+            "type": "SecureString"
+        },
+        "virtualMachines_wvd_o365_name": {
+            "defaultValue": "wvd-o365",
+            "type": "String"
+        },
+        "availabilitySets_DND_W10_LAB1995985745000_externalid": {
+            "defaultValue": "/subscriptions/128650d3-04c4-419f-b1d0-73ae5952621d/resourceGroups/dnd-w10-lab-vms/providers/Microsoft.Compute/availabilitySets/DND-W10-LAB1995985745000",
+            "type": "String"
+        },
+        "disks_wvd_o365_externalid": {
+            "defaultValue": "/subscriptions/128650d3-04c4-419f-b1d0-73ae5952621d/resourceGroups/DND-W10-LAB-VMS/providers/Microsoft.Compute/disks/wvd-o365",
+            "type": "String"
+        },
+        "disks_wvd_o365_datadisk_externalid": {
+            "defaultValue": "/subscriptions/128650d3-04c4-419f-b1d0-73ae5952621d/resourceGroups/DND-W10-LAB-VMS/providers/Microsoft.Compute/disks/wvd-o365-datadisk",
+            "type": "String"
+        },
+        "networkInterfaces_wvd_o365_externalid": {
+            "defaultValue": "/subscriptions/128650d3-04c4-419f-b1d0-73ae5952621d/resourceGroups/dnd-w10-lab-vms/providers/Microsoft.Network/networkInterfaces/wvd-o365",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2019-03-01",
+            "name": "[parameters('virtualMachines_wvd_o365_name')]",
+            "location": "westus2",
+            "tags": {
+                "hidden-DevTestLabs-LabUId": "283423da-608e-42ed-a5ca-628069d11ed1",
+                "hidden-DevTestLabs-LogicalResourceUId": "0df397db-127c-4df0-8369-6feb06ea6ffb"
+            },
+            "properties": {
+                "availabilitySet": {
+                    "id": "[parameters('availabilitySets_DND_W10_LAB1995985745000_externalid')]"
+                },
+                "hardwareProfile": {
+                    "vmSize": "Standard_NV6"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "microsoftwindowsdesktop",
+                        "offer": "office-365",
+                        "sku": "rs5-evd-o365pp",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "osType": "Windows",
+                        "name": "[parameters('virtualMachines_wvd_o365_name')]",
+                        "createOption": "FromImage",
+                        "caching": "ReadWrite",
+                        "managedDisk": {
+                            "storageAccountType": "StandardSSD_LRS",
+                            "id": "[parameters('disks_wvd_o365_externalid')]"
+                        },
+                        "diskSizeGB": 127
+                    },
+                    "dataDisks": [
+                        {
+                            "lun": 0,
+                            "name": "[concat(parameters('virtualMachines_wvd_o365_name'), '-datadisk')]",
+                            "createOption": "Attach",
+                            "caching": "None",
+                            "managedDisk": {
+                                "storageAccountType": "StandardSSD_LRS",
+                                "id": "[parameters('disks_wvd_o365_datadisk_externalid')]"
+                            },
+                            "diskSizeGB": 512,
+                            "toBeDetached": false
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "computerName": "[parameters('virtualMachines_wvd_o365_name')]",
+                    "adminUsername": "winadmin",
+                    "windowsConfiguration": {
+                        "provisionVMAgent": true,
+                        "enableAutomaticUpdates": true
+                    },
+                    "secrets": [],
+                    "allowExtensionOperations": true
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[parameters('networkInterfaces_wvd_o365_externalid')]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "https://adndw10lab7120.blob.core.windows.net"
+                    }
+                },
+                "licenseType": "Windows_Client"
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2019-03-01",
+            "name": "[concat(parameters('virtualMachines_wvd_o365_name'), '/enablevmaccess')]",
+            "location": "westus2",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachines_wvd_o365_name'))]"
+            ],
+            "properties": {
+                "autoUpgradeMinorVersion": true,
+                "publisher": "Microsoft.Compute",
+                "type": "VMAccessAgent",
+                "typeHandlerVersion": "2.0",
+                "settings": {
+                    "UserName": "toscal"
+                },
+                "protectedSettings": {}
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2019-03-01",
+            "name": "[concat(parameters('virtualMachines_wvd_o365_name'), '/Microsoft.Insights.VMDiagnosticsSettings')]",
+            "location": "westus2",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachines_wvd_o365_name'))]"
+            ],
+            "properties": {
+                "autoUpgradeMinorVersion": true,
+                "publisher": "Microsoft.Azure.Diagnostics",
+                "type": "IaaSDiagnostics",
+                "typeHandlerVersion": "1.5",
+                "settings": {
+                    "StorageAccount": "dndw10labvmsdiag621",
+                    "xmlCfg": "[parameters('extensions_Microsoft.Insights.VMDiagnosticsSettings_xmlCfg')]"
+                },
+                "protectedSettings": {
+                    "storageAccountName": "[parameters('extensions_Microsoft.Insights.VMDiagnosticsSettings_storageAccountName')]",
+                    "storageAccountKey": "[parameters('extensions_Microsoft.Insights.VMDiagnosticsSettings_storageAccountKey')]",
+                    "storageAccountEndPoint": "[parameters('extensions_Microsoft.Insights.VMDiagnosticsSettings_storageAccountEndPoint')]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2019-03-01",
+            "name": "[concat(parameters('virtualMachines_wvd_o365_name'), '/Microsoft.Powershell.DSC')]",
+            "location": "westus2",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachines_wvd_o365_name'))]"
+            ],
+            "tags": {
+                "AutomationAccountARMID": "/subscriptions/128650d3-04c4-419f-b1d0-73ae5952621d/resourceGroups/dnd-sharedservices/providers/Microsoft.Automation/automationAccounts/dnd-autom8azure"
+            },
+            "properties": {
+                "autoUpgradeMinorVersion": true,
+                "publisher": "Microsoft.Powershell",
+                "type": "DSC",
+                "typeHandlerVersion": "2.76",
+                "settings": {
+                    "modulesUrl": "[parameters('extensions_Microsoft.Powershell.DSC_modulesUrl')]",
+                    "configurationFunction": "[parameters('extensions_Microsoft.Powershell.DSC_configurationFunction')]"
+                },
+                "protectedSettings": {}
+            }
+        }
+    ]
+}

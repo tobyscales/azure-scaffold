@@ -166,7 +166,7 @@
     {
       "apiVersion": "2016-04-30-preview",
       "type": "Microsoft.Compute/virtualMachines",
-      "name": "[concat('Deploy', parameters('vmName'))]",
+      "name": "[concat('Deploy_', parameters('vmName'))]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
         "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
@@ -203,7 +203,7 @@
       }
     },
     {
-      "name": "[concat('Encrypt', parameters('vmName'))]",
+      "name": "[concat('Encrypt_', parameters('vmName'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
       "properties": {

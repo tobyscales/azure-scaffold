@@ -1,0 +1,208 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "extensions_IaaSAntimalware_Paths": {
+            "defaultValue": null,
+            "type": "SecureString"
+        },
+        "extensions_IaaSAntimalware_Extensions": {
+            "defaultValue": null,
+            "type": "SecureString"
+        },
+        "extensions_IaaSAntimalware_Processes": {
+            "defaultValue": null,
+            "type": "SecureString"
+        },
+        "extensions_IaaSDiagnostics_xmlCfg": {
+            "defaultValue": null,
+            "type": "SecureString"
+        },
+        "extensions_IaaSDiagnostics_storageAccountName": {
+            "defaultValue": null,
+            "type": "SecureString"
+        },
+        "extensions_IaaSDiagnostics_storageAccountKey": {
+            "defaultValue": null,
+            "type": "SecureString"
+        },
+        "extensions_IaaSDiagnostics_storageAccountEndPoint": {
+            "defaultValue": null,
+            "type": "SecureString"
+        },
+        "virtualMachines_workdesktop_name": {
+            "defaultValue": "workdesktop",
+            "type": "String"
+        },
+        "availabilitySets_DND_WIN103233585532001_externalid": {
+            "defaultValue": "/subscriptions/128650d3-04c4-419f-b1d0-73ae5952621d/resourceGroups/dnd-win103233585532001/providers/Microsoft.Compute/availabilitySets/DND-WIN103233585532001",
+            "type": "String"
+        },
+        "vaults_dndwin105356_externalid": {
+            "defaultValue": "/subscriptions/128650d3-04c4-419f-b1d0-73ae5952621d/resourceGroups/dnd-win10-wus2/providers/Microsoft.KeyVault/vaults/dndwin105356",
+            "type": "String"
+        },
+        "disks_workdesktop_externalid": {
+            "defaultValue": "/subscriptions/128650d3-04c4-419f-b1d0-73ae5952621d/resourceGroups/DND-WIN103233585532001/providers/Microsoft.Compute/disks/workdesktop",
+            "type": "String"
+        },
+        "disks_workdesktop_edrive_externalid": {
+            "defaultValue": "/subscriptions/128650d3-04c4-419f-b1d0-73ae5952621d/resourceGroups/DND-WIN10-WUS2/providers/Microsoft.Compute/disks/workdesktop-edrive",
+            "type": "String"
+        },
+        "networkInterfaces_workdesktop_externalid": {
+            "defaultValue": "/subscriptions/128650d3-04c4-419f-b1d0-73ae5952621d/resourceGroups/dnd-win103233585532001/providers/Microsoft.Network/networkInterfaces/workdesktop",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2019-03-01",
+            "name": "[parameters('virtualMachines_workdesktop_name')]",
+            "location": "westus2",
+            "tags": {
+                "hidden-DevTestLabs-LabUId": "ffac9232-d336-4aee-bc80-242ab085d889",
+                "hidden-DevTestLabs-LogicalResourceUId": "e8e4d634-9632-4810-ae69-d63b0b7a33cd"
+            },
+            "properties": {
+                "availabilitySet": {
+                    "id": "[parameters('availabilitySets_DND_WIN103233585532001_externalid')]"
+                },
+                "hardwareProfile": {
+                    "vmSize": "Standard_E16s_v3"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsDesktop",
+                        "offer": "Windows-10",
+                        "sku": "RS3-Pro",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "osType": "Windows",
+                        "encryptionSettings": {
+                            "enabled": true,
+                            "diskEncryptionKey": {
+                                "sourceVault": {
+                                    "id": "[parameters('vaults_dndwin105356_externalid')]"
+                                },
+                                "secretUrl": "https://dndwin105356.vault.azure.net/secrets/FA746439-E78A-4849-B500-23CFA1FC042A/e714a6bc7af94b1ab3d22a702cfe9814"
+                            }
+                        },
+                        "name": "[parameters('virtualMachines_workdesktop_name')]",
+                        "createOption": "FromImage",
+                        "caching": "ReadWrite",
+                        "managedDisk": {
+                            "id": "[parameters('disks_workdesktop_externalid')]"
+                        }
+                    },
+                    "dataDisks": [
+                        {
+                            "lun": 0,
+                            "name": "[concat(parameters('virtualMachines_workdesktop_name'), '-edrive')]",
+                            "createOption": "Attach",
+                            "caching": "ReadOnly",
+                            "managedDisk": {
+                                "id": "[parameters('disks_workdesktop_edrive_externalid')]"
+                            },
+                            "toBeDetached": false
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "computerName": "[parameters('virtualMachines_workdesktop_name')]",
+                    "adminUsername": "winadmin",
+                    "windowsConfiguration": {
+                        "provisionVMAgent": true,
+                        "enableAutomaticUpdates": true
+                    },
+                    "secrets": []
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[parameters('networkInterfaces_workdesktop_externalid')]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "https://adndwin106115.blob.core.windows.net"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2019-03-01",
+            "name": "[concat(parameters('virtualMachines_workdesktop_name'), '/AzureNetworkWatcherExtension')]",
+            "location": "westus2",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachines_workdesktop_name'))]"
+            ],
+            "properties": {
+                "autoUpgradeMinorVersion": true,
+                "publisher": "Microsoft.Azure.NetworkWatcher",
+                "type": "NetworkWatcherAgentWindows",
+                "typeHandlerVersion": "1.4"
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2019-03-01",
+            "name": "[concat(parameters('virtualMachines_workdesktop_name'), '/IaaSAntimalware')]",
+            "location": "westus2",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachines_workdesktop_name'))]"
+            ],
+            "properties": {
+                "autoUpgradeMinorVersion": true,
+                "publisher": "Microsoft.Azure.Security",
+                "type": "IaaSAntimalware",
+                "typeHandlerVersion": "1.1",
+                "settings": {
+                    "AntimalwareEnabled": "true",
+                    "Exclusions": {
+                        "Paths": "[parameters('extensions_IaaSAntimalware_Paths')]",
+                        "Extensions": "[parameters('extensions_IaaSAntimalware_Extensions')]",
+                        "Processes": "[parameters('extensions_IaaSAntimalware_Processes')]"
+                    },
+                    "RealtimeProtectionEnabled": "true",
+                    "ScheduledScanSettings": {
+                        "isEnabled": "false",
+                        "scanType": "Quick",
+                        "day": "7",
+                        "time": "120"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2019-03-01",
+            "name": "[concat(parameters('virtualMachines_workdesktop_name'), '/IaaSDiagnostics')]",
+            "location": "westus2",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachines_workdesktop_name'))]"
+            ],
+            "properties": {
+                "autoUpgradeMinorVersion": true,
+                "publisher": "Microsoft.Azure.Diagnostics",
+                "type": "IaaSDiagnostics",
+                "typeHandlerVersion": "1.5",
+                "settings": {
+                    "StorageAccount": "dndwin103233585532001813",
+                    "xmlCfg": "[parameters('extensions_IaaSDiagnostics_xmlCfg')]"
+                },
+                "protectedSettings": {
+                    "storageAccountName": "[parameters('extensions_IaaSDiagnostics_storageAccountName')]",
+                    "storageAccountKey": "[parameters('extensions_IaaSDiagnostics_storageAccountKey')]",
+                    "storageAccountEndPoint": "[parameters('extensions_IaaSDiagnostics_storageAccountEndPoint')]"
+                }
+            }
+        }
+    ]
+}
