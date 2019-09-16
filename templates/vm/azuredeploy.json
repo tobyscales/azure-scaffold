@@ -179,17 +179,17 @@
           "computerName": "[parameters('vmName')]",
           "adminUsername": "[parameters('adminUsername')]",
           "adminPassword": "[parameters('adminPassword')]",
-          "storageProfile": {
-            "imageReference": {
-              "publisher": "[variables('imagePublisher')]",
-              "offer": "[variables('imageOffer')]",
-              "sku": "[variables('osSku')]",
-              "version": "latest"
-            },
-            "osDisk": {
-              "name": "[variables('osDiskName')]",
-              "createOption": "FromImage"
-            }
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('imagePublisher')]",
+            "offer": "[variables('imageOffer')]",
+            "sku": "[variables('osSku')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "[variables('osDiskName')]",
+            "createOption": "FromImage"
           },
           "networkProfile": {
             "networkInterfaces": [

@@ -35,7 +35,6 @@
       }
     }
   },
-
   "variables": {
     "pricingTier": "Free",
     "credentialName": "AzureCredential",
@@ -46,7 +45,6 @@
     "runbookTemplate": "https://raw.githubusercontent.com/tescales/azure-scaffold/master/templates/automation/runbooks/azuredeploy.json"
   },
   "resources": [
-
     {
       "name": "[parameters('accountName')]",
       "type": "Microsoft.Automation/automationAccounts",
@@ -60,7 +58,6 @@
         }
       },
       "resources": [
-
         {
           "name": "[variables('credentialName')]",
           "type": "credentials",
@@ -76,6 +73,32 @@
           }
         },
         {
+          "name": "AutomationEndpoint",
+          "type": "variables",
+          "apiVersion": "2015-10-31",
+          "dependsOn": [
+            "[resourceId('Microsoft.Automation/automationAccounts/', parameters('accountName'))]"
+          ],
+          "tags": {},
+          "properties": {
+            "description": "Automation endpoint",
+            "Value": "[concat('\"', reference(resourceId(resourceGroup().name, 'Microsoft.Automation/automationAccounts/', parameters('accountName')), '2015-01-01-preview').registrationUrl,'\"')]"
+          }
+        },
+        {
+          "name": "AutomationCredential",
+          "type": "credentials",
+          "apiVersion": "2015-10-31",
+          "dependsOn": [
+            "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'))]"
+          ],
+          "tags": {},
+          "properties": {
+            "userName": "AutomationKey",
+            "password": "[listKeys(resourceId(resourceGroup().name, 'Microsoft.Automation/automationAccounts/', parameters('accountName')), '2015-01-01-preview').Keys[0].value]"
+          }
+        },
+        {
           "name": "[variables('variableName')]",
           "type": "variables",
           "apiVersion": "2015-01-01-preview",
@@ -83,8 +106,7 @@
           "dependsOn": [
             "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'))]"
           ],
-          "tags": {
-          },
+          "tags": {},
           "properties": {
             "description": "Subscription ID for the Azure account to manage.",
             "isEncrypted": 0,
@@ -102,8 +124,7 @@
       "dependsOn": [
         "[resourceId('Microsoft.Automation/automationAccounts/', parameters('accountName'))]"
       ],
-      "tags": {
-      },
+      "tags": {},
       "properties": {
         "runbookType": "[parameters('runbooks')[copyIndex()].runboookType]",
         "description": "[parameters('runbooks')[copyIndex()].description]",
@@ -112,7 +133,6 @@
           "version": "1.0.0.0"
         }
       },
-
       "copy": {
         "name": "deployRunbooks",
         "count": "[length(parameters('runbooks'))]"
@@ -169,7 +189,9 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "seed": { "value": "parameters('runnowbooks')[copyIndex()].name" }
+          "seed": {
+            "value": "parameters('runnowbooks')[copyIndex()].name"
+          }
         }
       }
     },
@@ -210,5 +232,5 @@
       }
     }
   ],
-      "outputs": {}
-    }
+  "outputs": {}
+}
