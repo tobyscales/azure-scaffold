@@ -181,7 +181,7 @@
       }
     },
     {
-      "name": "[concat('Deploy', variables('keyVaultName'))]",
+      "name": "[concat('Deploy_', variables('keyVaultName'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
       "properties": {
@@ -250,7 +250,7 @@
       }
     },
     {
-      "name": "[concat('Deploy', variables('automationAcctName'))]",
+      "name": "[concat('Deploy_', variables('automationAcctName'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
       "dependsOn": [
@@ -320,7 +320,7 @@
       }
     },
     {
-      "name": "[concat('Deploy', variables('vmName'))]",
+      "name": "[concat('Deploy_', variables('vmName'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
       "dependsOn": [
@@ -342,7 +342,7 @@
           "adminPassword": {
             "reference": {
               "keyVault": {
-                "id": "[resourceId(concat('/subscriptions/', subscription().subscriptionId, 'resourceGroups', resourceGroup().name, 'Microsoft.KeyVault/vaults'), variables('keyVaultName'))]"
+                "id": "[resourceId(concat('/subscriptions/', parameters('subscriptionId'), '/resourceGroups/', resourceGroup().name, '/Microsoft.KeyVault/vaults/'), variables('keyVaultName'))]"
               },
               "secretName": "adminPassword"
             }

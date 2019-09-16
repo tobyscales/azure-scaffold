@@ -43,7 +43,7 @@
     "variableType": "string",
     "jobLink": "https://raw.githubusercontent.com/tescales/azure-scaffold/master/templates/automation/jobs/azuredeploy.json",
     "scheduleTemplate": "https://raw.githubusercontent.com/azureautomation/automation-packs/master/000-base-automation-resource-templates/deploy-schedule/deployRunbookOnSchedule.json",
-    "runbookTemplate": "https://raw.githubusercontent.com/azureautomation/automation-packs/master/000-base-automation-resource-templates/deploy-runbooks/deployPublishedRunbook.json"
+    "runbookTemplate": "https://raw.githubusercontent.com/tescales/azure-scaffold/master/templates/automation/runbooks/azuredeploy.json"
   },
   "resources": [
 
