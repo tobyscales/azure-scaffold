@@ -133,7 +133,7 @@
         "mode": "Incremental",
         "templateLink": {
           "uri": "[variables('runbookTemplate')]",
-          "contentVersion": "1.0"
+          "contentVersion": "1.0.0.0"
         },
         "parameters": {
           "accountName": {

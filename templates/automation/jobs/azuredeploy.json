@@ -33,7 +33,7 @@
       "name": "[concat(parameters('accountName'), '/', parameters('jobId'))]",
       "type": "Microsoft.Automation/automationAccounts/jobs",
       "apiVersion": "2015-10-31",
-      "location": "parameters('location')]",
+      "location": "[resourcegroup().location]",
       "tags": {},
       "properties": {
         "jobId": "[parameters('jobId')]",
