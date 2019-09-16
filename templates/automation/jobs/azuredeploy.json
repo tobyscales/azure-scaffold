@@ -8,18 +8,6 @@
         "description": "The name of the Azure Automation account to deploy the configuration in."
       }
     },
-    "location": {
-      "type": "string",
-      "metadata": {
-        "description": "The location of the Azure Automation account."
-      }
-    },
-    "jobName": {
-      "type": "string",
-      "metadata": {
-        "description": "The name of the Azure Automation job."
-      }
-    },
     "jobId": {
       "type": "string",
       "metadata": {

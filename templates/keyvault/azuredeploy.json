@@ -4,9 +4,9 @@
     "parameters": {
         "keyVaultName": {
             "type": "string",
-          "metadata": {
-            "description": "Name of the Key Vault"
-          }
+            "metadata": {
+                "description": "Name of the Key Vault"
+            }
         },
         "tenantId": {
             "type": "string",
@@ -97,5 +97,15 @@
                 "count": "[length(parameters('secrets'))]"
             }
         }
-    ]
+    ],
+    "outputs": {
+        "secrets": {
+            "value": "[concat(parameters('keyVaultName'), '/', parameters('secrets')).secretName]",
+            "type": "array"
+        },
+        "secret0Uri": {
+            "type": "string",
+            "value": "[concat(parameters('keyVaultName'), '/', parameters('secrets'), '0').secretName.id]"
+        }
+    }
 }
