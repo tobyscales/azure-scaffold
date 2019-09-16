@@ -205,6 +205,9 @@
       "name": "[concat('Encrypt_', parameters('vmName'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
+      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
