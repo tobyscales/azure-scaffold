@@ -195,16 +195,10 @@
           "accountName": {
             "value": "[parameters('accountName')]"
           },
-          "location": {
-            "value": "[resourceGroup().location]"
-          },
           "runbook": {
             "value": "[parameters('runnowbooks')[copyIndex()].name]"
           },
           "jobId": {
-            "value": "[reference(concat('getGuid-',copyIndex())).outputs.guid.value]"
-          },
-          "jobName": {
             "value": "[reference(concat('getGuid-',copyIndex())).outputs.guid.value]"
           },
           "runbook-parameters": {
