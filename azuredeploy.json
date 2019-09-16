@@ -34,7 +34,8 @@
       "type": "string",
       "metadata": {
         "description": "Your User ObjectId"
-      }
+      },
+      "defaultvalue": "00000000-0000-0000-0000-000000000000"
     },
     "roleName": {
       "type": "string",
@@ -240,8 +241,8 @@
           "secrets": {
             "value": [
               {
-                "secretName": "deployer",
-                "secretValue": "SecureString1"
+                "secretName": "adminPassword",
+                "secretValue": "[guid(concat(resourceGroup().id,deployment().name))]"
               }
             ]
           }
@@ -323,7 +324,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
       "dependsOn": [
-        "[concat('Microsoft.Resources/deployments/', 'Deploy', variables('automationAcctName'))]"
+        "[concat('Microsoft.Resources/deployments/', 'Deploy', variables('keyVaultName'))]"
       ],
       "properties": {
         "mode": "Incremental",
@@ -337,6 +338,14 @@
           },
           "keyVaultName": {
             "value": "[variables('keyVaultName')]"
+          },
+          "adminPassword": {
+            "reference": {
+              "keyVault": {
+                "id": "[resourceId(concat('/subscriptions/', subscription().subscriptionId, 'resourceGroups', resourceGroup().name, 'Microsoft.KeyVault/vaults'), variables('keyVaultName'))]"
+              },
+              "secretName": "adminPassword"
+            }
           }
         }
       }
