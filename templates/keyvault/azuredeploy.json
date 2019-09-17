@@ -46,7 +46,7 @@
                 "description": "Specifies if the vault is enabled for ARM template deployment"
             }
         },
-        "enabledForVolumeEncryption": {
+        "enabledForDiskEncryption": {
             "type": "bool",
             "defaultValue": false,
             "metadata": {
@@ -73,7 +73,7 @@
             "properties": {
                 "enabledForDeployment": "[parameters('enabledForDeployment')]",
                 "enabledForTemplateDeployment": "[parameters('enabledForTemplateDeployment')]",
-                "enabledForVolumeEncryption": "[parameters('enabledForVolumeEncryption')]",
+                "enabledForDiskEncryption": "[parameters('enabledForDiskEncryption')]",
                 "tenantId": "[parameters('tenantId')]",
                 "accessPolicies": "[parameters('accessPolicies')]",
                 "sku": {
