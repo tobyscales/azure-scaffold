@@ -20,12 +20,10 @@
                 "description": "The region for the Log Analytics workspace."
             }
         },
-        "solutionName": {
-            "type": "string",
-            "metadata": {
-                "description": "The name of the solution."
-            }
-        }
+        "solutions": {
+            "type": "array",
+            "defaultvalue": []
+          }
     },
     "resources": [
         {
@@ -42,26 +40,44 @@
                     "legacy": 0,
                     "searchVersion": 1
                 }
-            }
+            },
+            "resources": [
+                {
+                    "name": "AzureActivityLog",
+                    "type": "datasources",
+                    "apiVersion": "2015-11-01-preview",
+                    "dependsOn": [
+                        "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+                    ],
+                    "kind": "AzureActivityLog",
+                    "properties": {
+                        "linkedResourceId": "[concat(subscription().id, '/providers/Microsoft.Insights/eventTypes/management')]"
+                    }
+                }
+            ]
         },
         {
             "apiVersion": "2015-11-01-preview",
             "type": "Microsoft.OperationsManagement/solutions",
             "location": "[parameters('workspaceRegion')]",
-            "name": "[concat(parameters('solutionName'),'(', parameters('workspaceName'),')')]",
+            "name": "[concat(parameters('solutions')[copyIndex()].name,'(', parameters('workspaceName'),')')]",
             "dependsOn": [
                 "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
             ],
-            "id": "[resourceId('Microsoft.OperationsManagement/solutions', concat(parameters('solutionName'),'(', parameters('workspaceName'),')'))]",
+            "id": "[resourceId('Microsoft.OperationsManagement/solutions', concat(parameters('solutions')[copyIndex()].name,'(', parameters('workspaceName'),')'))]",
             "properties": {
                 "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
             },
             "plan": {
-                "name": "[concat(parameters('solutionName'),'(', parameters('workspaceName'),')')]",
-                "product": "[concat('OMSGallery/', parameters('solutionName'))]",
+                "name": "[concat(parameters('solutions')[copyIndex()].name,'(', parameters('workspaceName'),')')]",
+                "product": "[concat('OMSGallery/', parameters('solutions')[copyIndex()].product)]",
                 "promotionCode": "",
-                "publisher": "Microsoft"
-            }
+                "publisher": "[concat('OMSGallery/', parameters('solutions')[copyIndex()].publisher)]"
+            },
+            "copy": {
+                "name": "deploySolutions",
+                "count": "[length(parameters('solutions'))]"
+              }
         }
     ]
 }
