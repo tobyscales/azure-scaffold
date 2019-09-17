@@ -206,7 +206,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
       "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
+        "[concat('Microsoft.Compute/virtualMachines/Deploy_', parameters('vmName'))]"
       ],
       "properties": {
         "mode": "Incremental",
