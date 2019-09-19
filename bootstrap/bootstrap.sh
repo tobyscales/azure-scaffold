@@ -7,7 +7,7 @@ az login --identity
 az configure --defaults location=$AZURE_LOCATION
 az configure --defaults group=$AZURE_RESOURCE_GROUP
 
-cd /code
+cd /code/$GITHUB_REPO
 
 ## from https://docs.microsoft.com/en-us/cli/azure/keyvault/certificate?view=azure-cli-latest#az-keyvault-certificate-create
 az keyvault certificate create --vault-name $AZURE_KEYVAULT --name $AZURE_RESOURCE_GROUP --policy "$(az keyvault certificate get-default-policy)"
@@ -15,8 +15,8 @@ secrets=$(az keyvault secret list-versions --vault-name vaultname -n cert1 --que
 vm_secrets=$(az vm secret format -s "$secrets")
 ##TODO: assign to vm at deployment time
 
-jq -r '\(.dscConfigs)' config2.json > dscConfigs.json
-jq -r '\(.dscModules)' config2.json > dscModules.json
+jq -r .dscConfigs config2.json > dscConfigs.json
+jq -r .dscModules config2.json > dscModules.json
 
 az group deployment create --template-file ./templates/dsc/azuredeploy.json --parameters accountname=$AZURE_AUTOMATIONACCOUNT configurations=@dscConfigs.json modules=@dscModules.json
 ## sample keyvault secret set/get operations
