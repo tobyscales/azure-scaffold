@@ -1,0 +1,51 @@
+{
+    "dscConfigs": [
+        {
+            "name": "InstallChoco",
+            "description": "Installs Chocolatey",
+            "location": "configurations/installChoco.ps1"
+        },
+        {
+            "name": "Win10-DevOps",
+            "description": "Installs Win10 with DevOps Tools",
+            "location": "configurations/w10-devops.ps1"
+        }
+    ],
+    "dscModules": [
+        {
+            "name": "ActiveDirectoryCSDsc",
+            "location": "PSGallery"
+        },
+        {
+            "name": "AuditPolicyDsc",
+            "location": "PSGallery"
+        },
+        {
+            "name": "cChoco",
+            "url": "PSGallery"
+        },
+        {
+            "name": "CertificateDsc",
+            "url": "PSGallery"
+        },
+        {
+            "name": "PSDscResources",
+            "url": "PSGallery"
+        }
+    ],
+    "automationRunBooks": [
+        {
+            "name": "StartAzureV2VMs",
+            "location": "TechNet",
+            "run": "now"
+        },
+        {
+            "name": "StopAzureV2VMs",
+            "location": "TechNet"
+        },
+        {
+            "name": "Register-VMDSC",
+            "location": "TechNet"
+        }
+    ]
+}

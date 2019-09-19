@@ -1,0 +1,50 @@
+{
+  "dscConfigs": [
+    {
+      "name": "InstallChoco",
+      "description": "Installs Chocolatey",
+      "uri": "configurations/installChoco.ps1"
+    },
+    {
+      "name": "Win10-DevOps",
+      "description": "Installs Win10 with DevOps Tools",
+      "uri": "configurations/w10-devops.ps1"
+    }
+  ],
+  "dscModules": [
+    {
+      "name": "ActiveDirectoryCSDsc",
+      "uri": "https://psg-prod-eastus.azureedge.net/packages/activedirectorycsdsc.4.1.0.nupkg"
+    },
+    {
+      "name": "AuditPolicyDsc",
+      "uri": "https://psg-prod-eastus.azureedge.net/packages/auditpolicydsc.1.4.0.nupkg"
+    },
+    {
+      "name": "cChoco",
+      "uri": "https://psg-prod-eastus.azureedge.net/packages/auditpolicydsc.1.4.0.nupkg"
+    },
+    {
+      "name": "CertificateDsc",
+      "uri": "https://psg-prod-eastus.azureedge.net/packages/auditpolicydsc.1.4.0.nupkg"
+    },
+    {
+      "name": "PSDscResources",
+      "uri": "https://psg-prod-eastus.azureedge.net/packages/auditpolicydsc.1.4.0.nupkg"
+    }
+  ],
+  "automationRunBooks": [
+    {
+      "runBookType": "Graph",
+      "name": "StopAzureV2VMs",
+      "description": "Stop Azure V2 VMs This Graphical PowerShell runbook connects to Azure using an Automation Run As account and stops all V2 VMs in an Azure subscription or in a resource group or a single named V2 VM. You can attach a recurring schedule to this runbook to run it at a specific time.",
+      "uri": "https://gallery.technet.microsoft.com//scriptcenter/Stop-Azure-ARM-VMs-1ba96d5b/file/162480/1/StopAzureV2Vm.graphrunbook"
+    },
+    {
+      "runBookType": "Graph",
+      "name": "Register-VMDSC",
+      "description": "This runbook registers Azure resource manager virtual machines with automation DSC service. These can either be Windows or Linux virtual machines that are supported with DSC. You can specify the whole subscription, a specific resource group, or an individual VM.",
+      "uri": "https://gallery.technet.microsoft.com//scriptcenter/Registers-Azure-resource-31979771/file/160035/1/Register-VMDSC.graphrunbook"
+    }
+  ]
+}
