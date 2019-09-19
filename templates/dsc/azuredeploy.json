@@ -2,9 +2,8 @@
   "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "accountName": {
+    "accountname": {
       "type": "string",
-      "defaultValue": "MyAutomationAccount",
       "metadata": {
         "description": "The name of the Automation account to use.  If this account exists, check the SKU and tags to make sure they match the exisitng account."
       }
@@ -102,32 +101,16 @@
     },
     {
       "apiVersion": "2015-01-01",
-      "name": "[concat('getDSCGuid-', copyIndex())]",
-      "type": "Microsoft.Resources/deployments",
-      "copy": {
-        "name": "getGuids",
-        "count": "[length(parameters('configurations'))]"
-      },
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "https://raw.githubusercontent.com/davidjrh/azurerm-newguid/master/NewGuid.json",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "seed": { "value": "parameters('configurations')[copyIndex()].name" }
-        }
-      }
-    },
-    {
-      "apiVersion": "2015-01-01",
       "name": "[concat('installJob-', copyIndex())]",
       "type": "Microsoft.Resources/deployments",
       "copy": {
         "name": "deployJobs",
         "count": "[variables('guidCount')]"
       },
-      "dependson": [ "installConfigs", "installModules"],
+      "dependson": [
+        "installConfigs",
+        "installModules"
+      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -145,11 +128,11 @@
             "value": "[parameters('configurations')[copyIndex()].name]"
           },
           "jobId": {
-            "value": "[reference(concat('getDSCGuid-',copyIndex())).outputs.guid.value]"
+            "value": "[guid(resourceGroup().id)]"
           }
         }
       }
     }
   ],
-      "outputs": {}
-    }
+  "outputs": {}
+}
