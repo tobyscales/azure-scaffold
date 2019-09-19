@@ -3,12 +3,12 @@
     {
       "name": "InstallChoco",
       "description": "Installs Chocolatey",
-      "uri": "configurations/installChoco.ps1"
+      "uri": "https://raw.githubusercontent.com/tescales/azure-scaffold/master/configurations/installChoco.ps1"
     },
     {
       "name": "Win10-DevOps",
       "description": "Installs Win10 with DevOps Tools",
-      "uri": "configurations/w10-devops.ps1"
+      "uri": "https://raw.githubusercontent.com/tescales/azure-scaffold/master/configurations/w10-devops.ps1"
     }
   ],
   "dscModules": [
@@ -17,20 +17,12 @@
       "uri": "https://psg-prod-eastus.azureedge.net/packages/activedirectorycsdsc.4.1.0.nupkg"
     },
     {
-      "name": "AuditPolicyDsc",
-      "uri": "https://psg-prod-eastus.azureedge.net/packages/auditpolicydsc.1.4.0.nupkg"
-    },
-    {
       "name": "cChoco",
-      "uri": "https://psg-prod-eastus.azureedge.net/packages/auditpolicydsc.1.4.0.nupkg"
+      "uri": "https://psg-prod-eastus.azureedge.net/packages/activedirectorycsdsc.4.1.0.nupkg"
     },
     {
       "name": "CertificateDsc",
-      "uri": "https://psg-prod-eastus.azureedge.net/packages/auditpolicydsc.1.4.0.nupkg"
-    },
-    {
-      "name": "PSDscResources",
-      "uri": "https://psg-prod-eastus.azureedge.net/packages/auditpolicydsc.1.4.0.nupkg"
+      "uri": "https://psg-prod-eastus.azureedge.net/packages/activedirectorycsdsc.4.1.0.nupkg"
     }
   ],
   "automationRunBooks": [

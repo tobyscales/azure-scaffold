@@ -18,7 +18,7 @@ vm_secrets=$(az vm secret format -s "$secrets")
 jq -r .dscConfigs config2.json > dscConfigs.json
 jq -r .dscModules config2.json > dscModules.json
 
-az group deployment create --template-file ./templates/dsc/azuredeploy.json --parameters accountname=$AZURE_AUTOMATIONACCOUNT configurations=@dscConfigs.json modules=@dscModules.json
+az group deployment create --template-file ./templates/dsc/Deploy_DSC.json --parameters accountname=$AZURE_AUTOMATIONACCOUNT configurations=@dscConfigs.json modules=@dscModules.json
 ## sample keyvault secret set/get operations
 az keyvault secret set --vault-name $AZURE_KEYVAULT --name "mySecret" --value "mySecretValue"  > secret.json
 jq -r '"secretUrl: \(.id)"' secret.json
