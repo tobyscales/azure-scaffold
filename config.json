@@ -6,9 +6,9 @@
             "location": "configurations/installChoco.ps1"
         },
         {
-            "name": "Win10-DevOps",
+            "name": "w10DevOps",
             "description": "Installs Win10 with DevOps Tools",
-            "location": "configurations/w10-devops.ps1"
+            "location": "configurations/w10Devops.ps1"
         }
     ],
     "dscModules": [

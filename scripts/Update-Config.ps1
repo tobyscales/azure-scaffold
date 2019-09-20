@@ -43,7 +43,7 @@ function get-TechNetItem {
 
     try { $response = invoke-webrequest "$scriptPage" } catch { $response = $_.Exception.Response }
     $relativeUrl = ($response.Links | where-object { $_.class -eq "Button" }).href
-    $return.fullUrl = "https://gallery.technet.microsoft.com/$relativeUrl"
+    $return.fullUrl = "https://gallery.technet.microsoft.com$relativeUrl"
 
     switch ($relativeUrl.split(".")[1]) {
         "ps1" { $return.type = "PowerShell" }

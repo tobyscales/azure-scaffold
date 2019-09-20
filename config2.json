@@ -34,9 +34,9 @@
       "uri": "configurations/installChoco.ps1"
     },
     {
-      "name": "Win10-DevOps",
+      "name": "w10DevOps",
       "description": "Installs Win10 with DevOps Tools",
-      "uri": "configurations/w10-devops.ps1"
+      "uri": "configurations/w10devops.ps1"
     }
   ],
   "dscModules": [

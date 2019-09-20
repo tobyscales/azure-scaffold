@@ -96,6 +96,79 @@
   },
   "resources": [
     {
+      "name": "[concat('Deploy_', variables('automationAcctName'))]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('automationAcctDeployUri')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "accountName": {
+            "value": "[variables('automationAcctName')]"
+          },
+          "userName": {
+            "value": "[parameters('userObjectId')]"
+          },
+          "password": {
+            "value": "**ENTER PASSWORD HERE**"
+          },
+          "subscriptionId": {
+            "value": "[parameters('subscriptionId')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
+      "name": "[concat('Deploy_',variables('workspaceName'))]",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('workspaceDeployUri')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "workspaceName": {
+            "value": "[variables('workspaceName')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
+      "name": "Link_AccountWithWorkspace",
+      "dependsOn": [
+        "[concat('Microsoft.Resources/deployments/', 'Deploy_', variables('workspaceName'))]",
+        "[concat('Microsoft.Resources/deployments/', 'Deploy_', variables('automationAcctName'))]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "https://raw.githubusercontent.com/azureautomation/automation-packs/master/managed-vm/linked-templates/linkedworkspaceaccount.json",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "accountName": {
+            "value": "[variables('automationAcctName')]"
+          },
+          "accountResourceGroupName": {
+            "value": "[resourceGroup().name]"
+          },
+          "workspaceName": {
+            "value": "[variables('workspaceName')]"
+          },
+          "workspaceRegion": {
+            "value": "[resourceGroup().location]"
+          }
+        }
+      }
+    },
+    {
       "name": "[variables('cgName')]",
       "type": "Microsoft.ContainerInstance/containerGroups",
       "apiVersion": "2018-10-01",
@@ -264,79 +337,6 @@
                 "secretValue": "[guid(concat(resourceGroup().id,deployment().name))]"
               }
             ]
-          }
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2017-05-10",
-      "name": "[concat('Deploy_',variables('workspaceName'))]",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('workspaceDeployUri')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "workspaceName": {
-            "value": "[variables('workspaceName')]"
-          }
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2017-05-10",
-      "name": "Link_AccountWithWorkspace",
-      "dependsOn": [
-        "[concat('Microsoft.Resources/deployments/', 'Deploy_', variables('workspaceName'))]",
-        "[concat('Microsoft.Resources/deployments/', 'Deploy_', variables('automationAcctName'))]"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "https://raw.githubusercontent.com/azureautomation/automation-packs/master/managed-vm/linked-templates/linkedworkspaceaccount.json",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "accountName": {
-            "value": "[variables('automationAcctName')]"
-          },
-          "accountResourceGroupName": {
-            "value": "[resourceGroup().name]"
-          },
-          "workspaceName": {
-            "value": "[variables('workspaceName')]"
-          },
-          "workspaceRegion": {
-            "value": "[resourceGroup().location]"
-          }
-        }
-      }
-    },
-    {
-      "name": "[concat('Deploy_', variables('automationAcctName'))]",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-01-01",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('automationAcctDeployUri')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "accountName": {
-            "value": "[variables('automationAcctName')]"
-          },
-          "userName": {
-            "value": "[parameters('userObjectId')]"
-          },
-          "password": {
-            "value": "**ENTER PASSWORD HERE**"
-          },
-          "subscriptionId": {
-            "value": "[parameters('subscriptionId')]"
           }
         }
       }
