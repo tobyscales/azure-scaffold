@@ -100,6 +100,9 @@
       "type": "Microsoft.ContainerInstance/containerGroups",
       "apiVersion": "2018-10-01",
       "location": "[resourcegroup().location]",
+      "dependson": [
+        "[concat('Microsoft.Resources/deployments/', 'Deploy_', variables('automationAcctName'))]"
+      ],
       "comments": "",
       "identity": {
         "type": "SystemAssigned"
@@ -145,6 +148,10 @@
                 {
                   "name": "AZURE_KEYVAULT",
                   "value": "[parameters('newVaultName')]"
+                },
+                {
+                  "name": "AZURE_AUTOMATIONACCOUNT",
+                  "value": "[variables('automationAcctName')]"
                 }
               ],
               "resources": {
@@ -321,9 +328,6 @@
       "name": "[concat('Deploy_', variables('automationAcctName'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
-      "dependsOn": [
-        "[concat('Microsoft.Resources/deployments/', 'Deploy_', variables('keyVaultName'))]"
-      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -342,84 +346,6 @@
           },
           "subscriptionId": {
             "value": "[parameters('subscriptionId')]"
-          },
-          "runbooks": {
-            "value": [
-              {
-                "name": "StartAzureV2VMs",
-                "runboookType": "Graph",
-                "Uri": "https://gallery.technet.microsoft.com/scriptcenter/Start-Azure-ARM-VMs-66fb875d/file/162482/1/StartAzureV2Vm.graphrunbook",
-                "description": "This Graphical PowerShell runbook connects to Azure using an Automation Run As account and starts all V2 VMs in an Azure subscription or in a resource group or a single named V2 VM. You can attach a recurring schedule to this runbook to run it at a specific time."
-              },
-              {
-                "name": "StopAzureV2VMs",
-                "runboookType": "Graph",
-                "Uri": "https://gallery.technet.microsoft.com/scriptcenter/Stop-Azure-ARM-VMs-1ba96d5b/file/162480/1/StopAzureV2Vm.graphrunbook",
-                "description": "This Graphical PowerShell runbook connects to Azure using an Automation Run As account and stops all V2 VMs in an Azure subscription or in a resource group or a single named V2 VM. You can attach a recurring schedule to this runbook to run it at a specific time."
-              },
-              {
-                "name": "Register-VMDSC",
-                "runboookType": "Graph",
-                "Uri": "https://gallery.technet.microsoft.com/scriptcenter/Registers-Azure-resource-31979771/file/160035/1/Register-VMDSC.graphrunbook",
-                "description": "This runbook registers Azure resource manager virtual machines with automation DSC service. These can either be Windows or Linux virtual machines that are supported with DSC. You can specify the whole subscription, a specific resource group, or an individual VM."
-              },
-              {
-                "name": "New-HybridWorkerAndAzureVM",
-                "runboookType": "PowerShell",
-                "Uri": "https://raw.githubusercontent.com/azureautomation/runbooks/master/Utility/ARM/New-HybridWorkerAndAzureVM.ps1",
-                "description": "This Azure/OMS Automation runbook creates a new VM and onboards it as a hybrid worker.",
-                "credentialName": "AzureCredential",
-                "variableName": "AzureSubscriptionId",
-                "variableType": "string"
-              }
-            ]
-          },
-          "runnowbooks": {
-            "value": [
-              {
-                "name": "AutoTagResources-generic",
-                "runboookType": "Script",
-                "Uri": "https://gallery.technet.microsoft.com/scriptcenter/Automatically-Azure-fc5f1443/file/165796/1/AutoTagResources-generic.ps1",
-                "description": "An Azure Automation Runbook, to automatically tag Azure Resource Groups with the owner alias."
-              }
-            ]
-          }
-        }
-      }
-    },
-    {
-      "name": "Deploy_DSCAutomation",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-01-01",
-      "dependsOn": [
-        "[concat('Microsoft.Resources/deployments/', 'Deploy_', variables('automationAcctName'))]"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('dscDeployUri')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "accountName": {
-            "value": "[variables('automationAcctName')]"
-          },
-          "configurations": {
-            "value": [
-              {
-                "name": "InstallChoco",
-                "description": "Installs Chocolatey",
-                "uri": "https://raw.githubusercontent.com/tescales/azure-scaffold/master/configurations/installChoco.ps1"
-              }
-            ]
-          },
-          "modules": {
-            "value": [
-              {
-                "name": "cChoco",
-                "uri": "https://devopsgallerystorage.blob.core.windows.net/packages/cchoco.2.3.1.nupkg"
-              }
-            ]
           }
         }
       }
@@ -429,6 +355,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
       "dependsOn": [
+        "[concat('Microsoft.ContainerInstance/containerGroups/', variables('cgName'))]",
         "[concat('Microsoft.Resources/deployments/', 'Deploy_', variables('keyVaultName'))]"
       ],
       "properties": {
@@ -482,7 +409,8 @@
       "type": "Microsoft.Compute/virtualMachines/extensions",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[concat('Microsoft.Resources/deployments/', 'Deploy_', variables('vmName'))]"
+        "[concat('Microsoft.Resources/deployments/', 'Deploy_', variables('vmName'))]",
+        "[concat('Microsoft.ContainerInstance/containerGroups/', variables('cgName'))]"
       ],
       "tags": {
         "AutomationAccountARMID": "[resourceId(resourceGroup().name, 'Microsoft.Automation/automationAccounts/', variables('automationAcctName'))]"

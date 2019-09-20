@@ -83,27 +83,6 @@
         },
         {
             "apiVersion": "2015-01-01",
-            "name": "[concat('getGuid-', copyIndex())]",
-            "type": "Microsoft.Resources/deployments",
-            "copy": {
-                "name": "getGuids",
-                "count": "[length(parameters('runnowbooks'))]"
-            },
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/davidjrh/azurerm-newguid/master/NewGuid.json",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "seed": {
-                        "value": "parameters('runnowbooks')[copyIndex()].name"
-                    }
-                }
-            }
-        },
-        {
-            "apiVersion": "2015-01-01",
             "type": "Microsoft.Resources/deployments",
             "name": "[concat('installJob-', copyIndex())]",
             "copy": {
@@ -128,7 +107,7 @@
                         "value": "[parameters('runnowbooks')[copyIndex()].name]"
                     },
                     "jobId": {
-                        "value": "[reference(concat('getGuid-',copyIndex())).outputs.guid.value]"
+                        "value": "[guid(resourcegroup().id,copyIndex())]"
                     },
                     "runbook-parameters": {
                         "value": {
