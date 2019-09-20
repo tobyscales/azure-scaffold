@@ -2,7 +2,7 @@
 
 This creates a DevOps VM and Automation/Management scaffold in Azure, including an Automation Account and several DSC Configs. You can easily add new configurations into the /configurations folder, or simply point this deployment to your own repo.
 
-In addition, you can customize what gets deployed by editing the (config2.json)[https://github.com/tescales/azure-scaffold/blob/master/config2.json] file. To ensure you're using the latest version of all selected Modules and Runbooks, use the (config.json)[https://github.com/tescales/azure-scaffold/blob/master/config.json] and run (/scripts/Update-Config.ps1)[https://github.com/tescales/azure-scaffold/blob/master/scripts/Update-Config.ps1] to generate the config2.json file prior to deployment. 
+In addition, you can customize what gets deployed by editing the [config2.json](https://github.com/tescales/azure-scaffold/blob/master/config2.json) file. To ensure you're using the latest version of all selected Modules and Runbooks, use the (config.json)[https://github.com/tescales/azure-scaffold/blob/master/config.json] and run (/scripts/Update-Config.ps1)[https://github.com/tescales/azure-scaffold/blob/master/scripts/Update-Config.ps1] to generate the config2.json file prior to deployment. 
 
 This project is notable for its use of my (Azure Bootstrapper)[https://github.com/tescales/azure-bootstrapper-arm] to create a sidecar deployment inside a container instance. This is the magic that abstracts all the nested parameter files into a single place.
 
