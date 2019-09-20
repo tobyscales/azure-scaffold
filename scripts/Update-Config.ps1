@@ -93,7 +93,7 @@ foreach ($runbook in $j.automationRunbooks) {
         $runnowParams += [ordered]@{ 
             'name'        = $runbook.name
             'description' = $item.description
-            'runBookType' = $item.type
+            'runbookType' = $item.type
             'uri'         = $item.fullUrl
         }
     }
@@ -101,7 +101,7 @@ foreach ($runbook in $j.automationRunbooks) {
         $runbookParams += @{ 
             'name'        = $runbook.name
             'description' = $item.description
-            'runBookType' = $item.type
+            'runbookType' = $item.type
             'uri'         = $item.fullUrl
         }
     }

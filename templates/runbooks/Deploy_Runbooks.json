@@ -67,7 +67,7 @@
                         "value": "[parameters('runnowbooks')[copyIndex()].uri]"
                     },
                     "runbookType": {
-                        "value": "[parameters('runnowbooks')[copyIndex()].runboookType]"
+                        "value": "[parameters('runnowbooks')[copyIndex()].runbookType]"
                     },
                     "runbookDescription": {
                         "value": "[parameters('runnowbooks')[copyIndex()].description]"
