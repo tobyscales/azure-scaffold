@@ -67,6 +67,9 @@ function get-PSGalleryItem {
     try { $response = (invoke-webrequest "https://www.powershellgallery.com/api/v2/package/$($info.name)/$($info.version)" -method Get -MaximumRedirection 0).BaseRequest } catch { $response = $_.Exception.Response } 
     $return.fullUrl = $response.Headers.Location.AbsoluteUri
     $return.description = $info.description
+
+    # return AbsoluteUri for scripts... probably a better place to get this info from
+    if ($itemType -eq "script") { $return.fullUrl = $info.ProjectUri.AbsoluteUri }
     
     return $return
 }
