@@ -17,14 +17,10 @@ vm_secrets=$(az vm secret format -s "$secrets")
 
 jq -r .dscConfigs config2.json > dscConfigs.json
 jq -r .dscModules config2.json > dscModules.json
+jq -r .automationRunbooks config2.json > runbooks.json
 
-az group deployment create --template-file ./templates/dsc/Deploy_DSC.json --parameters accountname=$AZURE_AUTOMATIONACCOUNT configurations=@dscConfigs.json modules=@dscModules.json
-## sample keyvault secret set/get operations
-az keyvault secret set --vault-name $AZURE_KEYVAULT --name "mySecret" --value "mySecretValue"  > secret.json
-jq -r '"secretUrl: \(.id)"' secret.json
-
-az keyvault secret show --vault-name $AZURE_KEYVAULT --name "mySecret" > value.json
-jq -r '"secretValue: \(.value)"' value.json
+az group deployment create --template-file ./templates/dsc/Deploy_DSC.json --parameters accountname=$AZURE_AUTOMATIONACCOUNT configurations=@dscConfigs.json modules=@dscModules.json --no-wait
+az group deployment create --template-file ./templates/runbooks/Deploy_Runbooks.json --parameters accountname=$AZURE_AUTOMATIONACCOUNT runbooks=@runbooks.json runnowbooks=@[] --no-wait
 
 ## uncomment the below statement to troubleshoot your startup script interactively in ACI (on the Connect tab)
 tail -f /dev/null

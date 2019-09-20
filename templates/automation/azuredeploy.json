@@ -20,14 +20,6 @@
         "description": "The password for the Azure Automation credential."
       }
     },
-    "runbooks": {
-      "type": "array",
-      "defaultvalue": []
-    },
-    "runnowbooks": {
-      "type": "array",
-      "defaultvalue": []
-    },
     "subscriptionId": {
       "type": "string",
       "metadata": {
@@ -115,121 +107,6 @@
           }
         }
       ]
-    },
-    {
-      "name": "[concat(parameters('accountName'), '/', parameters('runbooks')[copyIndex()].name)]",
-      "type": "Microsoft.Automation/automationAccounts/runbooks",
-      "apiVersion": "2015-10-31",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Automation/automationAccounts/', parameters('accountName'))]"
-      ],
-      "tags": {},
-      "properties": {
-        "runbookType": "[parameters('runbooks')[copyIndex()].runboookType]",
-        "description": "[parameters('runbooks')[copyIndex()].description]",
-        "publishContentLink": {
-          "uri": "[parameters('runbooks')[copyIndex()].Uri]",
-          "version": "1.0.0.0"
-        }
-      },
-      "copy": {
-        "name": "deployRunbooks",
-        "count": "[length(parameters('runbooks'))]"
-      }
-    },
-    {
-      "apiVersion": "2015-01-01",
-      "name": "[concat('installRunNow-', copyIndex())]",
-      "type": "Microsoft.Resources/deployments",
-      "copy": {
-        "name": "installRunNowBooks",
-        "count": "[length(parameters('runnowbooks'))]"
-      },
-      "dependsOn": [
-        "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'))]"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('runbookTemplate')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "accountName": {
-            "value": "[parameters('accountName')]"
-          },
-          "runbookName": {
-            "value": "[parameters('runnowbooks')[copyIndex()].name]"
-          },
-          "runbookUri": {
-            "value": "[parameters('runnowbooks')[copyIndex()].uri]"
-          },
-          "runbookType": {
-            "value": "[parameters('runnowbooks')[copyIndex()].runboookType]"
-          },
-          "runbookDescription": {
-            "value": "[parameters('runnowbooks')[copyIndex()].description]"
-          }
-        }
-      }
-    },
-    {
-      "apiVersion": "2015-01-01",
-      "name": "[concat('getGuid-', copyIndex())]",
-      "type": "Microsoft.Resources/deployments",
-      "copy": {
-        "name": "getGuids",
-        "count": "[length(parameters('runnowbooks'))]"
-      },
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "https://raw.githubusercontent.com/davidjrh/azurerm-newguid/master/NewGuid.json",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "seed": {
-            "value": "parameters('runnowbooks')[copyIndex()].name"
-          }
-        }
-      }
-    },
-    {
-      "apiVersion": "2015-01-01",
-      "type": "Microsoft.Resources/deployments",
-      "name": "[concat('installJob-', copyIndex())]",
-      "copy": {
-        "name": "installRunNowJobs",
-        "count": "[length(parameters('runnowbooks'))]"
-      },
-      "dependsOn": [
-        "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'))]",
-        "installRunNowBooks"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('jobLink')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "accountName": {
-            "value": "[parameters('accountName')]"
-          },
-          "runbook": {
-            "value": "[parameters('runnowbooks')[copyIndex()].name]"
-          },
-          "jobId": {
-            "value": "[reference(concat('getGuid-',copyIndex())).outputs.guid.value]"
-          },
-          "runbook-parameters": {
-            "value": {
-              "TO": "test"
-            }
-          }
-        }
-      }
     }
   ],
   "outputs": {}
