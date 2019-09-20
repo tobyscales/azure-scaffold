@@ -2,9 +2,9 @@
 
 This creates a DevOps VM and Automation/Management scaffold in Azure, including an Automation Account and several DSC Configs. You can easily add new configurations into the /configurations folder, or simply point this deployment to your own repo.
 
-In addition, you can customize what gets deployed by editing the [config2.json](https://github.com/tescales/azure-scaffold/blob/master/config2.json) file. To ensure you're using the latest version of all selected Modules and Runbooks, use the (config.json)[https://github.com/tescales/azure-scaffold/blob/master/config.json] and run (/scripts/Update-Config.ps1)[https://github.com/tescales/azure-scaffold/blob/master/scripts/Update-Config.ps1] to generate the config2.json file prior to deployment. 
+In addition, you can customize what gets deployed by editing the [config2.json](https://github.com/tescales/azure-scaffold/blob/master/config2.json) file. To ensure you're using the latest version of all selected Modules and Runbooks, use [config.json](https://github.com/tescales/azure-scaffold/blob/master/config.json) instead and run [/scripts/Update-Config.ps1](https://github.com/tescales/azure-scaffold/blob/master/scripts/Update-Config.ps1) to generate the config2.json file prior to deployment. 
 
-This project is notable for its use of my (Azure Bootstrapper)[https://github.com/tescales/azure-bootstrapper-arm] to create a sidecar deployment inside a container instance. This is the magic that abstracts all the nested parameter files into a single place.
+This project is notable for its use of my [Azure Bootstrapper](https://github.com/tescales/azure-bootstrapper-arm) to create a sidecar deployment inside a container instance. This is the magic that abstracts all the nested parameter files into a single place.
 
 
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Ftescales%2Fazure-scaffold%2Fmaster%2Fazuredeploy.json" target="_blank">
@@ -13,7 +13,8 @@ This project is notable for its use of my (Azure Bootstrapper)[https://github.co
 <a href="http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2Ftescales%2Fazure-scaffold%2Fmaster%2Fazuredeploy.json" target="_blank">
     <img src="http://armviz.io/visualizebutton.png"/>
 </a>
-^ these buttons are currently broken due to a sequencing limitation in the Azure Portal. If you `git clone` the repo and deploy from a command-line, it will work.
+
+^^^ these buttons are currently broken due to a sequencing limitation in the Azure Portal. If you '''git clone''' the repo and deploy from a command-line, it will work.
 
 
 
