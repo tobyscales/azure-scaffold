@@ -50,7 +50,7 @@
             "name": "[concat('installRunNow-', copyIndex())]",
             "type": "Microsoft.Resources/deployments",
             "copy": {
-                "name": "installRunNowBooks",
+                "name": "installRunnowbooks",
                 "count": "[length(parameters('runnowbooks'))]"
             },
             "dependsOn": [
@@ -91,7 +91,7 @@
             },
             "dependsOn": [
                 "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'))]",
-                "installRunNowBooks"
+                "installRunnowbooks"
             ],
             "properties": {
                 "mode": "Incremental",
