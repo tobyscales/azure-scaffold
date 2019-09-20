@@ -1,0 +1,12 @@
+[
+    {
+      "name": "InstallChoco",
+      "description": "Installs Chocolatey",
+      "uri": "https://raw.githubusercontent.com/tescales/azure-scaffold/master/configurations/installChoco.ps1"
+    },
+    {
+      "name": "w10_DevOps",
+      "description": "Installs Win10 with DevOps Tools",
+      "uri": "https://raw.githubusercontent.com/tescales/azure-scaffold/master/configurations/w10_devops.ps1"
+    }
+  ]

@@ -1,0 +1,10 @@
+[
+    {
+        "name": "AzureAutomation",
+        "publisher": "Microsoft"
+    },
+    {
+        "name": "AzureActivity",
+        "publisher": "Microsoft"
+    }
+]
