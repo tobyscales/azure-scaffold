@@ -23,8 +23,9 @@
     "moduleTemplate": "https://raw.githubusercontent.com/azureautomation/automation-packs/master/000-base-automation-resource-templates/deploy-module/DeployModule.json",
     "configurationTemplate": "https://raw.githubusercontent.com/azureautomation/automation-packs/master/000-base-automation-resource-templates/deploy-configuration/deployConfiguration.json",
     "compilationjobTemplate": "https://raw.githubusercontent.com/azureautomation/automation-packs/master/000-base-automation-resource-templates/deploy-compilationjob/deployCompilationjob.json",
-    "guidCount": "[length(parameters('modules'))]"
-  },
+    "moduleCount": "[length(parameters('modules'))]",
+    "configCount": "[length(parameters('configurations'))]"
+    },
   "resources": [
     {
       "name": "[parameters('accountName')]",
@@ -45,7 +46,7 @@
       "type": "Microsoft.Resources/deployments",
       "copy": {
         "name": "installModules",
-        "count": "[length(parameters('modules'))]"
+        "count": "[variables('moduleCount')]"
       },
       "properties": {
         "mode": "Incremental",
@@ -70,9 +71,12 @@
       "apiVersion": "2015-01-01",
       "name": "[concat('installDSCConfig-', copyIndex())]",
       "type": "Microsoft.Resources/deployments",
+      "dependsOn": [
+        "[concat('Microsoft.Resources/deployments/', 'installDSCModule-', variables('moduleCount'))]"
+      ],
       "copy": {
         "name": "installConfigs",
-        "count": "[length(parameters('configurations'))]"
+        "count": "[variables('configCount')]"
       },
       "properties": {
         "mode": "Incremental",
@@ -105,7 +109,7 @@
       "type": "Microsoft.Resources/deployments",
       "copy": {
         "name": "deployJobs",
-        "count": "[variables('guidCount')]"
+        "count": "[variables('configCount')]"
       },
       "dependson": [
         "installConfigs",
@@ -128,7 +132,7 @@
             "value": "[parameters('configurations')[copyIndex()].name]"
           },
           "jobId": {
-            "value": "[guid(resourceGroup().id)]"
+            "value": "[guid(resourceGroup().id, copyIndex())]"
           }
         }
       }
