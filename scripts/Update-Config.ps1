@@ -33,7 +33,7 @@ function get-TechNetItem {
     param(
         [string]$itemName
     )
-    [hashtable]$return = @{}
+    [hashtable]$return = @{ }
 
     try { $response = invoke-webrequest "https://social.technet.microsoft.com/search/en-US/feed?query=$itemName&format=RSS&theme=scriptcenter&refinement=200" } catch { $response = $_.Exception.Response } 
     [xml]$xml = $response.Content
@@ -57,11 +57,11 @@ function get-PSGalleryItem {
     param(
         [string]$itemName, [string]$itemType
     )
-    [hashtable]$return = @{}
+    [hashtable]$return = @{ }
 
     switch ($itemType) {
         "module" { $info = find-module $itemName }
-        "script" { $info = find-script $itemName; $return.type="Script" }
+        "script" { $info = find-script $itemName; $return.type = "Script" }
     }
     
     try { $response = (invoke-webrequest "https://www.powershellgallery.com/api/v2/package/$($info.name)/$($info.version)" -method Get -MaximumRedirection 0).BaseRequest } catch { $response = $_.Exception.Response } 
@@ -86,6 +86,7 @@ $runbookParams = @()
 $runnowParams = @()
 $dscConfigParams = @()
 $dscModuleParams = @()
+$solutionsParams = @()
 
 foreach ($runbook in $j.automationRunbooks) {
 
@@ -140,6 +141,8 @@ foreach ($dscModule in $j.dscModules) {
     }
 }
 
+$solutionsParams = $j.solutions
+
 # Optional behavior: save to dedicated azuredeploy.parameters.json files
 #  $j = get-content -raw $dscParamsFile | ConvertFrom-Json
 #  $j.parameters.modules.value = $dscModuleParams 
@@ -151,9 +154,10 @@ foreach ($dscModule in $j.dscModules) {
 #  $j.parameters.runnowbooks.value = $runnowParams
 #  $j | convertto-json -depth 32 | set-content $automationParamsFile
 
-$j | add-member -MemberType NoteProperty -Name "automationRunbooks" -Value $runbookParams -force
+$j | add-member -MemberType NoteProperty -Name "automationRunbooks" -Value $runbookParams -Force
 $j | add-member -MemberType NoteProperty -Name "automationRunnowbooks" -Value $runnowParams -Force
 $j | add-member -MemberType NoteProperty -Name "dscConfigs" -Value $dscConfigParams -Force
 $j | add-member -MemberType NoteProperty -Name "dscModules" -Value $dscModuleParams -Force
+$j | add-member -MemberType NoteProperty -Name "solutions" -Value $solutionsParams -Force
 
 $j | convertto-json -depth 32 | set-content config2.json

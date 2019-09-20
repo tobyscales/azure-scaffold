@@ -43,5 +43,15 @@
             "name": "Register-VMDSC",
             "location": "TechNet"
         }
+    ],
+    "solutions": [
+        {
+            "name": "AzureAutomation",
+            "publisher": "Microsoft"
+        },
+        {
+            "name": "AzureActivity",
+            "publisher": "Microsoft"
+        }
     ]
 }
