@@ -72,7 +72,7 @@
       "name": "[concat('installDSCConfig-', copyIndex())]",
       "type": "Microsoft.Resources/deployments",
       "dependsOn": [
-        "[concat('Microsoft.Resources/deployments/', 'installDSCModule-', variables('moduleCount'))]"
+        "installModules"
       ],
       "copy": {
         "name": "installConfigs",
