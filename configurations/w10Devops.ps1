@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-Configuration w10_devops
+Configuration w10Devops
 {
     Import-DscResource -Module cChoco
     

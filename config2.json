@@ -50,7 +50,7 @@
     {
       "name": "Win10-DevOps",
       "description": "Installs Win10 with DevOps Tools",
-      "uri": "configurations/w10-devops.ps1"
+      "uri": "configurations/w10Devops.ps1"
     }
   ],
   "dscModules": [
