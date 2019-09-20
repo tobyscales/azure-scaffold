@@ -23,7 +23,8 @@ az group deployment create --template-file ./templates/runbooks/Deploy_Runbooks.
 az group deployment create --template-file ./templates/dsc/Deploy_DSC.json --parameters accountname=$AZURE_AUTOMATIONACCOUNT configUrl=$CONFIG_URL configurations=@dscConfigs.json modules=@dscModules.json
 
 ## from https://docs.microsoft.com/en-us/cli/azure/keyvault/certificate?view=azure-cli-latest#az-keyvault-certificate-create
-az keyvault certificate create --vault-name $AZURE_KEYVAULT --name $AZURE_RESOURCE_GROUP --policy "$(az keyvault certificate get-default-policy)"
+az keyvault certificate get-default-policy > kvpolicy.json
+az keyvault certificate create --vault-name $AZURE_KEYVAULT --name vmcert --policy kvpolicy.json
 secrets=$(az keyvault secret list-versions --vault-name vaultname -n cert1 --query "[?attributes.enabled].id" -o tsv)
 vm_secrets=$(az vm secret format -s "$secrets")
 ##TODO: assign to vm at deployment time
