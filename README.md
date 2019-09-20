@@ -25,6 +25,7 @@ This project is notable for its use of my [Azure Bootstrapper](https://github.co
  * move VM deployment logic to sidecar (to solve Deploy to Azure button issue)
  * Fix PSGallery deployment type not working for Runbooks
  * Refactor RunNow logic using a .runnow value (collect true/false and deploy jobs for them)
+ * Add scheduling logic for runbooks
  * Use KV to generate cert for VM authentication:
     https://www.rahulpnath.com/blog/manage-certificates-in-azure-key-vault/
  * Consider adding Function to pull UserObjectID: 

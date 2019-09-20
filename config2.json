@@ -1,18 +1,8 @@
 {
-  "solutions": [
-    {
-      "name": "AzureAutomation",
-      "publisher": "Microsoft"
-    },
-    {
-      "name": "AzureActivity",
-      "publisher": "Microsoft"
-    }
-  ],
   "automationRunbooks": [
     {
       "runbookType": "Graph",
-      "description": "Start Azure V2 VMs This Graphical PowerShell runbook connects to Azure using an Automation Run As account and starts all V2 VMs in an Azure subscription or in a resource group or a single named V2 VM.",
+      "description": "Start Azure V2 VMs This Graphical PowerShell runbook connects to Azure using an Automation Run As account and starts all V2 VMs in an Azure subscription or in a resource group or a single named V2 VM. You can attach a recurring schedule to this runbook to run it at a specific time. The asso",
       "name": "StartAzureV2VMs",
       "uri": "https://gallery.technet.microsoft.com/scriptcenter/Start-Azure-ARM-VMs-66fb875d/file/162482/1/StartAzureV2Vm.graphrunbook"
     },
@@ -31,10 +21,16 @@
   ],
   "automationRunnowbooks": [
     {
-      "name": "Update-ModulesInAutomationToLatestVersion",
-      "description": "This Azure/OMS Automation runbook imports the latest version on PowerShell Gallery of all modules in an \r\nAutomation account. By connecting the runbook to an Automation schedule, you can ensure all modules in\r\nyour Automation account stay up to date.\r\nIf a new module to import is specified, it will import that module from the PowerShell Gallery\r\nafter all other modules are updated from the gallery.",
-      "runbookType": "Script",
-      "uri": "https://github.com/azureautomation/runbooks/blob/master/Utility/ARM/Update-ModulesInAutomationToLatestVersion.ps1"
+      "name": "Send Mail Office 365",
+      "description": "- The From address must be one with authorization to send email in Office 365. - The SmtpPort value defaults to 587. You can change the default value, or pass in a different value when calling the runbook. - The SmtpServer value defaults to smtp.office365.com. You can change the default value, or pass in a different value when calling the runbook.",
+      "runbookType": "Graph",
+      "uri": "https://gallery.technet.microsoft.com/scriptcenter/Send-Mail-Office-365-c8679aef/file/153032/1/SendMailO365.graphrunbook"
+    },
+    {
+      "name": "Authenticate to Azure using Azure RunAs account",
+      "description": "This Graphical PowerShell runbook authenticates to Azure using the built in Azure RunAs account. It is useful when called from parent runbooks that want to easily authenticate against Azure before calling Azure activities.",
+      "runbookType": "Graph",
+      "uri": "https://gallery.technet.microsoft.com/scriptcenter/Authenticate-to-Azure-b2fcf043/file/163276/1/AuthenticateTo-Azure.graphrunbook"
     }
   ],
   "dscConfigs": [
@@ -61,6 +57,28 @@
     {
       "name": "CertificateDsc",
       "uri": "https://psg-prod-eastus.azureedge.net/packages/certificatedsc.4.7.0.nupkg"
+    },
+    {
+      "name": "PSSlack",
+      "uri": "https://psg-prod-eastus.azureedge.net/packages/psslack.1.0.1.nupkg"
+    },
+    {
+      "name": "AzureAD",
+      "uri": "https://psg-prod-eastus.azureedge.net/packages/azuread.2.0.2.50.nupkg"
+    },
+    {
+      "name": "PowerShellForGitHub",
+      "uri": "https://psg-prod-eastus.azureedge.net/packages/powershellforgithub.0.9.0.nupkg"
+    }
+  ],
+  "solutions": [
+    {
+      "name": "AzureAutomation",
+      "publisher": "Microsoft"
+    },
+    {
+      "name": "AzureActivity",
+      "publisher": "Microsoft"
     }
   ]
 }

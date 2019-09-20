@@ -23,12 +23,29 @@
         {
             "name": "CertificateDsc",
             "location": "PSGallery"
+        },
+        {
+            "name": "PSSlack",
+            "location": "PSGallery"
+        },
+        {
+            "name": "AzureAD",
+            "location": "PSGallery"
+        },
+        {
+            "name": "PowerShellForGitHub",
+            "location": "PSGallery"
         }
     ],
     "automationRunBooks": [
         {
-            "name": "Update-ModulesInAutomationToLatestVersion",
-            "location": "PSGallery",
+            "name": "Send Mail Office 365",
+            "location": "TechNet",
+            "run": "now"
+        },
+        {
+            "name": "Authenticate to Azure using Azure RunAs account",
+            "location": "TechNet",
             "run": "now"
         },
         {
