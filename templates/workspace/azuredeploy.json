@@ -13,10 +13,6 @@
             "metadata": {
                 "description": "The region for the Log Analytics workspace."
             }
-        },
-        "solutions": {
-            "type": "array",
-            "defaultvalue": []
         }
     },
     "resources": [
@@ -49,29 +45,6 @@
                     }
                 }
             ]
-        },
-        {
-            "apiVersion": "2015-11-01-preview",
-            "type": "Microsoft.OperationsManagement/solutions",
-            "location": "[parameters('workspaceRegion')]",
-            "name": "[concat(parameters('solutions')[copyIndex()].name,'(', parameters('workspaceName'),')')]",
-            "dependsOn": [
-                "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-            ],
-            "id": "[resourceId('Microsoft.OperationsManagement/solutions', concat(parameters('solutions')[copyIndex()].name,'(', parameters('workspaceName'),')'))]",
-            "properties": {
-                "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
-            },
-            "plan": {
-                "name": "[concat(parameters('solutions')[copyIndex()].name,'(', parameters('workspaceName'),')')]",
-                "product": "[concat('OMSGallery/', parameters('solutions')[copyIndex()].name)]",
-                "promotionCode": "",
-                "publisher": "[parameters('solutions')[copyIndex()].publisher]"
-            },
-            "copy": {
-                "name": "deploySolutions",
-                "count": "[length(parameters('solutions'))]"
-            }
         }
     ],
     "outputs": {

@@ -12,11 +12,13 @@ az configure --defaults group=$AZURE_RESOURCE_GROUP
 
 cd /code/$GITHUB_REPO
 
-jq -r .dscConfigs config2.json > dscConfigs.json
-jq -r .dscModules config2.json > dscModules.json
+jq -r .solutions config2.json > solutions.json
 jq -r .automationRunbooks config2.json > runbooks.json
 jq -r .automationRunnowbooks config2.json > runnowbooks.json
+jq -r .dscConfigs config2.json > dscConfigs.json
+jq -r .dscModules config2.json > dscModules.json
 
+az group deployment create --template-file ./templates/solutions/Deploy_Solutions.json --parameters workspacename=$AZURE_WORKSPACENAME solutions=@solutions.json --no-wait
 az group deployment create --template-file ./templates/runbooks/Deploy_Runbooks.json --parameters accountname=$AZURE_AUTOMATIONACCOUNT runbooks=@runbooks.json runnowbooks=@runnowbooks --no-wait
 az group deployment create --template-file ./templates/dsc/Deploy_DSC.json --parameters accountname=$AZURE_AUTOMATIONACCOUNT configUrl=$CONFIG_URL configurations=@dscConfigs.json modules=@dscModules.json
 

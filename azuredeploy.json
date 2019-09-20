@@ -62,7 +62,7 @@
     "keyVaultName": "[concat('kv-', resourcegroup().name)]",
     "automationAcctName": "[concat('aa-', resourcegroup().name)]",
     "workspaceName": "[concat('logs-', resourcegroup().name)]",
-    "vmName": "[concat('vm-', resourceGroup().name)]",
+    "vmName": "[take(concat('vm-', resourceGroup().name),15)]",
     "roleAssignmentId": "[guid(resourceGroup().name)]",
     "cgName": "[concat('deploy', take(toLower( replace( resourceGroup().name, '-', '') ),23))]",
     "roleDefinitions": {
@@ -156,6 +156,10 @@
                 {
                   "name": "AZURE_AUTOMATIONACCOUNT",
                   "value": "[variables('automationAcctName')]"
+                },
+                {
+                  "name": "AZURE_WORKSPACENAME",
+                  "value": "[variables('workspaceName')]"
                 }
               ],
               "resources": {
@@ -280,22 +284,6 @@
           },
           "workspaceRegion": {
             "value": "[resourceGroup().location]"
-          },
-          "solutions": {
-            "value": [
-              {
-                "name": "AzureAutomation",
-                "publisher": "Microsoft"
-              },
-              {
-                "name": "AzureActivity",
-                "publisher": "Microsoft"
-              },
-              {
-                "name": "InfrastructureInsights",
-                "publisher:": "Microsoft"
-              }
-            ]
           }
         }
       }

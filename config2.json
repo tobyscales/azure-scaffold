@@ -1,4 +1,18 @@
 {
+  "solutions": [
+    {
+      "name": "AzureAutomation",
+      "publisher": "Microsoft"
+    },
+    {
+      "name": "AzureActivity",
+      "publisher": "Microsoft"
+    },
+    {
+      "name": "InfrastructureInsights",
+      "publisher:": "Microsoft"
+    }
+  ],
   "automationRunbooks": [
     {
       "name": "StartAzureV2VMs",
