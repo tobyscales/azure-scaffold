@@ -1,22 +1,22 @@
 {
   "automationRunbooks": [
     {
-      "uri": "https://gallery.technet.microsoft.com//scriptcenter/Start-Azure-ARM-VMs-66fb875d/file/162482/1/StartAzureV2Vm.graphrunbook",
       "runbookType": "Graph",
       "description": "Start Azure V2 VMs This Graphical PowerShell runbook connects to Azure using an Automation Run As account and starts all V2 VMs in an Azure subscription or in a resource group or a single named V2 VM. You can attach a recurring schedule to this runbook to run it at a specific time. The asso",
-      "name": "StartAzureV2VMs"
+      "name": "StartAzureV2VMs",
+      "uri": "https://gallery.technet.microsoft.com/scriptcenter/Start-Azure-ARM-VMs-66fb875d/file/162482/1/StartAzureV2Vm.graphrunbook"
     },
     {
-      "uri": "https://gallery.technet.microsoft.com//scriptcenter/Stop-Azure-ARM-VMs-1ba96d5b/file/162480/1/StopAzureV2Vm.graphrunbook",
       "runbookType": "Graph",
       "description": "Stop Azure V2 VMs This Graphical PowerShell runbook connects to Azure using an Automation Run As account and stops all V2 VMs in an Azure subscription or in a resource group or a single named V2 VM. You can attach a recurring schedule to this runbook to run it at a specific time.",
-      "name": "StopAzureV2VMs"
+      "name": "StopAzureV2VMs",
+      "uri": "https://gallery.technet.microsoft.com/scriptcenter/Stop-Azure-ARM-VMs-1ba96d5b/file/162480/1/StopAzureV2Vm.graphrunbook"
     },
     {
-      "uri": "https://gallery.technet.microsoft.com//scriptcenter/Registers-Azure-resource-31979771/file/160035/1/Register-VMDSC.graphrunbook",
       "runbookType": "Graph",
       "description": "This runbook registers Azure resource manager virtual machines with automation DSC service. These can either be Windows or Linux virtual machines that are supported with DSC. You can specify the whole subscription, a specific resource group, or an individual VM.",
-      "name": "Register-VMDSC"
+      "name": "Register-VMDSC",
+      "uri": "https://gallery.technet.microsoft.com/scriptcenter/Registers-Azure-resource-31979771/file/160035/1/Register-VMDSC.graphrunbook"
     }
   ],
   "automationRunnowbooks": [
@@ -24,7 +24,7 @@
       "name": "Update-ModulesInAutomationToLatestVersion",
       "description": "This Azure/OMS Automation runbook imports the latest version on PowerShell Gallery of all modules in an \r\nAutomation account. By connecting the runbook to an Automation schedule, you can ensure all modules in\r\nyour Automation account stay up to date.\r\nIf a new module to import is specified, it will import that module from the PowerShell Gallery\r\nafter all other modules are updated from the gallery.",
       "runbookType": "Script",
-      "uri": "https://github.com/azureautomation/runbooks/blob/master/Utility/ARM/Update-ModulesInAutomationToLatestVersion.ps1"
+      "uri": "https://raw.githubusercontent.com/azureautomation/runbooks/master/Utility/ARM/Update-ModulesInAutomationToLatestVersion.ps1"
     }
   ],
   "dscConfigs": [
@@ -36,7 +36,7 @@
     {
       "name": "w10DevOps",
       "description": "Installs Win10 with DevOps Tools",
-      "uri": "configurations/w10devops.ps1"
+      "uri": "configurations/w10Devops.ps1"
     }
   ],
   "dscModules": [
