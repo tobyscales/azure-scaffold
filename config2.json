@@ -7,10 +7,6 @@
     {
       "name": "AzureActivity",
       "publisher": "Microsoft"
-    },
-    {
-      "name": "InfrastructureInsights",
-      "publisher:": "Microsoft"
     }
   ],
   "automationRunbooks": [

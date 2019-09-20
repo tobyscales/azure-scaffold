@@ -31,19 +31,6 @@
     },
   "resources": [
     {
-      "name": "[parameters('accountName')]",
-      "type": "Microsoft.Automation/automationAccounts",
-      "apiVersion": "2015-10-31",
-      "location": "[resourcegroup().location]",
-      "dependsOn": [],
-      "tags": {},
-      "properties": {
-        "sku": {
-          "name": "[variables('pricingTier')]"
-        }
-      }
-    },
-    {
       "apiVersion": "2015-01-01",
       "name": "[concat('installDSCModule-', copyIndex())]",
       "type": "Microsoft.Resources/deployments",

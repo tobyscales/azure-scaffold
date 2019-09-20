@@ -28,9 +28,6 @@
             "type": "Microsoft.Automation/automationAccounts/runbooks",
             "apiVersion": "2015-10-31",
             "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Automation/automationAccounts/', parameters('accountName'))]"
-            ],
             "tags": {},
             "properties": {
                 "runbookType": "[parameters('runbooks')[copyIndex()].runboookType]",
@@ -53,9 +50,6 @@
                 "name": "installRunnowbooks",
                 "count": "[length(parameters('runnowbooks'))]"
             },
-            "dependsOn": [
-                "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'))]"
-            ],
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -90,7 +84,6 @@
                 "count": "[length(parameters('runnowbooks'))]"
             },
             "dependsOn": [
-                "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'))]",
                 "installRunnowbooks"
             ],
             "properties": {
