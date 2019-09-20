@@ -27,9 +27,13 @@
     ],
     "automationRunBooks": [
         {
-            "name": "StartAzureV2VMs",
-            "location": "TechNet",
+            "name": "Update-ModulesInAutomationToLatestVersion",
+            "location": "PSGallery",
             "run": "now"
+        },
+        {
+            "name": "StartAzureV2VMs",
+            "location": "TechNet"
         },
         {
             "name": "StopAzureV2VMs",

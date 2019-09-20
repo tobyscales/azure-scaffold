@@ -29,11 +29,52 @@ param (
     [Parameter(Mandatory = $false)]
     [string]$rootUrl
 )
+function get-TechNetItem {
+    param(
+        [string]$itemName
+    )
+    [hashtable]$return = @{}
+
+    try { $response = invoke-webrequest "https://social.technet.microsoft.com/search/en-US/feed?query=$itemName&format=RSS&theme=scriptcenter&refinement=200" } catch { $response = $_.Exception.Response } 
+    [xml]$xml = $response.Content
+
+    $scriptPage = $xml.rss.channel.item[0].link
+    $return.description = $xml.rss.channel.item[0].description
+
+    try { $response = invoke-webrequest "$scriptPage" } catch { $response = $_.Exception.Response }
+    $relativeUrl = ($response.Links | where-object { $_.class -eq "Button" }).href
+    $return.fullUrl = "https://gallery.technet.microsoft.com/$relativeUrl"
+
+    switch ($relativeUrl.split(".")[1]) {
+        "ps1" { $return.type = "PowerShell" }
+        "graphrunbook" { $return.type = "Graph" }
+        "py" { $return.type = "PythonScript" }
+    }
+
+    return $return
+}
+function get-PSGalleryItem {
+    param(
+        [string]$itemName, [string]$itemType
+    )
+    [hashtable]$return = @{}
+
+    switch ($itemType) {
+        "module" { $info = find-module $itemName }
+        "script" { $info = find-script $itemName; $return.type="Script" }
+    }
+    
+    try { $response = (invoke-webrequest "https://www.powershellgallery.com/api/v2/package/$($info.name)/$($info.version)" -method Get -MaximumRedirection 0).BaseRequest } catch { $response = $_.Exception.Response } 
+    $return.fullUrl = $response.Headers.Location.AbsoluteUri
+    $return.description = $info.description
+    
+    return $return
+}
 
 $startPath = $pwd.path
 $rootPath = (get-item $PSScriptRoot).Parent.FullName
-$dscParamsFile = (Join-Path $rootPath "templates" -AdditionalChildPath "dsc","azuredeploy.parameters.json")
-$automationParamsFile = (Join-Path $rootPath "templates" -AdditionalChildPath "automation","azuredeploy.parameters.json")
+$dscParamsFile = (Join-Path $rootPath "templates" -AdditionalChildPath "dsc", "azuredeploy.parameters.json")
+$automationParamsFile = (Join-Path $rootPath "templates" -AdditionalChildPath "automation", "azuredeploy.parameters.json")
 
 $configFile = (Join-Path $rootPath config.json)
 $j = get-content -Raw $configFile | ConvertFrom-Json
@@ -43,37 +84,25 @@ $runnowParams = @()
 $dscConfigParams = @()
 $dscModuleParams = @()
 
-foreach ($runbook in $j.automationRunBooks) {
-    try { $response = invoke-webrequest "https://social.technet.microsoft.com/search/en-US/feed?query=$($runbook.name)&format=RSS&theme=scriptcenter&refinement=200" } catch { $response = $_.Exception.Response } 
-    [xml]$xml = $response.Content
+foreach ($runbook in $j.automationRunbooks) {
 
-    $scriptPage = $xml.rss.channel.item[0].link
-    $description = $xml.rss.channel.item[0].description
-
-    try { $response = invoke-webrequest "$scriptPage" } catch { $response = $_.Exception.Response }
-    $relativeUrl = ($response.Links | where-object { $_.class -eq "Button" }).href
-    $fullUrl = "https://gallery.technet.microsoft.com/$relativeUrl"
-
-    switch ($relativeUrl.split(".")[1]) {
-        "ps1" { $type = "PowerShell" }
-        "graphrunbook" { $type = "Graph" }
-        "py" { $type = "PythonScript" }
-    }
+    if ( $runbook.location -eq "TechNet" ) { $item = get-TechNetItem -itemName $runbook.name } 
+    elseif ( $runbook.location -eq "PSGallery" ) { $item = get-PSGalleryItem -itemName $runbook.name -itemType "script" }
 
     if ($runbook.run -eq "now") {
         $runnowParams += [ordered]@{ 
-            'name'        = $runbook.Name
-            'description' = $description
-            'runBookType' = $type
-            'uri'         = $fullUrl
+            'name'        = $runbook.name
+            'description' = $item.description
+            'runBookType' = $item.type
+            'uri'         = $item.fullUrl
         }
     }
     else {
         $runbookParams += @{ 
-            'name'        = $runbook.Name
-            'description' = $description
-            'runBookType' = $type
-            'uri'         = $fullUrl
+            'name'        = $runbook.name
+            'description' = $item.description
+            'runBookType' = $item.type
+            'uri'         = $item.fullUrl
         }
     }
 }
@@ -95,19 +124,16 @@ foreach ($config in $j.dscConfigs) {
         }
     }
 }
-$j.dscModules | fl 
+
 foreach ($dscModule in $j.dscModules) {
 
     if ($dscModule.location -eq "PSGallery") { 
-        $moduleInfo = find-module $dscModule.name
-        try { $response = (invoke-webrequest "https://www.powershellgallery.com/api/v2/package/$($moduleInfo.Name)/$($moduleInfo.Version)" -method Get -MaximumRedirection 0).BaseRequest } catch { $response = $_.Exception.Response } 
-        $fullUrl = $response.Headers.Location.AbsoluteUri
-        $fullUrl
+        $item = Get-PSGalleryItem -itemName $dscModule.name -itemType "module"
     }
 
     $dscModuleParams += [ordered]@{ 
-        'name'        = $dscModule.name
-        'uri'         = $fullUrl
+        'name' = $dscModule.name
+        'uri'  = $item.fullUrl
     }
 }
 
@@ -122,8 +148,9 @@ foreach ($dscModule in $j.dscModules) {
 #  $j.parameters.runnowbooks.value = $runnowParams
 #  $j | convertto-json -depth 32 | set-content $automationParamsFile
 
-$j.automationRunBooks = $runbookParams
-$j.dscConfigs = $dscConfigParams
-$j.dscModules = $dscModuleParams
+$j | add-member -MemberType NoteProperty -Name "automationRunbooks" -Value $runbookParams -force
+$j | add-member -MemberType NoteProperty -Name "automationRunnowbooks" -Value $runnowParams -Force
+$j | add-member -MemberType NoteProperty -Name "dscConfigs" -Value $dscConfigParams -Force
+$j | add-member -MemberType NoteProperty -Name "dscModules" -Value $dscModuleParams -Force
 
 $j | convertto-json -depth 32 | set-content config2.json

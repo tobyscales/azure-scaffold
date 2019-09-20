@@ -10,16 +10,14 @@
 This creates a scaffold in Azure.
 
 ## TODO: 
- * Refactor to use guid() function, without reliance on NewGuid.json
- * Dynamically generate parameters files for runbooks, solutions, extensions, modules and dsc configs:
-    https://blog.kloud.com.au/2016/08/08/passing-parameters-to-linked-arm-templates/
-    https://stackoverflow.com/questions/48963263/append-data-to-json-file-with-jq
  * Add bastion host support
- * Use KV to generate cert for VM authentication
+ * Use KV to generate cert for VM authentication:
+    https://www.rahulpnath.com/blog/manage-certificates-in-azure-key-vault/
  * Consider adding Function to pull UserObjectID: 
     https://github.com/jussiroine/TenantIDLookup
  * Add Alerts Toolkit:
     https://github.com/Microsoft/manageability-toolkits
+    https://www.powershellgallery.com/packages/Enable-AzureDiagnostics/1.1
  * Look at CAF integration:
     https://github.com/microsoft/CloudAdoptionFramework
  * Add AzureAutomation RunAs Account:
@@ -31,3 +29,6 @@ This creates a scaffold in Azure.
 
  * Azsecrets?
  https://www.gollahalli.com/blog/azsecrets-a-cli-to-set-azure-key-vault-as-environment-variables/
+
+ * Secure web app? (web+appgw):
+ https://blogs.msdn.microsoft.com/mihansen/2018/02/15/web-app-with-vnet-only-access-using-app-gateway-powershell-automation/
