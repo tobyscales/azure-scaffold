@@ -3,12 +3,12 @@
     {
       "name": "InstallChoco",
       "description": "Installs Chocolatey",
-      "uri": "https://raw.githubusercontent.com/tescales/azure-scaffold/master/configurations/installChoco.ps1"
+      "uri": "https://raw.githubuser.com//configurations/installChoco.ps1"
     },
     {
-      "name": "w10_DevOps",
+      "name": "Win10-DevOps",
       "description": "Installs Win10 with DevOps Tools",
-      "uri": "https://raw.githubusercontent.com/tescales/azure-scaffold/master/configurations/w10_devops.ps1"
+      "uri": "https://raw.githubuser.com//configurations/w10-devops.ps1"
     }
   ],
   "dscModules": [
@@ -18,24 +18,24 @@
     },
     {
       "name": "cChoco",
-      "uri": "https://psg-prod-eastus.azureedge.net/packages/activedirectorycsdsc.4.1.0.nupkg"
+      "uri": "https://psg-prod-eastus.azureedge.net/packages/cchoco.2.4.0.nupkg"
     },
     {
       "name": "CertificateDsc",
-      "uri": "https://psg-prod-eastus.azureedge.net/packages/activedirectorycsdsc.4.1.0.nupkg"
+      "uri": "https://psg-prod-eastus.azureedge.net/packages/certificatedsc.4.7.0.nupkg"
     }
   ],
-  "automationRunbooks": [
+  "automationRunBooks": [
     {
       "runBookType": "Graph",
-      "name": "StopAzureV2VMs",
       "description": "Stop Azure V2 VMs This Graphical PowerShell runbook connects to Azure using an Automation Run As account and stops all V2 VMs in an Azure subscription or in a resource group or a single named V2 VM. You can attach a recurring schedule to this runbook to run it at a specific time.",
+      "name": "StopAzureV2VMs",
       "uri": "https://gallery.technet.microsoft.com//scriptcenter/Stop-Azure-ARM-VMs-1ba96d5b/file/162480/1/StopAzureV2Vm.graphrunbook"
     },
     {
       "runBookType": "Graph",
-      "name": "Register-VMDSC",
       "description": "This runbook registers Azure resource manager virtual machines with automation DSC service. These can either be Windows or Linux virtual machines that are supported with DSC. You can specify the whole subscription, a specific resource group, or an individual VM.",
+      "name": "Register-VMDSC",
       "uri": "https://gallery.technet.microsoft.com//scriptcenter/Registers-Azure-resource-31979771/file/160035/1/Register-VMDSC.graphrunbook"
     }
   ]
