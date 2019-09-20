@@ -170,5 +170,3 @@ Configuration w10_devops
         }
     }
 }
-
-w10_devops
