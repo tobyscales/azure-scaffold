@@ -100,7 +100,7 @@
                         "value": "[parameters('runnowbooks')[copyIndex()].name]"
                     },
                     "jobId": {
-                        "value": "[guid(resourcegroup().id,copyIndex())]"
+                        "value": "[guid(resourcegroup().id)]"
                     },
                     "runbook-parameters": {
                         "value": {

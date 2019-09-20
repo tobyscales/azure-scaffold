@@ -122,7 +122,7 @@
             "value": "[parameters('configurations')[copyIndex()].name]"
           },
           "jobId": {
-            "value": "[guid(resourceGroup().id, copyIndex())]"
+            "value": "[guid(resourceGroup().id)]"
           }
         }
       }
