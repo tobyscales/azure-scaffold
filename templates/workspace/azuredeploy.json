@@ -2,24 +2,18 @@
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "workspaceName": {
+        "workspacename": {
             "type": "string",
             "metadata": {
                 "description": "The name of the Log Analytics workspace."
-            }
-        },
-        "workspaceRegion": {
-            "type": "string",
-            "metadata": {
-                "description": "The region for the Log Analytics workspace."
             }
         }
     },
     "resources": [
         {
             "apiVersion": "2017-03-15-preview",
-            "location": "[parameters('workspaceRegion')]",
-            "name": "[parameters('workspaceName')]",
+            "location": "[resourceGroup().location]",
+            "name": "[parameters('workspacename')]",
             "type": "Microsoft.OperationalInsights/workspaces",
             "comments": "Azure Log Analytics workspace",
             "properties": {
@@ -37,7 +31,7 @@
                     "type": "datasources",
                     "apiVersion": "2015-11-01-preview",
                     "dependsOn": [
-                        "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+                        "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspacename'))]"
                     ],
                     "kind": "AzureActivityLog",
                     "properties": {
@@ -50,7 +44,7 @@
     "outputs": {
         "WorkspaceId": {
             "type": "string",
-            "value": "[reference(resourceId(resourceGroup().name, 'Microsoft.OperationalInsights/workspaces/', parameters('workspaceName')), '2015-11-01-preview').customerId]"
+            "value": "[reference(resourceId(resourceGroup().name, 'Microsoft.OperationalInsights/workspaces/', parameters('workspacename')), '2015-11-01-preview').customerId]"
         }
     }
 }

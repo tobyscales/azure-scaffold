@@ -2,7 +2,7 @@
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "workspaceName": {
+        "workspacename": {
             "type": "string",
             "metadata": {
                 "description": "The name of the Log Analytics workspace."
@@ -18,16 +18,16 @@
             "apiVersion": "2015-11-01-preview",
             "type": "Microsoft.OperationsManagement/solutions",
             "location": "[resourceGroup().location]",
-            "name": "[concat(parameters('solutions')[copyIndex()].name,'(', parameters('workspaceName'),')')]",
+            "name": "[concat(parameters('solutions')[copyIndex()].name,'(', parameters('workspacename'),')')]",
             "dependsOn": [
-                "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+                "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspacename'))]"
             ],
-            "id": "[resourceId('Microsoft.OperationsManagement/solutions', concat(parameters('solutions')[copyIndex()].name,'(', parameters('workspaceName'),')'))]",
+            "id": "[resourceId('Microsoft.OperationsManagement/solutions', concat(parameters('solutions')[copyIndex()].name,'(', parameters('workspacename'),')'))]",
             "properties": {
-                "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
+                "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspacename'))]"
             },
             "plan": {
-                "name": "[concat(parameters('solutions')[copyIndex()].name,'(', parameters('workspaceName'),')')]",
+                "name": "[concat(parameters('solutions')[copyIndex()].name,'(', parameters('workspacename'),')')]",
                 "product": "[concat('OMSGallery/', parameters('solutions')[copyIndex()].name)]",
                 "promotionCode": "",
                 "publisher": "[parameters('solutions')[copyIndex()].publisher]"

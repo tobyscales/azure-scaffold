@@ -281,9 +281,6 @@
         "parameters": {
           "workspaceName": {
             "value": "[variables('workspaceName')]"
-          },
-          "workspaceRegion": {
-            "value": "[resourceGroup().location]"
           }
         }
       }
