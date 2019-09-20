@@ -30,7 +30,7 @@
             "location": "[resourceGroup().location]",
             "tags": {},
             "properties": {
-                "runbookType": "[parameters('runbooks')[copyIndex()].runboookType]",
+                "runbookType": "[parameters('runbooks')[copyIndex()].runbookType]",
                 "description": "[parameters('runbooks')[copyIndex()].description]",
                 "publishContentLink": {
                     "uri": "[parameters('runbooks')[copyIndex()].Uri]",

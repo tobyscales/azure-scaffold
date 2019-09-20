@@ -11,6 +11,7 @@ This creates a scaffold in Azure.
 
 ## TODO: 
  * Add bastion host support
+ * Refactor RunNow logic using a .runnow value (collect true/false and deploy jobs for them)
  * Use KV to generate cert for VM authentication:
     https://www.rahulpnath.com/blog/manage-certificates-in-azure-key-vault/
  * Consider adding Function to pull UserObjectID: 
