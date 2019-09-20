@@ -8,6 +8,9 @@
         "description": "The name of the Automation account to use.  If this account exists, check the SKU and tags to make sure they match the exisitng account."
       }
     },
+    "configUrl": {
+      "type": "string"
+    },
     "configurations": {
       "type": "array",
       "defaultvalue": []
@@ -98,7 +101,7 @@
             "value": "[parameters('configurations')[copyIndex()].description]"
           },
           "configurationURI": {
-            "value": "[parameters('configurations')[copyIndex()].uri]"
+            "value": "[concat(parameters('configUrl'), parameters('configurations')[copyIndex()].uri)]"
           }
         }
       }

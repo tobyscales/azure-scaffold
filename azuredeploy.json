@@ -130,6 +130,10 @@
                   "value": "[parameters('gitHubRepo')]"
                 },
                 {
+                  "name": "GITHUB_USER",
+                  "value": "[parameters('gitHubUser')]"
+                },
+                {
                   "name": "AZURE_RESOURCE_GROUP",
                   "value": "[resourceGroup().name]"
                 },
@@ -232,7 +236,9 @@
                   "secrets": [
                     "all"
                   ],
-                  "certificates": [],
+                  "certificates": [
+                    "all"
+                  ],
                   "storage": []
                 }
               }

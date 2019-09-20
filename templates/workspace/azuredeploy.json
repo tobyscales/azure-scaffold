@@ -1,12 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "outputs": {
-        "WorkspaceId": {
-            "type": "string",
-            "value": "[reference(resourceId(resourceGroup().name, 'Microsoft.OperationalInsights/workspaces/', parameters('workspaceName')), '2015-11-01-preview').customerId]"
-        }
-    },
     "parameters": {
         "workspaceName": {
             "type": "string",
@@ -23,7 +17,7 @@
         "solutions": {
             "type": "array",
             "defaultvalue": []
-          }
+        }
     },
     "resources": [
         {
@@ -70,14 +64,20 @@
             },
             "plan": {
                 "name": "[concat(parameters('solutions')[copyIndex()].name,'(', parameters('workspaceName'),')')]",
-                "product": "[concat('OMSGallery/', parameters('solutions')[copyIndex()].product)]",
+                "product": "[concat('OMSGallery/', parameters('solutions')[copyIndex()].name)]",
                 "promotionCode": "",
-                "publisher": "[concat('OMSGallery/', parameters('solutions')[copyIndex()].publisher)]"
+                "publisher": "[parameters('solutions')[copyIndex()].publisher]"
             },
             "copy": {
                 "name": "deploySolutions",
                 "count": "[length(parameters('solutions'))]"
-              }
+            }
         }
-    ]
+    ],
+    "outputs": {
+        "WorkspaceId": {
+            "type": "string",
+            "value": "[reference(resourceId(resourceGroup().name, 'Microsoft.OperationalInsights/workspaces/', parameters('workspaceName')), '2015-11-01-preview').customerId]"
+        }
+    }
 }
