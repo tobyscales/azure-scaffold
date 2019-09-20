@@ -92,7 +92,7 @@
             "value": "[resourcegroup().location]"
           },
           "configurationName": {
-            "value": "[parameters('configurations')[copyIndex()].name]"
+            "value": "[substring(parameters('configurations')[copyIndex()].name,lastIndexOf(parameters('configurations')[copyIndex()].name,'/'),lastIndexOf(parameters('configurations')[copyIndex()].name,'.'))]"
           },
           "configurationDescription": {
             "value": "[parameters('configurations')[copyIndex()].description]"
