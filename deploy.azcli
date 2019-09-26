@@ -1,0 +1,16 @@
+## Variables
+$resourceGroup = "dnd-devopsmgmt"
+$location = "westus2"
+$userObjectId = $(az ad signed-in-user show --query objectId --out tsv)
+$kvName = "kv-devopsmgmt"
+$gitHubUser = "tescales"
+$gitHubRepo = "azure-scaffold"
+$roleName = "Owner"
+
+# Set defaults
+az configure --defaults location=$location
+az configure --defaults group=$resourceGroup
+
+## Full Deployment
+az group create --name $resourceGroup
+az group deployment create --template-file azuredeploy.json --resource-group $resourceGroup --parameters gitHubUser=$gitHubUser gitHubRepo=$gitHubRepo roleName=$roleName newVaultName=$kvName userObjectId=$userObjectId
