@@ -435,7 +435,7 @@
             },
             {
               "Name": "NodeConfigurationName",
-              "Value": "InstallChoco.chocoVM",
+              "Value": "w10DevOps.localhost",
               "TypeName": "System.String"
             },
             {

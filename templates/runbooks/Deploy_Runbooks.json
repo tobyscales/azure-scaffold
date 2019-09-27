@@ -99,9 +99,6 @@
                     "runbook": {
                         "value": "[parameters('runnowbooks')[copyIndex()].name]"
                     },
-                    "jobId": {
-                        "value": "[guid(resourceGroup().id, deployment().name, parameters('runnowbooks')[copyIndex()].name)]"
-                    },
                     "runbook-parameters": {
                         "value": {
                             "TO": "test"

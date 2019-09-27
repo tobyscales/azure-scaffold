@@ -25,7 +25,7 @@
     "dscOverwrite": "true",
     "moduleTemplate": "https://raw.githubusercontent.com/azureautomation/automation-packs/master/000-base-automation-resource-templates/deploy-module/DeployModule.json",
     "configurationTemplate": "https://raw.githubusercontent.com/azureautomation/automation-packs/master/000-base-automation-resource-templates/deploy-configuration/deployConfiguration.json",
-    "compilationjobTemplate": "https://raw.githubusercontent.com/azureautomation/automation-packs/master/000-base-automation-resource-templates/deploy-compilationjob/deployCompilationjob.json",
+    "compilationjobTemplate": "https://raw.githubusercontent.com/tescales/azure-scaffold/master/templates/dsc/jobs/azuredeploy.json",
     "moduleCount": "[length(parameters('modules'))]",
     "configCount": "[length(parameters('configurations'))]"
     },
@@ -109,7 +109,7 @@
         "mode": "Incremental",
         "templateLink": {
           "uri": "[variables('compilationjobTemplate')]",
-          "contentVersion": "1.0"
+          "contentVersion": "1.0.0.0"
         },
         "parameters": {
           "accountName": {
@@ -120,9 +120,6 @@
           },
           "configurationName": {
             "value": "[parameters('configurations')[copyIndex()].name]"
-          },
-          "jobId": {
-            "value": "[guid(resourceGroup().id, deployment().name, parameters('configurations')[copyIndex()].name)]"
           }
         }
       }
