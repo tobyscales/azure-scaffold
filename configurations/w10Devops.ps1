@@ -41,6 +41,7 @@ Configuration w10DevOps
             LogLevel  = "All"
         }
         #>
+        
         Environment CreatePathEnvironmentVariable {
             Name   = 'AddCLItoPath'
             Value  = '%OneDriveCommercial%\Tools\CLI'
