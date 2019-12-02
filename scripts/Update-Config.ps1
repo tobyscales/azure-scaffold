@@ -21,13 +21,17 @@
     Requires PSCore. Config.json must exist in the parent directory.
 
 .PARAMETER rootURL
-    OPTIONAL - Save time when running the script multiple times! Add the -SkipPrereqs switch today.
+    OPTIONAL - If you store your DSC configs in a dedicated GH repo, you can specify it here to maintain links.
 
+.PARAMETER UpdateInPlace
+    OPTIONAL - Updates config.json in place rather than parsing into dedicated files. Defaults to false.
 #>
 
 param (
     [Parameter(Mandatory = $false)]
-    [string]$rootUrl
+    [string]$rootUrl,
+    [Parameter(Mandatory = $false)]
+    [switch]$UpdateInPlace = $false
 )
 function get-TechNetItem {
     param(
@@ -44,8 +48,10 @@ function get-TechNetItem {
     try { $response = invoke-webrequest "$scriptPage" } catch { $response = $_.Exception.Response }
     $relativeUrl = ($response.Links | where-object { $_.class -eq "Button" }).href
     $return.fullUrl = "https://gallery.technet.microsoft.com$relativeUrl"
+    $type=$relativeUrl.split(".")[1]
 
-    switch ($relativeUrl.split(".")[1]) {
+    switch ($type) {
+
         "ps1" { $return.type = "PowerShell" }
         "graphrunbook" { $return.type = "Graph" }
         "py" { $return.type = "PythonScript" }
@@ -76,8 +82,18 @@ function get-PSGalleryItem {
 
 $startPath = $pwd.path
 $rootPath = (get-item $PSScriptRoot).Parent.FullName
-$dscParamsFile = (Join-Path $rootPath "templates" -AdditionalChildPath "dsc", "azuredeploy.parameters.json")
-$automationParamsFile = (Join-Path $rootPath "templates" -AdditionalChildPath "automation", "azuredeploy.parameters.json")
+
+#$dscParamsFile = (Join-Path $rootPath "templates" -AdditionalChildPath "dsc", "azuredeploy.parameters.json")
+#$runbooksParamsFile = (Join-Path $rootPath "templates" -AdditionalChildPath "runbooks", "azuredeploy.parameters.json")
+#$runnowbooksParamsFile = (Join-Path $rootPath "templates" -AdditionalChildPath "automation", "azuredeploy.parameters.json")
+#$solutionsParamsFile = (Join-Path $rootPath "templates" -AdditionalChildPath "solutions", "azuredeploy.parameters.json")
+
+
+$dscConfigsFile = (Join-Path $rootPath "dscConfigs.json")
+$dscModulesFile = (Join-Path $rootPath "dscModules.json")
+$runbooksFile = (Join-Path $rootPath "runbooks.json")
+$runnowbooksFile = (Join-Path $rootPath "runnowbooks.json")
+$solutionsFile = (Join-Path $rootPath "solutions.json")
 
 $configFile = (Join-Path $rootPath config.json)
 $j = get-content -Raw $configFile | ConvertFrom-Json
@@ -143,21 +159,27 @@ foreach ($dscModule in $j.dscModules) {
 
 $solutionsParams = $j.solutions
 
-# Optional behavior: save to dedicated azuredeploy.parameters.json files
-#  $j = get-content -raw $dscParamsFile | ConvertFrom-Json
-#  $j.parameters.modules.value = $dscModuleParams 
-#  $j.parameters.configurations.value = $dscConfigParams
-#  $j | convertto-json -depth 32 | set-content $dscParamsFile
-
-#  $j = get-content -raw $automationParamsFile | ConvertFrom-Json
-#  $j.parameters.runbooks.value = $runbookParams
-#  $j.parameters.runnowbooks.value = $runnowParams
-#  $j | convertto-json -depth 32 | set-content $automationParamsFile
-
 $j | add-member -MemberType NoteProperty -Name "automationRunbooks" -Value $runbookParams -Force
 $j | add-member -MemberType NoteProperty -Name "automationRunnowbooks" -Value $runnowParams -Force
 $j | add-member -MemberType NoteProperty -Name "dscConfigs" -Value $dscConfigParams -Force
 $j | add-member -MemberType NoteProperty -Name "dscModules" -Value $dscModuleParams -Force
 $j | add-member -MemberType NoteProperty -Name "solutions" -Value $solutionsParams -Force
 
-$j | convertto-json -depth 32 | set-content config2.json
+
+# Optional behavior: save over original config.json file
+if ($UpdateInPlace) {
+    $j | convertto-json | set-content config2.json -Force
+} 
+# Default behavior: save to dedicated .json files
+else {
+    
+    #$k = get-content -raw $automationParamsFile | ConvertFrom-Json
+    #$j.parameters.automationRunbooks.value = $runbookParams
+    #$j.parameters.automationRunnowbooks.value = $runnowParams
+    $j.dscConfigs | convertto-json | set-content $dscConfigsFile
+    $j.dscModules | convertto-json | set-content $dscModulesFile
+    $j.automationRunbooks | convertto-json | set-content $runbooksFile
+    $j.automationRunnowbooks | convertto-json | set-content $runnowbooksFile
+    $j.solutions | convertto-json | set-content $solutionsFile
+
+}
