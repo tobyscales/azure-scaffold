@@ -13,9 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-Configuration w10Devops
+Configuration w10DevOps
 {
     Import-DscResource -Module cChoco
+    Import-DscResource –ModuleName 'PSDesiredStateConfiguration'
     
     Node "localhost"
     {

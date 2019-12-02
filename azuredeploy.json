@@ -189,15 +189,19 @@
               "command": [
                 "/bin/bash",
                 "-c",
-                "chmod +x /code/$GITHUB_REPO/bootstrap/bootstrap.sh; /code/$GITHUB_REPO/bootstrap/bootstrap.sh"
+                "chmod +x /$BOOTSTRAP_REPO/bootstrap/bootstrap.sh; /$BOOTSTRAP_REPO/bootstrap/bootstrap.sh"
               ],
               "volumeMounts": [
                 {
-                  "name": "git-volume",
-                  "mountPath": "/code"
+                  "name": "git-bootstrapper",
+                  "mountPath": "[concat('/', parameters('gitHubUser'))]"
                 }
               ],
               "environmentVariables": [
+                {
+                  "name": "BOOTSTRAP_REPO",
+                  "value": "[concat(parameters('gitHubUser'), '/', parameters('gitHubRepo'))]"
+                },
                 {
                   "name": "GITHUB_REPO",
                   "value": "[parameters('gitHubRepo')]"
@@ -248,7 +252,7 @@
         "osType": "Linux",
         "volumes": [
           {
-            "name": "git-volume",
+            "name": "git-bootstrapper",
             "gitRepo": {
               "repository": "[concat('https://github.com/', parameters('gitHubUser'), '/', parameters('gitHubRepo'))]"
             }

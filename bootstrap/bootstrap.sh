@@ -33,7 +33,7 @@ retry 5 az login --identity
 az configure --defaults location=$AZURE_LOCATION
 az configure --defaults group=$AZURE_RESOURCE_GROUP
 
-cd /code/$GITHUB_REPO
+cd /$BOOTSTRAP_REPO
 
 jq -r .solutions config2.json > solutions.json
 jq -r .automationRunbooks config2.json > runbooks.json
