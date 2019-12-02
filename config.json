@@ -1,14 +1,14 @@
 {
     "dscConfigs": [
         {
-            "name": "InstallChoco",
-            "description": "Installs Chocolatey",
-            "location": "configurations/installChoco.ps1"
+            "name": "win10",
+            "description": "Installs Win10 with DevOps Tools",
+            "location": "configurations/win10.ps1"
         },
         {
-            "name": "w10DevOps",
-            "description": "Installs Win10 with DevOps Tools",
-            "location": "configurations/w10Devops.ps1"
+            "name": "basic",
+            "description": "Two configs: basic.Chocolatey and basic.BoxStarter are available.",
+            "location": "configurations/basic.ps1"
         }
     ],
     "dscModules": [
@@ -39,7 +39,7 @@
     ],
     "automationRunBooks": [
         {
-            "name": "Send Mail Office 365",
+            "name": "Azure Inventory using Powershell",
             "location": "TechNet",
             "run": "now"
         },

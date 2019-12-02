@@ -52,9 +52,9 @@ function get-TechNetItem {
 
     switch ($type) {
 
-        "ps1" { $return.type = "PowerShell" }
+        "ps1" { $return.type = "Script" }
         "graphrunbook" { $return.type = "Graph" }
-        "py" { $return.type = "PythonScript" }
+        "py" { $return.type = "Script" }
     }
 
     return $return

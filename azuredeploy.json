@@ -37,6 +37,13 @@
       },
       "defaultvalue": "00000000-0000-0000-0000-000000000000"
     },
+    "configName": {
+      "type": "string",
+      "metadata": { 
+        "description": "The full name of your DSC config (config.node format)."
+      },
+      "defaultvalue": "win10.devOps"
+    },
     "roleName": {
       "type": "string",
       "metadata": {
@@ -439,7 +446,7 @@
             },
             {
               "Name": "NodeConfigurationName",
-              "Value": "w10DevOps.localhost",
+              "Value": "[parameters('configName')]",
               "TypeName": "System.String"
             },
             {

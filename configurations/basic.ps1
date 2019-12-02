@@ -1,21 +1,28 @@
 #
-# installChoco.ps1
+# basic.ps1
 #
 
-Configuration InstallChoco
+Configuration basic
 {
     Import-DscResource -Module cChoco  
 
-    Node "chocoVM"
+    Node "installChoco"
+    {
+        cChocoInstaller InstallChoco
+        {
+            InstallDir = "c:\choco"
+        }
+    }
+    Node "installBoxstarter"
     {
         cChocoInstaller InstallChoco
         {
             InstallDir = "c:\choco"
         }
 
-        cChocoPackageInstaller installSkypeWithChocoParams
+        cChocoPackageInstaller installBoxstarter
         {
-            Name                 = 'skype'
+            Name                 = 'boxstarter'
             Ensure               = 'Present'
             DependsOn            = '[cChocoInstaller]installChoco'
         }
