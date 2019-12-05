@@ -15,10 +15,17 @@
 
 Configuration win10
 {
-    Import-DscResource -Module cChoco
-    Import-DscResource –ModuleName 'PSDesiredStateConfiguration'
-    
-    Node "devOps"
+    param
+    (
+        [string]$remoteUserName = "azureadmin"
+    )
+    Import-DscResource -ModuleName 'cChoco'
+    Import-DscResource -ModuleName 'PSDscResources'
+    #Import-DscResource -ModuleName 'xFirefox'
+
+    $remoteUserCred = Get-AutomationPSCredential $remoteUserName
+
+    Node 'devOps'
     {
         LocalConfigurationManager {
             DebugMode = 'ForceModuleImport'
@@ -39,9 +46,23 @@ Configuration win10
             Name      = "Microsoft-Windows-Subsystem-Linux"
             Ensure    = "Enable"
             LogLevel  = "All"
+        }#>
+        User 'RemoteUser' {
+            Ensure   = 'Present'  # To ensure the user account does not exist, set Ensure to "Absent"
+            UserName = $remoteUserCred.UserName
+            Password = $remoteUserCred # This needs to be a credential object
         }
-        #>
-        
+        Group remoteUserPU {
+            GroupName        = 'Power Users'
+            Ensure           = 'Present'
+            MembersToInclude = @($remoteUserCred.UserName)
+        }
+        Group remoteUserRA {
+            GroupName        = 'Remote Desktop Users'
+            Ensure           = 'Present'
+            MembersToInclude = @($remoteUserCred.UserName)
+        }
+
         Environment CreatePathEnvironmentVariable {
             Name   = 'AddCLItoPath'
             Value  = '%OneDriveCommercial%\Tools\CLI'
@@ -65,55 +86,50 @@ Configuration win10
             ValueName = "KFMSilentOptInWithNotification"
             ValueData = "1"
         }
-        cChocoInstaller installChoco
-        {
+        # MSFT_xFirefoxPreference FirefoxSyncSetting
+        # {
+        #     PreferenceName  = "identity.sync.tokenserver.uri"
+        #     PreferenceValue = "https://sync.scales.cloud/token/1.0/sync/1.5"
+        # }
+        cChocoInstaller installChoco {
             InstallDir = "c:\choco"
         }
         cChocoFeature allowGlobalConfirmation {
             FeatureName = "allowGlobalConfirmation"
             Ensure      = 'Present'
         }
-        cChocoPackageInstaller installFirefox
-        {
+        cChocoPackageInstaller installFirefox {
             Ensure      = 'Present'
             Name        = "firefox"
             DependsOn   = "[cChocoInstaller]installChoco"
-            #This will automatically try to upgrade if available, only if a version is not explicitly specified.
             AutoUpgrade = $True
         }
-        cChocoPackageInstaller installNodeJS
-        {
+        cChocoPackageInstaller installNodeJS {
             Ensure      = 'Present'
             Name        = "nodejs"
             DependsOn   = "[cChocoInstaller]installChoco"
-            #This will automatically try to upgrade if available, only if a version is not explicitly specified.
             AutoUpgrade = $True
         }
-        cChocoPackageInstaller installZoom
-        {
+        cChocoPackageInstaller installZoom {
             Ensure      = 'Present'
             Name        = "zoom"
             DependsOn   = "[cChocoInstaller]installChoco"
-            #This will automatically try to upgrade if available, only if a version is not explicitly specified.
             AutoUpgrade = $True
         }
-        cChocoPackageInstaller installAzureCLI
-        {
+        cChocoPackageInstaller installAzureCLI {
             Ensure      = 'Present'
             Name        = "azure-cli"
             DependsOn   = "[cChocoInstaller]installChoco"
             #This will automatically try to upgrade if available, only if a version is not explicitly specified.
             AutoUpgrade = $True
         }
-        cChocoPackageInstaller installVSCode
-        {
+        cChocoPackageInstaller installVSCode {
             Ensure      = 'Present'
             Name        = "vscode"
             DependsOn   = "[cChocoInstaller]installChoco"
             AutoUpgrade = $True
         }
-        cChocoPackageInstallerSet installVSCodeExtensions
-        {
+        cChocoPackageInstallerSet installVSCodeExtensions {
             Ensure    = 'Present'
             Name      = @(
                 "ms-vscode.azurecli"
@@ -126,48 +142,48 @@ Configuration win10
             )
             DependsOn = "[cChocoPackageInstaller]installVSCode"
         }
-        cChocoPackageInstaller installNotepadPlusPlus
-        {
+        cChocoPackageInstaller installNotepadPlusPlus {
             Ensure      = 'Present'
             Name        = "notepadplusplus.install"
             DependsOn   = "[cChocoInstaller]installChoco"
             AutoUpgrade = $True
         }
-        cChocoPackageInstaller installSlack
-        {
+        cChocoPackageInstaller installSlack {
             Ensure      = 'Present'
             Name        = "slack"
             DependsOn   = "[cChocoInstaller]installChoco"
             AutoUpgrade = $True
         }
-        cChocoPackageInstaller installPSCore
-        {
+        cChocoPackageInstaller installPSCore {
             Ensure      = 'Present'
             Name        = "powershell-core"
             DependsOn   = "[cChocoInstaller]installChoco"
             AutoUpgrade = $True
         }
-        cChocoPackageInstaller installAzureStorageExplorer
-        {
+        cChocoPackageInstaller installAzureStorageExplorer {
             Ensure      = 'Present'
             Name        = "microsoftazurestorageexplorer"
             DependsOn   = "[cChocoInstaller]installChoco"
             AutoUpgrade = $True
         }
-        cChocoPackageInstaller noFlashAllowed
-        {
-            Ensure    = 'Absent'
-            Name      = "flashplayerplugin"
-            DependsOn = "[cChocoInstaller]installChoco"
+        cChocoPackageInstaller installEdgeInsider {
+            Ensure      = 'Present'
+            Name        = "microsoft-edge-insider"
+            DependsOn   = "[cChocoInstaller]installChoco"
+            AutoUpgrade = $True
         }
-        cChocoPackageInstallerSet installGitStuff
-        {
+        cChocoPackageInstallerSet installGitStuff {
             Ensure    = 'Present'
             Name      = @(
                 "git-credential-manager-for-windows"
                 "github-desktop"
                 "git.install"
             )
+            DependsOn = "[cChocoInstaller]installChoco"
+        }
+        cChocoPackageInstaller noFlashAllowed {
+            Ensure    = 'Absent'
+            Name      = "flashplayerplugin"
             DependsOn = "[cChocoInstaller]installChoco"
         }
     }

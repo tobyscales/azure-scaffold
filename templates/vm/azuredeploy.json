@@ -106,7 +106,8 @@
       "type": "Microsoft.Network/virtualNetworks",
       "location": "[resourceGroup().location]",
       "apiVersion": "2016-12-01",
-      "dependsOn": [],
+      "dependsOn": [
+      ],
       "tags": {
         "displayName": "[variables('vNetName')]"
       },
@@ -171,6 +172,9 @@
       "dependsOn": [
         "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
       ],
+      "identity": {
+        "type": "SystemAssigned"
+      },
       "properties": {
         "hardwareProfile": {
           "vmSize": "[parameters('vmSize')]"
@@ -228,5 +232,6 @@
       }
     }
   ],
-  "outputs": {}
+  "outputs": {
+  }
 }

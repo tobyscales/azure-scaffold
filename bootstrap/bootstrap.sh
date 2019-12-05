@@ -1,10 +1,8 @@
 #!/bin/bash
 # additional environment variables available: $AZURE_SUBSCRIPTION_ID, $AZURE_AADTENANT_ID and $AZURE_KEYVAULT
-CONFIG_URL="https://raw.githubusercontent.com/$GITHUB_USER/$GITHUB_REPO/master/"
 
 echo Location: $AZURE_LOCATION
 echo Resource Group: $AZURE_RESOURCE_GROUP
-echo Configurations from: $CONFIG_URL
 
 # cribbed from http://fahdshariff.blogspot.com/2014/02/retrying-commands-in-shell-scripts.html
 # Retries a command on failure.
@@ -34,6 +32,10 @@ az configure --defaults location=$AZURE_LOCATION
 az configure --defaults group=$AZURE_RESOURCE_GROUP
 
 cd /$BOOTSTRAP_REPO
+
+### Custom Code goes here 
+CONFIG_URL="https://raw.githubusercontent.com/$GITHUB_USER/$GITHUB_REPO/master/"
+echo Configurations from: $CONFIG_URL
 
 #TODO -- refactor my Update-Config powershell script into bash, to run in a container
 #pwsh -noprofile -nologo -executionpolicy Bypass -File ./scripts/Update-Config.ps1
