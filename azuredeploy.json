@@ -1,5 +1,5 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/deploymentTemplate.json#",
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
     "gitHubUser": {
@@ -39,10 +39,23 @@
     },
     "configName": {
       "type": "string",
-      "metadata": { 
+      "metadata": {
         "description": "The full name of your DSC config (config.node format)."
       },
       "defaultvalue": "win10.devOps"
+    },
+    "remoteUser": {
+      "type": "string",
+      "metadata": {
+        "description": "The username for remote access."
+      },
+      "defaultvalue": "azureadmin"
+    },
+    "remoteUserPass": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password for your remote user."
+      }
     },
     "roleName": {
       "type": "string",
@@ -70,6 +83,8 @@
     "automationAcctName": "[concat('aa-', resourcegroup().name)]",
     "workspaceName": "[concat('logs-', resourcegroup().name)]",
     "vmName": "[take(concat('vm-', resourceGroup().name),15)]",
+    "storageAccountName": "[take(concat('stor', replace( resourceGroup().name, '-', '')),15)]",
+    "containerName": "scripts",
     "roleAssignmentId": "[guid(resourceGroup().name)]",
     "cgName": "[concat('deploy', take(toLower( replace( resourceGroup().name, '-', '') ),23))]",
     "roleDefinitions": {
@@ -117,10 +132,10 @@
             "value": "[variables('automationAcctName')]"
           },
           "userName": {
-            "value": "[parameters('userObjectId')]"
+            "value": "[parameters('remoteUser')]"
           },
           "password": {
-            "value": "**ENTER PASSWORD HERE**"
+            "value": "[parameters('remoteUserPass')]"
           },
           "subscriptionId": {
             "value": "[parameters('subscriptionId')]"
@@ -320,14 +335,16 @@
                 "tenantId": "[reference(concat('Microsoft.ContainerInstance/containerGroups/', variables('cgName')), '2018-10-01', 'Full').identity.tenantId]",
                 "objectId": "[reference(concat('Microsoft.ContainerInstance/containerGroups/', variables('cgName')), '2018-10-01', 'Full').identity.principalId]",
                 "permissions": {
-                  "keys": [],
+                  "keys": [
+                  ],
                   "secrets": [
                     "all"
                   ],
                   "certificates": [
                     "all"
                   ],
-                  "storage": []
+                  "storage": [
+                  ]
                 }
               }
             ]
@@ -385,6 +402,31 @@
       }
     },
     {
+      "name": "[variables('storageAccountName')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2018-02-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "description": "Used for ScriptStorage"
+      },
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "StorageV2",
+      "properties": {
+      },
+      "resources": [
+        {
+          "name": "[concat('default/', variables('containerName'))]",
+          "type": "blobServices/containers",
+          "apiVersion": "2018-07-01",
+          "dependsOn": [
+            "[variables('storageAccountName')]"
+          ]
+        }
+      ]
+    },
+    {
       "type": "Microsoft.Compute/virtualMachines/extensions",
       "apiVersion": "2017-03-30",
       "name": "[concat(variables('vmName'),'/Microsoft.Monitoring')]",
@@ -399,31 +441,51 @@
         "typeHandlerVersion": "1.0",
         "autoUpgradeMinorVersion": true,
         "settings": {
-          "workspaceId": "[reference(resourceId(resourceGroup().name, 'Microsoft.OperationalInsights/workspaces/', variables('workspaceName')), '2015-11-01-preview').customerId]",
-          "azureResourceId": "[resourceId(resourceGroup().name, 'Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+          "workspaceId": "[reference(resourceId('Microsoft.OperationalInsights/workspaces/', variables('workspaceName')), '2015-11-01-preview').customerId]",
+          "azureResourceId": "[resourceId('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
         },
         "protectedSettings": {
-          "workspaceKey": "[listKeys(resourceId(resourceGroup().name, 'Microsoft.OperationalInsights/workspaces/', variables('workspaceName')), '2015-11-01-preview').primarySharedKey]"
+          "workspaceKey": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces/', variables('workspaceName')), '2015-11-01-preview').primarySharedKey]"
         }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "apiVersion": "2017-03-30",
+      "name": "[concat(variables('vmName'),'/AADLoginForWindows')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Resources/deployments/', 'Deploy_', variables('workspaceName'))]",
+        "[concat('Microsoft.Resources/deployments/', 'Deploy_', variables('vmName'))]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Azure.ActiveDirectory",
+        "type": "AADLoginForWindows",
+        "typeHandlerVersion": "0.4",
+        "autoUpgradeMinorVersion": true
       }
     },
     {
       "name": "[concat(variables('vmName'),'/Microsoft.Powershell.DSC')]",
       "type": "Microsoft.Compute/virtualMachines/extensions",
+      "apiVersion": "2017-03-30",
       "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[concat('Microsoft.Resources/deployments/', 'Deploy_', variables('vmName'))]",
-        "[concat('Microsoft.ContainerInstance/containerGroups/', variables('cgName'))]"
-      ],
-      "tags": {
-        "AutomationAccountARMID": "[resourceId(resourceGroup().name, 'Microsoft.Automation/automationAccounts/', variables('automationAcctName'))]"
-      },
-      "apiVersion": "2015-06-15",
       "properties": {
         "publisher": "Microsoft.Powershell",
         "type": "DSC",
-        "typeHandlerVersion": "2.74",
+        "typeHandlerVersion": "2.8",
         "autoUpgradeMinorVersion": true,
+        "protectedSettings": {
+          "configurationArguments": {
+            "parameterOfTypePSCredential1": {
+              "remoteUserName": "[parameters('remoteUser')]",
+              "remoteUserPassword": "[parameters('remoteUserPass')]"
+            }
+          },
+          "Items": {
+            "registrationKeyPrivate": "[listKeys(resourceId('Microsoft.Automation/automationAccounts/', variables('automationAcctName')), '2018-06-30').Keys[0].value]"
+          }
+        },
         "settings": {
           "Properties": [
             {
@@ -436,53 +498,19 @@
             },
             {
               "Name": "RegistrationUrl",
-              "Value": "[reference(resourceId(concat(resourceGroup().name), 'Microsoft.Automation/automationAccounts/', variables('automationAcctName')),'2015-01-01-preview').RegistrationUrl]",
-              "TypeName": "System.String"
-            },
-            {
-              "Name": "ConfigurationMode",
-              "Value": "ApplyAndAutoCorrect",
+              "Value": "[reference(resourceId('Microsoft.Automation/automationAccounts/', variables('automationAcctName')),'2015-01-01-preview').RegistrationUrl]",
               "TypeName": "System.String"
             },
             {
               "Name": "NodeConfigurationName",
               "Value": "[parameters('configName')]",
               "TypeName": "System.String"
-            },
-            {
-              "Name": "ConfigurationModeFrequencyMins",
-              "Value": "15",
-              "TypeName": "System.Int32"
-            },
-            {
-              "Name": "RefreshFrequencyMins",
-              "Value": "30",
-              "TypeName": "System.Int32"
-            },
-            {
-              "Name": "RebootNodeIfNeeded",
-              "Value": true,
-              "TypeName": "System.Boolean"
-            },
-            {
-              "Name": "AllowModuleOverwrite",
-              "Value": true,
-              "TypeName": "System.Boolean"
-            },
-            {
-              "Name": "ActionAfterReboot",
-              "Value": "ContinueConfiguration",
-              "TypeName": "System.String"
             }
           ]
-        },
-        "protectedSettings": {
-          "Items": {
-            "registrationKeyPrivate": "[listKeys(resourceId(concat(resourceGroup().name), 'Microsoft.Automation/automationAccounts/', variables('automationAcctName')), '2015-01-01-preview').Keys[0].value]"
-          }
         }
       }
     }
   ],
-  "outputs": {}
+  "outputs": {
+  }
 }

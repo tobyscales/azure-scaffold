@@ -1,5 +1,5 @@
 {
-    "$schema": "http://schemas.microsoft.org/azure/deploymentTemplate?api-version=2015-01-01-preview#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "accountName": {
@@ -34,7 +34,7 @@
         {
             "name": "[concat(parameters('accountName'), '/', parameters('jobId'))]",
             "type": "Microsoft.Automation/AutomationAccounts/Compilationjobs",
-            "apiVersion": "2015-01-01-preview",
+            "apiVersion": "2018-01-15",
             "location": "parameters('location')]",
             "tags": {},
             "properties": {

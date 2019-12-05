@@ -95,7 +95,7 @@
     },
     {
       "apiVersion": "2015-01-01",
-      "name": "[concat('installJob-', copyIndex())]",
+      "name": "[concat('installDSCCompilationJob-', copyIndex())]",
       "type": "Microsoft.Resources/deployments",
       "copy": {
         "name": "deployJobs",
