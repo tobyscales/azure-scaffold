@@ -10,11 +10,13 @@
         },
         "runbooks": {
             "type": "array",
-            "defaultvalue": []
+            "defaultvalue": [
+            ]
         },
         "runnowbooks": {
             "type": "array",
-            "defaultvalue": []
+            "defaultvalue": [
+            ]
         }
     },
     "variables": {
@@ -28,7 +30,8 @@
             "type": "Microsoft.Automation/automationAccounts/runbooks",
             "apiVersion": "2015-10-31",
             "location": "[resourceGroup().location]",
-            "tags": {},
+            "tags": {
+            },
             "properties": {
                 "runbookType": "[parameters('runbooks')[copyIndex()].runbookType]",
                 "description": "[parameters('runbooks')[copyIndex()].description]",
@@ -43,48 +46,35 @@
             }
         },
         {
-            "apiVersion": "2015-01-01",
-            "name": "[concat('installRunNow-', copyIndex())]",
-            "type": "Microsoft.Resources/deployments",
-            "copy": {
-                "name": "installRunnowbooks",
-                "count": "[length(parameters('runnowbooks'))]"
+            "name": "[concat(parameters('accountName'), '/', parameters('runnowbooks')[copyIndex()].name)]",
+            "type": "Microsoft.Automation/automationAccounts/runbooks",
+            "apiVersion": "2015-10-31",
+            "location": "[resourceGroup().location]",
+            "tags": {
             },
             "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[variables('runbookTemplate')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "accountName": {
-                        "value": "[parameters('accountName')]"
-                    },
-                    "runbookName": {
-                        "value": "[parameters('runnowbooks')[copyIndex()].name]"
-                    },
-                    "runbookUri": {
-                        "value": "[parameters('runnowbooks')[copyIndex()].uri]"
-                    },
-                    "runbookType": {
-                        "value": "[parameters('runnowbooks')[copyIndex()].runbookType]"
-                    },
-                    "runbookDescription": {
-                        "value": "[parameters('runnowbooks')[copyIndex()].description]"
-                    }
+                "runbookType": "[parameters('runnowbooks')[copyIndex()].runbookType]",
+                "description": "[parameters('runnowbooks')[copyIndex()].description]",
+                "publishContentLink": {
+                    "uri": "[parameters('runnowbooks')[copyIndex()].Uri]",
+                    "version": "1.0.0.0"
                 }
+            },
+            "copy": {
+                "name": "deployRunnowbooks",
+                "count": "[length(parameters('runbooks'))]"
             }
         },
         {
             "apiVersion": "2015-01-01",
             "type": "Microsoft.Resources/deployments",
-            "name": "[concat('installJob-', copyIndex())]",
+            "name": "[concat('runJob-', copyIndex())]",
             "copy": {
                 "name": "installRunNowJobs",
                 "count": "[length(parameters('runnowbooks'))]"
             },
             "dependsOn": [
-                "installRunnowbooks"
+                "deployRunnowbooks"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -108,5 +98,6 @@
             }
         }
     ],
-    "outputs": {}
+    "outputs": {
+    }
 }
