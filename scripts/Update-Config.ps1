@@ -121,7 +121,7 @@ foreach ($runbook in $j.automationRunbooks) {
         }
     }
     else {
-        $runbookParams += @{ 
+        $runbookParams += [ordered]@{ 
             'name'        = $item.name
             'description' = $item.description
             'runbookType' = $item.type

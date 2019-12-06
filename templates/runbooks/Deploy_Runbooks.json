@@ -62,7 +62,7 @@
             },
             "copy": {
                 "name": "deployRunnowbooks",
-                "count": "[length(parameters('runbooks'))]"
+                "count": "[length(parameters('runnowbooks'))]"
             }
         },
         {
