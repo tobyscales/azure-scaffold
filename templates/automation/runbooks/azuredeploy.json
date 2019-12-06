@@ -42,13 +42,13 @@
         {
             "name": "[concat(parameters('accountName'), '/', parameters('runbookName'))]",
             "type": "Microsoft.Automation/automationAccounts/runbooks",
-            "apiVersion": "2015-01-01-preview",
+            "apiVersion": "2015-10-31",
             "location": "[resourceGroup().location]",
             "tags": {},
             "properties": {
-                "runbookType": "Script",
-                "logProgress": "false",
-                "logVerbose": "false",
+                "runbookType": "[parameters('runbookType')]",
+                "logProgress": false,
+                "logVerbose": false,
                 "description": "[parameters('runbookDescription')]",
                 "publishContentLink": {
                     "uri": "[parameters('runbookURI')]",
