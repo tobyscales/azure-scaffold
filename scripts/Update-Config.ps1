@@ -57,6 +57,8 @@ function get-TechNetItem {
         "py" { $return.type = "Script" }
     }
 
+    $return.name = $return.fullUrl.split('/')[-1]
+
     return $return
 }
 function get-PSGalleryItem {
@@ -77,6 +79,7 @@ function get-PSGalleryItem {
     # return AbsoluteUri for scripts... probably a better place to get this info from
     if ($itemType -eq "script") { $return.fullUrl = $info.ProjectUri.AbsoluteUri }
     
+    $return.name = $return.fullUrl.split('/')[-1]
     return $return
 }
 
@@ -111,7 +114,7 @@ foreach ($runbook in $j.automationRunbooks) {
 
     if ($runbook.run -eq "now") {
         $runnowParams += [ordered]@{ 
-            'name'        = $runbook.name
+            'name'        = $item.name
             'description' = $item.description
             'runbookType' = $item.type
             'uri'         = $item.fullUrl
@@ -119,7 +122,7 @@ foreach ($runbook in $j.automationRunbooks) {
     }
     else {
         $runbookParams += @{ 
-            'name'        = $runbook.name
+            'name'        = $item.name
             'description' = $item.description
             'runbookType' = $item.type
             'uri'         = $item.fullUrl

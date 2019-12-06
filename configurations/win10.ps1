@@ -28,7 +28,8 @@ Configuration win10
     Node 'devOps'
     {
         LocalConfigurationManager {
-            DebugMode = 'ForceModuleImport'
+            DebugMode = 'ForceModuleImport' #change this for prod
+            AllowModuleOverwrite = '$true'
         }
         ## Do I want to force this?
         <# 
