@@ -57,7 +57,7 @@ function get-TechNetItem {
         "py" { $return.type = "Script" }
     }
 
-    $return.name = $return.fullUrl.split('/')[-1]
+    $return.name = (split-path -leaf $return.fullUrl).split('.')[0]
 
     return $return
 }
@@ -79,7 +79,7 @@ function get-PSGalleryItem {
     # return AbsoluteUri for scripts... probably a better place to get this info from
     if ($itemType -eq "script") { $return.fullUrl = $info.ProjectUri.AbsoluteUri }
     
-    $return.name = $return.fullUrl.split('/')[-1]
+    $return.name = (split-path -leaf $return.fullUrl).split('.')[0]
     return $return
 }
 
