@@ -18,11 +18,12 @@ Configuration win10
 {
     param
     (
-        [string]$remoteUserName,
-        [string]$tenantId,
-        [string]$azResourceGroup,
-        [string]$azLocation,
-        [string]$azConfigUrl
+        #have to keep default values to enable dsc-compilation
+        [string]$remoteUserName="default", 
+        [string]$tenantId="default",
+        [string]$azResourceGroup="default",
+        [string]$azLocation="default",
+        [string]$azConfigUrl="default"
     )
     Import-DscResource -ModuleName 'cChoco'
     Import-DscResource -ModuleName 'PSDscResources'
