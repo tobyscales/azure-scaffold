@@ -19,7 +19,7 @@ Configuration win10
     param
     (
         #have to keep default values to enable dsc-compilation
-        [string]$remoteUserName="default", 
+        [string]$remoteUserName="azureadmin", 
         [string]$tenantId="default",
         [string]$azResourceGroup="default",
         [string]$azLocation="default",
