@@ -480,6 +480,11 @@
             "parameterOfTypePSCredential1": {
               "remoteUserName": "[parameters('remoteUser')]",
               "remoteUserPassword": "[parameters('remoteUserPass')]"
+            },
+            "vmParams": {
+              "azResourceGroup": "[resourceGroup().name]",
+              "azLocation": "[resourceGroup().location]",
+              "azConfigUrl": "[variables('ghURL')]"
             }
           },
           "Items": {

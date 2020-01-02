@@ -13,41 +13,62 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 Configuration win10
 {
     param
     (
-        [string]$remoteUserName = "azureadmin"
+        [string]$remoteUserName,
+        [string]$tenantId,
+        [string]$azResourceGroup,
+        [string]$azLocation,
+        [string]$azConfigUrl
     )
     Import-DscResource -ModuleName 'cChoco'
     Import-DscResource -ModuleName 'PSDscResources'
+    #Import-DscResource -ModuleName 'PSDesiredStateConfiguration' DO NOT USE
+    Import-DscResource -ModuleName 'ComputerManagementDsc'
     #Import-DscResource -ModuleName 'xFirefox'
-
+    
     $remoteUserCred = Get-AutomationPSCredential $remoteUserName
+    
+    #can't use this because the DSC resource won't compile with it; need to use an external script instead, to set an env variable
+    #$tenantId = (invoke-restmethod "http://169.254.169.254/metadata/identity/info?api-version=2018-02-01" -UseBasicParsing -Method GET -Headers @{Metadata = "true" }).TenantId
 
     Node 'devOps'
     {
         LocalConfigurationManager {
-            DebugMode = 'ForceModuleImport' #change this for prod
-            AllowModuleOverwrite = '$true'
+            DebugMode            = 'ForceModuleImport' #change this for prod
+            AllowModuleOverwrite = $True
         }
         ## Do I want to force this?
-        <# 
-        WindowsOptionalFeature featureHyperV {
-            Name      = "Microsoft-Hyper-V-All"
-            Ensure    = "Enable"
-            LogLevel  = "All"
-        }
+        # WindowsOptionalFeature featureHyperV {
+        #     Name      = "Microsoft-Hyper-V-All"
+        #     Ensure    = "Enable"
+        #     LogLevel  = "All"
+        # }
+        # PowerShellExecutionPolicy ExecutionPolicy
+        # {
+        #     ExecutionPolicyScope = 'Process'
+        #     ExecutionPolicy      = 'Unrestricted'
+        # }
+        # MSFT_xFirefoxPreference FirefoxSyncSetting
+        # {
+        #     PreferenceName  = "identity.sync.tokenserver.uri"
+        #     PreferenceValue = "https://sync.scales.cloud/token/1.0/sync/1.5"
+        # }
+
         WindowsOptionalFeature featureContainers {
-            Name      = "Containers"
-            Ensure    = "Enable"
-            LogLevel  = "All"
+            Name   = 'Containers'
+            Ensure = 'Present'
         }
         WindowsOptionalFeature featureWSL {
-            Name      = "Microsoft-Windows-Subsystem-Linux"
-            Ensure    = "Enable"
-            LogLevel  = "All"
-        }#>
+            Name   = 'Microsoft-Windows-Subsystem-Linux'
+            Ensure = 'Present'
+        }
+        #######################
+        #region User+Group Settings
+        ####################### 
         User 'RemoteUser' {
             Ensure   = 'Present'  # To ensure the user account does not exist, set Ensure to "Absent"
             UserName = $remoteUserCred.UserName
@@ -63,35 +84,142 @@ Configuration win10
             Ensure           = 'Present'
             MembersToInclude = @($remoteUserCred.UserName)
         }
+        #endregion
 
-        Environment CreatePathEnvironmentVariable {
-            Name   = 'AddCLItoPath'
+        #######################
+        #region Environment Settings
+        ####################### 
+        Environment updatePathEnvironmentVariable {
+            Name   = 'Path'
             Value  = '%OneDriveCommercial%\Tools\CLI'
             Ensure = 'Present'
             Path   = $true
+            Target = @('Process', 'Machine')
         }
+        Environment azResourceGroup {
+            Name   = 'AZURE_RESOURCE_GROUP'
+            Value  = $azResourceGroup
+            Ensure = 'Present'
+        }
+        Environment azLocation {
+            Name   = 'AZURE_LOCATION'
+            Value  = $azLocation
+            Ensure = 'Present'
+        }
+        Environment azConfigUrl {
+            Name   = 'AZURE_CONFIG_URL'
+            Value  = $azConfigUrl
+            Ensure = 'Present'
+        }
+        #endregion
+
+        #######################
+        #region  File Settings
+        #######################
+        
         File createDownloads {
             Ensure          = 'Present'
             Type            = "Directory"
             DestinationPath = "D:\Downloads"
         }
+        File removeFFShortcut {
+            Ensure          = 'Absent'
+            Type            = 'File'
+            DestinationPath = 'C:\Users\Public\Desktop\Firefox.lnk'
+        }
+        File removeEdgeBetaShortcut {
+            Ensure          = 'Absent'
+            Type            = 'File'
+            DestinationPath = 'C:\Users\Public\Desktop\Microsoft Edge Beta.lnk'
+        }
+        File removeVSCShortcut {
+            Ensure          = 'Absent'
+            Type            = 'File'
+            DestinationPath = 'C:\Users\Public\Desktop\Visual Studio Code.lnk'
+        }
+        File removeZoomShortcut {
+            Ensure          = 'Absent'
+            Type            = 'File'
+            DestinationPath = 'C:\Users\Public\Desktop\Zoom.lnk'
+        }
+        File removeGHShortcut {
+            Ensure          = 'Absent'
+            Type            = 'File'
+            DestinationPath = '%OneDriveCommercial%\Desktop\Github Desktop.lnk'
+        }
+        File removeEdgeShortcut {
+            Ensure          = 'Absent'
+            Type            = 'File'
+            DestinationPath = '%OneDriveCommercial%\Desktop\Microsoft Edge.lnk'
+        }
+        File removeUserGHShortcut {
+            Ensure          = 'Absent'
+            Type            = 'File'
+            DestinationPath = '%userprofile%\Desktop\Github Desktop.lnk'
+        }
+        File removeUserEdgeShortcut {
+            Ensure          = 'Absent'
+            Type            = 'File'
+            DestinationPath = '%userprofile%\Desktop\Microsoft Edge.lnk'
+        }
+        #endregion
+
+        #######################
+        #region Registry Settings
+        #######################
+
+        # Registry odRenameRoot {
+        #     Ensure    = '"Present'
+        #     Key       = "HKEY_CURRENT_USER\Software\Microsoft\OneDrive\Accounts\Business1"
+        #     ValueName = "UserFolder"
+        #     ValueData = "C:\ODFB"
+        # }
+        # Registry odMoveRoot {
+        #     Ensure    = '"Present'
+        #     Key       = "HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\OneDrive\DefaultRootDir"
+        #     ValueName = $tenantId
+        #     ValueData = "C:\"
+        # }
         Registry odSilentAccountConfig {
-            Ensure    = "Present"
-            Key       = "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\OneDrive"
-            ValueName = "SilentAccountConfig"
-            ValueData = "1"
+            Ensure    = 'Present'
+            Key       = 'HKLM:\SOFTWARE\Policies\Microsoft\OneDrive'
+            ValueName = 'SilentAccountConfig'
+            ValueData = $tenantId
+            Force     = $true
+        }
+        Registry odSilentOptIn {
+            Ensure    = 'Present'
+            Key       = 'HKLM:\SOFTWARE\Policies\Microsoft\OneDrive'
+            ValueName = 'KFMSilentOptIn'
+            ValueData = '1'
+            Force     = $true
         }
         Registry odSilentKFMConfig {
-            Ensure    = "Present"
-            Key       = "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\OneDrive"
-            ValueName = "KFMSilentOptInWithNotification"
-            ValueData = "1"
+            Ensure    = 'Present'
+            Key       = 'HKLM:\SOFTWARE\Policies\Microsoft\OneDrive'
+            ValueName = 'KFMSilentOptInWithNotification'
+            ValueData = '1'
+            Force     = $true
         }
-        # MSFT_xFirefoxPreference FirefoxSyncSetting
-        # {
-        #     PreferenceName  = "identity.sync.tokenserver.uri"
-        #     PreferenceValue = "https://sync.scales.cloud/token/1.0/sync/1.5"
-        # }
+        Registry moveDownloadsFolder {
+            Ensure    = 'Present'
+            Key       = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders'
+            ValueName = '{374DE290-123F-4565-9164-39C4925E467B}'
+            ValueData = 'D:\Downloads'
+            Force     = $true
+        }
+        Registry moveIEDownloadsFolder {
+            Ensure    = 'Present'
+            Key       = 'HKCU:\Software\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppContainer\Storage\microsoft.microsoftedge_8wekyb3d8bbwe\MicrosoftEdge\Main'
+            ValueName = 'DefaultDownloadDirectory'
+            ValueData = 'D:\Downloads'
+            Force     = $true
+        }
+        #endregion
+
+        #######################
+        #region cChoco Installer
+        #######################
         cChocoInstaller installChoco {
             InstallDir = "c:\choco"
         }
@@ -105,15 +233,27 @@ Configuration win10
             DependsOn   = "[cChocoInstaller]installChoco"
             AutoUpgrade = $True
         }
-        cChocoPackageInstaller installNodeJS {
+        cChocoPackageInstaller installFunctionsCoreTools {
             Ensure      = 'Present'
-            Name        = "nodejs"
+            Name        = "azure-functions-core-tools"
             DependsOn   = "[cChocoInstaller]installChoco"
             AutoUpgrade = $True
         }
-        cChocoPackageInstaller installZoom {
+        cChocoPackageInstaller installdotNetCore {
             Ensure      = 'Present'
-            Name        = "zoom"
+            Name        = "dotnetcore-sdk"
+            DependsOn   = "[cChocoInstaller]installChoco"
+            AutoUpgrade = $True
+        }
+        cChocoPackageInstaller installPostman {
+            Ensure      = 'Present'
+            Name        = "postman"
+            DependsOn   = "[cChocoInstaller]installChoco"
+            AutoUpgrade = $True
+        }
+        cChocoPackageInstaller installNodeJS {
+            Ensure      = 'Present'
+            Name        = "nodejs"
             DependsOn   = "[cChocoInstaller]installChoco"
             AutoUpgrade = $True
         }
@@ -133,12 +273,12 @@ Configuration win10
         cChocoPackageInstallerSet installVSCodeExtensions {
             Ensure    = 'Present'
             Name      = @(
-                "ms-vscode.azurecli"
-                "vscode-settingssync"
-                "msazurermtools.azurerm-vscode-tools"
-                "ms-vscode.azure-account"
-                "ms-python.python"
-                "ms-vscode.powershell"
+                "ms-vscode.azurecli",
+                "vscode-settingssync",
+                "msazurermtools.azurerm-vscode-tools",
+                "ms-vscode.azure-account",
+                "ms-python.python",
+                "ms-vscode.powershell",
                 "peterjausovec.vscode-docker"
             )
             DependsOn = "[cChocoPackageInstaller]installVSCode"
@@ -149,11 +289,14 @@ Configuration win10
             DependsOn   = "[cChocoInstaller]installChoco"
             AutoUpgrade = $True
         }
-        cChocoPackageInstaller installSlack {
-            Ensure      = 'Present'
-            Name        = "slack"
-            DependsOn   = "[cChocoInstaller]installChoco"
-            AutoUpgrade = $True
+        cChocoPackageInstallerSet installConferenceTools {
+            Ensure    = 'Present'
+            Name      = @(
+                "zoom",
+                "slack",
+                "microsoft-teams"
+            )
+            DependsOn = "[cChocoInstaller]installChoco"
         }
         cChocoPackageInstaller installPSCore {
             Ensure      = 'Present'
@@ -173,11 +316,17 @@ Configuration win10
             DependsOn   = "[cChocoInstaller]installChoco"
             AutoUpgrade = $True
         }
+        cChocoPackageInstaller installO365 {
+            Ensure      = 'Present'
+            Name        = "office365business"
+            DependsOn   = "[cChocoInstaller]installChoco"
+            AutoUpgrade = $True
+        }
         cChocoPackageInstallerSet installGitStuff {
             Ensure    = 'Present'
             Name      = @(
-                "git-credential-manager-for-windows"
-                "github-desktop"
+                "git-credential-manager-for-windows",
+                "github-desktop",
                 "git.install"
             )
             DependsOn = "[cChocoInstaller]installChoco"
@@ -187,5 +336,6 @@ Configuration win10
             Name      = "flashplayerplugin"
             DependsOn = "[cChocoInstaller]installChoco"
         }
+        #endregion
     }
 }

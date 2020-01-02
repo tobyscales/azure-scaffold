@@ -8,6 +8,11 @@
                 "description": "The name of the Azure Automation account to deploy to."
             }
         },
+        "modules": {
+            "type": "array",
+            "defaultvalue": [
+            ]
+        },
         "runbooks": {
             "type": "array",
             "defaultvalue": [
@@ -20,11 +25,40 @@
         }
     },
     "variables": {
+        "moduleTemplate": "https://raw.githubusercontent.com/azureautomation/automation-packs/master/000-base-automation-resource-templates/deploy-module/DeployModule.json",
         "jobLink": "https://raw.githubusercontent.com/tescales/azure-scaffold/master/templates/automation/jobs/azuredeploy.json",
+        "moduleCount": "[length(parameters('modules'))]",
         "scheduleTemplate": "https://raw.githubusercontent.com/azureautomation/automation-packs/master/000-base-automation-resource-templates/deploy-schedule/deployRunbookOnSchedule.json",
         "runbookTemplate": "https://raw.githubusercontent.com/tescales/azure-scaffold/master/templates/automation/runbooks/azuredeploy.json"
     },
     "resources": [
+        {
+            "apiVersion": "2015-01-01",
+            "name": "[concat('installModule-', copyIndex())]",
+            "type": "Microsoft.Resources/deployments",
+            "copy": {
+                "name": "installModules",
+                "count": "[variables('moduleCount')]"
+            },
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('moduleTemplate')]",
+                    "contentVersion": "1.0"
+                },
+                "parameters": {
+                    "accountName": {
+                        "value": "[parameters('accountName')]"
+                    },
+                    "moduleName": {
+                        "value": "[parameters('modules')[copyIndex()].name]"
+                    },
+                    "moduleUri": {
+                        "value": "[parameters('modules')[copyIndex()].Uri]"
+                    }
+                }
+            }
+        },
         {
             "name": "[concat(parameters('accountName'), '/', parameters('runbooks')[copyIndex()].name)]",
             "type": "Microsoft.Automation/automationAccounts/runbooks",

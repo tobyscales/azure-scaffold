@@ -1,20 +1,20 @@
 {
   "automationRunbooks": [
     {
-      "description": "Start Azure V2 VMs This Graphical PowerShell runbook connects to Azure using an Automation Run As account and starts all V2 VMs in an Azure subscription or in a resource group or a single named V2 VM. You can attach a recurring schedule to this runbook to run it at a specific time. The asso",
       "name": "StartAzureV2Vm",
+      "description": "Start Azure V2 VMs This Graphical PowerShell runbook connects to Azure using an Automation Run As account and starts all V2 VMs in an Azure subscription or in a resource group or a single named V2 VM. You can attach a recurring schedule to this runbook to run it at a specific time. The asso",
       "runbookType": "Graph",
       "uri": "https://gallery.technet.microsoft.com/scriptcenter/Start-Azure-ARM-VMs-66fb875d/file/162482/1/StartAzureV2Vm.graphrunbook"
     },
     {
-      "description": "Stop Azure V2 VMs This Graphical PowerShell runbook connects to Azure using an Automation Run As account and stops all V2 VMs in an Azure subscription or in a resource group or a single named V2 VM. You can attach a recurring schedule to this runbook to run it at a specific time.",
       "name": "StopAzureV2Vm",
+      "description": "Stop Azure V2 VMs This Graphical PowerShell runbook connects to Azure using an Automation Run As account and stops all V2 VMs in an Azure subscription or in a resource group or a single named V2 VM. You can attach a recurring schedule to this runbook to run it at a specific time.",
       "runbookType": "Graph",
       "uri": "https://gallery.technet.microsoft.com/scriptcenter/Stop-Azure-ARM-VMs-1ba96d5b/file/162480/1/StopAzureV2Vm.graphrunbook"
     },
     {
-      "description": "This runbook registers Azure resource manager virtual machines with automation DSC service. These can either be Windows or Linux virtual machines that are supported with DSC. You can specify the whole subscription, a specific resource group, or an individual VM.",
       "name": "Register-VMDSC",
+      "description": "This runbook registers Azure resource manager virtual machines with automation DSC service. These can either be Windows or Linux virtual machines that are supported with DSC. You can specify the whole subscription, a specific resource group, or an individual VM.",
       "runbookType": "Graph",
       "uri": "https://gallery.technet.microsoft.com/scriptcenter/Registers-Azure-resource-31979771/file/160035/1/Register-VMDSC.graphrunbook"
     }
@@ -27,10 +27,24 @@
       "uri": "https://gallery.technet.microsoft.com/scriptcenter/Azure-Inventory-using-3db0f658/file/218278/1/AzureInventory_V2.ps1"
     },
     {
+      "name": "Enable-MultipleSolution",
+      "description": "Onboard Azure VMs to update and change tracking at scale This sample automation runbook onboards Azure VMs for either the Update or ChangeTracking (which includes Inventory) solution. It requires an existing Azure VM to already be onboarded to the solution.",
+      "runbookType": "Script",
+      "uri": "https://gallery.technet.microsoft.com/scriptcenter/This-sample-automation-f72ce469/file/200880/1/Enable-MultipleSolution.ps1"
+    },
+    {
       "name": "AuthenticateTo-Azure",
       "description": "This Graphical PowerShell runbook authenticates to Azure using the built in Azure RunAs account. It is useful when called from parent runbooks that want to easily authenticate against Azure before calling Azure activities.",
       "runbookType": "Graph",
       "uri": "https://gallery.technet.microsoft.com/scriptcenter/Authenticate-to-Azure-b2fcf043/file/163276/1/AuthenticateTo-Azure.graphrunbook"
+    }
+  ],
+  "automationModules": [
+    {
+      "name": "AzureRM.OperationalInsights",
+      "description": "Microsoft Azure PowerShell - OperationalInsights service cmdlets for Azure Resource Manager",
+      "runbookType": "Module",
+      "uri": "https://psg-prod-eastus.azureedge.net/packages/azurerm.operationalinsights.5.0.6.nupkg"
     }
   ],
   "dscConfigs": [
@@ -86,6 +100,26 @@
     },
     {
       "name": "AzureActivity",
+      "publisher": "Microsoft"
+    },
+    {
+      "name": "SecurityCenterFree",
+      "publisher": "Microsoft"
+    },
+    {
+      "name": "ChangeTracking",
+      "publisher": "Microsoft"
+    },
+    {
+      "name": "Updates",
+      "publisher": "Microsoft"
+    },
+    {
+      "name": "InfrastructureInsights",
+      "publisher": "Microsoft"
+    },
+    {
+      "name": "ServiceMap",
       "publisher": "Microsoft"
     }
   ]
