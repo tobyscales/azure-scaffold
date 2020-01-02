@@ -13,7 +13,7 @@
       "metadata": {
         "description": "The job id to compile the configuration"
       },
-      "defaultValue": "newGuid()"
+      "defaultValue": "[newGuid()]"
     },
     "runbook": {
       "type": "string",

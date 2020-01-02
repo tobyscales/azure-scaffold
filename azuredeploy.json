@@ -482,6 +482,7 @@
               "remoteUserPassword": "[parameters('remoteUserPass')]"
             },
             "vmParams": {
+              "tenantId": "[parameters('subscriptionId')]",
               "azResourceGroup": "[resourceGroup().name]",
               "azLocation": "[resourceGroup().location]",
               "azConfigUrl": "[variables('ghURL')]"
