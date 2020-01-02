@@ -118,7 +118,7 @@
   },
   "resources": [
     {
-      "name": "[concat('Deploy_', variables('automationAcctName'))]",
+      "name": "[concat('Main_', variables('automationAcctName'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
       "properties": {
@@ -146,7 +146,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2017-05-10",
-      "name": "[concat('Deploy_',variables('workspaceName'))]",
+      "name": "[concat('Main_',variables('workspaceName'))]",
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -163,10 +163,10 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2017-05-10",
-      "name": "Link_AccountWithWorkspace",
+      "name": "Main_LinkAccountWithWorkspace",
       "dependsOn": [
-        "[concat('Microsoft.Resources/deployments/', 'Deploy_', variables('workspaceName'))]",
-        "[concat('Microsoft.Resources/deployments/', 'Deploy_', variables('automationAcctName'))]"
+        "[concat('Microsoft.Resources/deployments/', 'Main_', variables('workspaceName'))]",
+        "[concat('Microsoft.Resources/deployments/', 'Main_', variables('automationAcctName'))]"
       ],
       "properties": {
         "mode": "Incremental",
@@ -196,7 +196,7 @@
       "apiVersion": "2018-10-01",
       "location": "[resourcegroup().location]",
       "dependson": [
-        "[concat('Microsoft.Resources/deployments/', 'Deploy_', variables('automationAcctName'))]"
+        "[concat('Microsoft.Resources/deployments/', 'Main_', variables('automationAcctName'))]"
       ],
       "comments": "",
       "identity": {
@@ -297,7 +297,7 @@
       }
     },
     {
-      "name": "[concat('Deploy_', variables('keyVaultName'))]",
+      "name": "[concat('Main_', variables('keyVaultName'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
       "properties": {
@@ -370,12 +370,12 @@
       }
     },
     {
-      "name": "[concat('Deploy_', variables('vmName'))]",
+      "name": "[concat('Main_', variables('vmName'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
       "dependsOn": [
         "[concat('Microsoft.ContainerInstance/containerGroups/', variables('cgName'))]",
-        "[concat('Microsoft.Resources/deployments/', 'Deploy_', variables('keyVaultName'))]"
+        "[concat('Microsoft.Resources/deployments/', 'Main_', variables('keyVaultName'))]"
       ],
       "properties": {
         "mode": "Incremental",
@@ -432,8 +432,8 @@
       "name": "[concat(variables('vmName'),'/Microsoft.Monitoring')]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[concat('Microsoft.Resources/deployments/', 'Deploy_', variables('workspaceName'))]",
-        "[concat('Microsoft.Resources/deployments/', 'Deploy_', variables('vmName'))]"
+        "[concat('Microsoft.Resources/deployments/', 'Main_', variables('workspaceName'))]",
+        "[concat('Microsoft.Resources/deployments/', 'Main_', variables('vmName'))]"
       ],
       "properties": {
         "publisher": "Microsoft.EnterpriseCloud.Monitoring",
@@ -455,8 +455,8 @@
       "name": "[concat(variables('vmName'),'/AADLoginForWindows')]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[concat('Microsoft.Resources/deployments/', 'Deploy_', variables('workspaceName'))]",
-        "[concat('Microsoft.Resources/deployments/', 'Deploy_', variables('vmName'))]"
+        "[concat('Microsoft.Resources/deployments/', 'Main_', variables('workspaceName'))]",
+        "[concat('Microsoft.Resources/deployments/', 'Main_', variables('vmName'))]"
       ],
       "properties": {
         "publisher": "Microsoft.Azure.ActiveDirectory",

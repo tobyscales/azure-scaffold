@@ -17,6 +17,12 @@
       "description": "This runbook registers Azure resource manager virtual machines with automation DSC service. These can either be Windows or Linux virtual machines that are supported with DSC. You can specify the whole subscription, a specific resource group, or an individual VM.",
       "runbookType": "Graph",
       "uri": "https://gallery.technet.microsoft.com/scriptcenter/Registers-Azure-resource-31979771/file/160035/1/Register-VMDSC.graphrunbook"
+    },
+    {
+      "name": "Enable-MultipleSolution",
+      "description": "Onboard Azure VMs to update and change tracking at scale This sample automation runbook onboards Azure VMs for either the Update or ChangeTracking (which includes Inventory) solution. It requires an existing Azure VM to already be onboarded to the solution.",
+      "runbookType": "Script",
+      "uri": "https://gallery.technet.microsoft.com/scriptcenter/This-sample-automation-f72ce469/file/200880/1/Enable-MultipleSolution.ps1"
     }
   ],
   "automationRunnowbooks": [
@@ -25,12 +31,6 @@
       "description": "Azure Inventory using Powershell Want to know about innovative and interesting ideas in Azure and automation? Check out my blog: https://manjunathrao.com.Version 2.0:I have changed the design of this script.",
       "runbookType": "Script",
       "uri": "https://gallery.technet.microsoft.com/scriptcenter/Azure-Inventory-using-3db0f658/file/218278/1/AzureInventory_V2.ps1"
-    },
-    {
-      "name": "Enable-MultipleSolution",
-      "description": "Onboard Azure VMs to update and change tracking at scale This sample automation runbook onboards Azure VMs for either the Update or ChangeTracking (which includes Inventory) solution. It requires an existing Azure VM to already be onboarded to the solution.",
-      "runbookType": "Script",
-      "uri": "https://gallery.technet.microsoft.com/scriptcenter/This-sample-automation-f72ce469/file/200880/1/Enable-MultipleSolution.ps1"
     }
   ],
   "automationModules": [
