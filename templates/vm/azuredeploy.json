@@ -41,37 +41,6 @@
     "keyVaultName": {
       "type": "string",
       "defaultValue": "[concat('kv-', resourcegroup().name)]"
-    },
-    "vmVisualStudioVersion": {
-      "type": "string",
-      "defaultValue": "VS-2015-Comm-VSU3-AzureSDK-291-WS2012R2",
-      "allowedValues": [
-        "VS-2015-Comm-AzureSDK-2.9-W10T-Win10-N",
-        "VS-2015-Comm-AzureSDK-2.9-WS2012R2",
-        "VS-2015-Comm-VSU3-AzureSDK-291-Win10-N",
-        "VS-2015-Comm-VSU3-AzureSDK-291-WS2012R2",
-        "VS-2015-Ent-AzureSDK-2.9-WS2012R2",
-        "VS-2015-Ent-AzureSDK-29-W10T-Win10-N",
-        "VS-2015-Ent-VSU3-AzureSDK-291-Win10-N",
-        "VS-2015-Ent-VSU3-AzureSDK-291-WS2012R2"
-      ],
-      "metadata": {
-        "description": "Which version of Visual Studio you would like to deploy"
-      }
-    },
-    "setupOfficeScriptFileName": {
-      "type": "string",
-      "defaultValue": "DeployO365SilentWithVersion.ps1",
-      "metadata": {
-        "description": "PowerShell script name to execute"
-      }
-    },
-    "_artifactsLocation": {
-      "type": "string",
-      "defaultValue": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/visual-studio-dev-vm-O365/scripts/",
-      "metadata": {
-        "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
-      }
     }
   },
   "variables": {
@@ -88,17 +57,7 @@
     "publicIPAddressType": "Dynamic",
     "nicName": "[toLower(concat('nic-',resourceGroup().name ))]",
     "encryptVMTemplateUrl": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/201-encrypt-running-windows-vm-without-aad/azuredeploy.json",
-    "automationName": "[concat('aa-', resourceGroup().name )]",
-    "automationUser": "username",
-    "automationPass": "password",
-    "keyVaultName": "[concat('kv-',resourceGroup().name )]",
-    "keyVaultURL": "[concat('https://', variables('keyVaultName'), '.vault.azure.net/')]",
-    "keyVaultResourceID": "[concat(subscription().id,'/resourceGroups/',resourceGroup().name,'/providers/Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
-    "setupChocolatelyScriptLocation": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/visual-studio-dev-vm-chocolatey/scripts/",
-    "setupChocolateyScriptFileName": "SetupChocolatey.ps1",
-    "chocoPackages": "boxstarter,googlechrome,adobereader,notepadplusplus.install",
-    "chocoScript": "https://chocolatey.org/install.ps1",
-    "chocoScriptFile": "install.ps1"
+    "keyVaultName": "[concat('kv-',resourceGroup().name )]"
   },
   "resources": [
     {

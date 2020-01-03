@@ -47,9 +47,9 @@ jq -r .automationRunnowbooks config2.json > runnowbooks.json
 jq -r .dscConfigs config2.json > dscConfigs.json
 jq -r .dscModules config2.json > dscModules.json
 
-az group deployment create --template-file ./templates/solutions/Deploy_Solutions.json --parameters workspacename=$AZURE_WORKSPACENAME solutions=@solutions.json --no-wait
-az group deployment create --template-file ./templates/runbooks/Deploy_Runbooks.json --parameters accountname=$AZURE_AUTOMATIONACCOUNT runbooks=@runbooks.json modules=@automationModules.json runnowbooks=@runnowbooks.json --no-wait
-az group deployment create --template-file ./templates/dsc/Deploy_DSC.json --parameters accountname=$AZURE_AUTOMATIONACCOUNT configUrl=$CONFIG_URL modules=@dscModules.json configurations=@dscConfigs.json
+az group deployment create --template-file ./templates/Configure_Workspace.json --parameters workspacename=$AZURE_WORKSPACENAME solutions=@solutions.json --no-wait
+az group deployment create --template-file ./templates/Configure_AutomationAccount.json --parameters accountname=$AZURE_AUTOMATIONACCOUNT runbooks=@runbooks.json modules=@automationModules.json runnowbooks=@runnowbooks.json --no-wait
+az group deployment create --template-file ./templates/Configure_DSC.json --parameters accountname=$AZURE_AUTOMATIONACCOUNT configUrl=$CONFIG_URL modules=@dscModules.json configurations=@dscConfigs.json
 
 ## from https://docs.microsoft.com/en-us/cli/azure/keyvault/certificate?view=azure-cli-latest#az-keyvault-certificate-create
 az keyvault certificate get-default-policy > kvpolicy.json
