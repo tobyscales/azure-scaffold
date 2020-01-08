@@ -32,7 +32,7 @@
   "resources": [
     {
       "apiVersion": "2015-01-01",
-      "name": "[concat('installDSCModule-', copyIndex())]",
+      "name": "[concat('installDSCModule-', parameters('modules')[copyIndex()].name)]",
       "type": "Microsoft.Resources/deployments",
       "copy": {
         "name": "installModules",
@@ -59,7 +59,7 @@
     },
     {
       "apiVersion": "2015-01-01",
-      "name": "[concat('installDSCConfig-', copyIndex())]",
+      "name": "[concat('installDSCConfig-', parameters('configurations')[copyIndex()].name)]",
       "type": "Microsoft.Resources/deployments",
       "dependsOn": [
         "installModules"
@@ -95,7 +95,7 @@
     },
     {
       "apiVersion": "2015-01-01",
-      "name": "[concat('startDSCCompilationJob-', copyIndex())]",
+      "name": "[concat('compileDSCConfiguration-', parameters('configurations')[copyIndex()].name)]",
       "type": "Microsoft.Resources/deployments",
       "copy": {
         "name": "deployJobs",

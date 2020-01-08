@@ -107,7 +107,7 @@
         {
             "apiVersion": "2015-01-01",
             "type": "Microsoft.Resources/deployments",
-            "name": "[concat('runJob-', copyIndex())]",
+            "name": "[concat('runJob-', parameters('runnowbooks')[copyIndex()].name)]",
             "copy": {
                 "name": "installRunNowJobs",
                 "count": "[length(parameters('runnowbooks'))]"
