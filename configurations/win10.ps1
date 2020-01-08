@@ -41,7 +41,7 @@ Configuration win10
     #can't use this because the DSC resource won't compile with it; need to use an external script instead, to set an env variable
     #$tenantId = (invoke-restmethod "http://169.254.169.254/metadata/identity/info?api-version=2018-02-01" -UseBasicParsing -Method GET -Headers @{Metadata = "true" }).TenantId
 
-    Node "localHost"
+    Node "devops"
     {
         # LocalConfigurationManager {
         #     DebugMode            = 'ForceModuleImport' #change this for prod
