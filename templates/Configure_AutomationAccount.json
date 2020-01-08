@@ -22,6 +22,11 @@
             "type": "array",
             "defaultvalue": [
             ]
+        },
+        "variables": {
+            "type": "array",
+            "defaultValue": [
+            ]
         }
     },
     "variables": {
@@ -129,6 +134,24 @@
                         }
                     }
                 }
+            }
+        },
+        {
+            "name": "[concat(parameters('accountName'), '/', parameters('variables')[copyIndex()].name)]",
+            "type": "Microsoft.Automation/automationAccounts/variables",
+            "apiVersion": "2015-10-31",
+            "location": "[resourceGroup().location]",
+            "tags": {
+            },
+            "copy": {
+                "name": "installVariables",
+                "count": "[length(parameters('variables'))]"
+            },
+            "properties": {
+                "description": "[parameters('variables')[copyIndex()].description]",
+                "isEncrypted": "[parameters('variables')[copyIndex()].isEncrypted]",
+                "type": "[parameters('variables')[copyIndex()].type]",
+                "value": "[parameters('variables')[copyIndex()].value]"
             }
         }
     ],

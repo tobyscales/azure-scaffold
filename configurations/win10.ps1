@@ -19,11 +19,16 @@ Configuration win10
     param
     (
         #have to keep default values to enable dsc-compilation
-        [string]$remoteUserName="azureadmin", 
-        [string]$tenantId="default",
-        [string]$azResourceGroup="default",
-        [string]$azLocation="default",
-        [string]$azConfigUrl="default"
+        [string]$remoteUserName = (Get-AutomationVariable "mgmtUserName"), 
+        [string]$tenantId= (Get-AutomationVariable "tenantId"),
+        [string]$azResourceGroup= (Get-AutomationVariable "mgmtResourceGroup"),
+        [string]$azLocation= (Get-AutomationVariable "mgmtLocation"),
+        [string]$azConfigUrl= (Get-AutomationVariable "mgmtConfigUrl")
+        # [string]$remoteUserName = "azureadmin",
+        # [string]$tenantId = "72f988bf-86f1-41af-91ab-2d7cd011db47", #MSFT tenantid
+        # [string]$azResourceGroup = "dnd-mgmt", #remove for prod
+        # [string]$azLocation = "westus2", #remove for prod
+        # [string]$azConfigUrl = "https://raw.github.com/user/tescales/az-scaffold/etc" #remove for prod
     )
     Import-DscResource -ModuleName 'cChoco'
     Import-DscResource -ModuleName 'PSDscResources'
@@ -36,12 +41,12 @@ Configuration win10
     #can't use this because the DSC resource won't compile with it; need to use an external script instead, to set an env variable
     #$tenantId = (invoke-restmethod "http://169.254.169.254/metadata/identity/info?api-version=2018-02-01" -UseBasicParsing -Method GET -Headers @{Metadata = "true" }).TenantId
 
-    Node 'devOps'
+    Node "localHost"
     {
-        LocalConfigurationManager {
-            DebugMode            = 'ForceModuleImport' #change this for prod
-            AllowModuleOverwrite = $True
-        }
+        # LocalConfigurationManager {
+        #     DebugMode            = 'ForceModuleImport' #change this for prod
+        #     AllowModuleOverwrite = $True
+        # }
         ## Do I want to force this?
         # WindowsOptionalFeature featureHyperV {
         #     Name      = "Microsoft-Hyper-V-All"
@@ -70,8 +75,8 @@ Configuration win10
         #######################
         #region User+Group Settings
         ####################### 
-        User 'RemoteUser' {
-            Ensure   = 'Present'  # To ensure the user account does not exist, set Ensure to "Absent"
+        User remoteUser {
+            Ensure   = 'Present'
             UserName = $remoteUserCred.UserName
             Password = $remoteUserCred # This needs to be a credential object
         }
@@ -101,16 +106,19 @@ Configuration win10
             Name   = 'AZURE_RESOURCE_GROUP'
             Value  = $azResourceGroup
             Ensure = 'Present'
+            Target = @('Process', 'Machine')
         }
         Environment azLocation {
             Name   = 'AZURE_LOCATION'
             Value  = $azLocation
             Ensure = 'Present'
+            Target = @('Process', 'Machine')
         }
         Environment azConfigUrl {
             Name   = 'AZURE_CONFIG_URL'
             Value  = $azConfigUrl
             Ensure = 'Present'
+            Target = @('Process', 'Machine')
         }
         #endregion
 
@@ -122,6 +130,11 @@ Configuration win10
             Ensure          = 'Present'
             Type            = "Directory"
             DestinationPath = "D:\Downloads"
+        }
+        File createRG {
+            Ensure          = 'Present'
+            Type            = "Directory"
+            DestinationPath = "D:\$azResourceGroup"
         }
         File removeFFShortcut {
             Ensure          = 'Absent'
@@ -146,22 +159,22 @@ Configuration win10
         File removeGHShortcut {
             Ensure          = 'Absent'
             Type            = 'File'
-            DestinationPath = '%OneDriveCommercial%\Desktop\Github Desktop.lnk'
+            DestinationPath = "$Env:OneDriveCommercial\Desktop\Github Desktop.lnk"
         }
         File removeEdgeShortcut {
             Ensure          = 'Absent'
             Type            = 'File'
-            DestinationPath = '%OneDriveCommercial%\Desktop\Microsoft Edge.lnk'
+            DestinationPath = "$Env:OneDriveCommercial\Desktop\Microsoft Edge.lnk"
         }
         File removeUserGHShortcut {
             Ensure          = 'Absent'
             Type            = 'File'
-            DestinationPath = '%userprofile%\Desktop\Github Desktop.lnk'
+            DestinationPath = "$Env:userprofile\Desktop\Github Desktop.lnk"
         }
         File removeUserEdgeShortcut {
             Ensure          = 'Absent'
             Type            = 'File'
-            DestinationPath = '%userprofile%\Desktop\Microsoft Edge.lnk'
+            DestinationPath = "$Env:userprofile)\Desktop\Microsoft Edge.lnk"
         }
         #endregion
 

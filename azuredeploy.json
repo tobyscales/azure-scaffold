@@ -137,8 +137,45 @@
           "password": {
             "value": "[parameters('remoteUserPass')]"
           },
-          "subscriptionId": {
-            "value": "[parameters('subscriptionId')]"
+          "variables": {
+            "value": [
+              {
+                "name": "subscriptionId",
+                "value": "[parameters('subscriptionId')]",
+                "description": "SubscriptionID for mgmt Resource Group.",
+                "isEncrypted": false
+              },
+              {
+                "name": "tenantId",
+                "value": "[subscription().tenantId]",
+                "description": "tenantID for mgmt Resource Group.",
+                "isEncrypted": false
+              },
+              {
+                "name": "mgmtUserName",
+                "value": "[parameters('remoteUser')]",
+                "description": "Remote Username for mgmt Resource Group.",
+                "isEncrypted": false
+              },
+              {
+                "name": "mgmtResourceGroup",
+                "value": "[resourceGroup().name]",
+                "description": "Name of mgmt Resource Group.",
+                "isEncrypted": false
+              },
+              {
+                "name": "mgmtLocation",
+                "value": "[resourceGroup().location]",
+                "description": "Location for mgmt Resource Group.",
+                "isEncrypted": false
+              },
+              {
+                "name": "mgmtConfigUrl",
+                "value": "[variables('ghURL')]",
+                "description": "Configuration File location.",
+                "isEncrypted": false
+              }
+            ]
           }
         }
       }
@@ -468,51 +505,37 @@
     {
       "name": "[concat(variables('vmName'),'/Microsoft.Powershell.DSC')]",
       "type": "Microsoft.Compute/virtualMachines/extensions",
-      "apiVersion": "2017-03-30",
+      "apiVersion": "2019-03-01",
       "location": "[resourceGroup().location]",
       "properties": {
         "publisher": "Microsoft.Powershell",
         "type": "DSC",
-        "typeHandlerVersion": "2.8",
+        "typeHandlerVersion": "2.9",
         "autoUpgradeMinorVersion": true,
         "protectedSettings": {
           "configurationArguments": {
-            "parameterOfTypePSCredential1": {
-              "remoteUserName": "[parameters('remoteUser')]",
-              "remoteUserPassword": "[parameters('remoteUserPass')]"
-            },
-            "vmParams": {
-              "tenantId": "[parameters('subscriptionId')]",
-              "azResourceGroup": "[resourceGroup().name]",
-              "azLocation": "[resourceGroup().location]",
-              "azConfigUrl": "[variables('ghURL')]"
+            "RegistrationKey": {
+              "userName": "NOT_USED",
+              "Password": "[listKeys(resourceId(resourceGroup().name,'Microsoft.Automation/automationAccounts/', variables('automationAcctName')), '2018-01-15').Keys[0].value]"
             }
-          },
-          "Items": {
-            "registrationKeyPrivate": "[listKeys(resourceId('Microsoft.Automation/automationAccounts/', variables('automationAcctName')), '2018-06-30').Keys[0].value]"
           }
         },
         "settings": {
-          "Properties": [
-            {
-              "Name": "RegistrationKey",
-              "Value": {
-                "UserName": "PLACEHOLDER_DONOTUSE",
-                "Password": "PrivateSettingsRef:registrationKeyPrivate"
-              },
-              "TypeName": "System.Management.Automation.PSCredential"
-            },
-            {
-              "Name": "RegistrationUrl",
-              "Value": "[reference(resourceId('Microsoft.Automation/automationAccounts/', variables('automationAcctName')),'2015-01-01-preview').RegistrationUrl]",
-              "TypeName": "System.String"
-            },
-            {
-              "Name": "NodeConfigurationName",
-              "Value": "[parameters('configName')]",
-              "TypeName": "System.String"
-            }
-          ]
+          "configurationArguments": {
+            "NodeConfigurationName": "[parameters('configName')]",
+            "RegistrationUrl": "[reference(resourceId(resourceGroup().name, 'Microsoft.Automation/automationAccounts/', variables('automationAcctName')),'2018-01-15').RegistrationUrl]",
+            "configurationMode": "ApplyandAutoCorrect",
+            "RefreshFrequencyMins": "30",
+            "RebootNodeIfNeeded": true
+          },
+          "properties": {
+            "remoteUserName": "[parameters('remoteUser')]",
+            "tenantId": "[subscription().tenantId]",
+            "azResourceGroup": "[resourceGroup().name]",
+            "azLocation": "[resourceGroup().location]",
+            "azConfigUrl": "[variables('ghURL')]"
+
+          }
         }
       }
     }

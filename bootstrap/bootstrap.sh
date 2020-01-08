@@ -42,13 +42,14 @@ echo Configurations from: $CONFIG_URL
 
 jq -r .solutions config2.json > solutions.json
 jq -r .automationModules config2.json > automationModules.json
+jq -r .automationVariables config2.json > automationVariables.json
 jq -r .automationRunbooks config2.json > runbooks.json
 jq -r .automationRunnowbooks config2.json > runnowbooks.json
 jq -r .dscConfigs config2.json > dscConfigs.json
 jq -r .dscModules config2.json > dscModules.json
 
 az group deployment create --template-file ./templates/Configure_Workspace.json --parameters workspacename=$AZURE_WORKSPACENAME solutions=@solutions.json --no-wait
-az group deployment create --template-file ./templates/Configure_AutomationAccount.json --parameters accountname=$AZURE_AUTOMATIONACCOUNT runbooks=@runbooks.json modules=@automationModules.json runnowbooks=@runnowbooks.json --no-wait
+az group deployment create --template-file ./templates/Configure_AutomationAccount.json --parameters accountname=$AZURE_AUTOMATIONACCOUNT runbooks=@runbooks.json modules=@automationModules.json runnowbooks=@runnowbooks.json variables=@automationVariables.json --no-wait
 az group deployment create --template-file ./templates/Configure_DSC.json --parameters accountname=$AZURE_AUTOMATIONACCOUNT configUrl=$CONFIG_URL modules=@dscModules.json configurations=@dscConfigs.json
 
 ## from https://docs.microsoft.com/en-us/cli/azure/keyvault/certificate?view=azure-cli-latest#az-keyvault-certificate-create

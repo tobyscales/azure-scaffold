@@ -112,5 +112,25 @@
       "name": "ServiceMap",
       "publisher": "Microsoft"
     }
+  ],
+  "automationVariables": [
+    {
+      "name": "mgmtResourceGroup",
+      "value": "$AZURE_RESOURCE_GROUP",
+      "description": "Name of mgmt Resource Group.",
+      "isEncrypted": false
+    },
+    {
+      "name": "mgmtLocation",
+      "value": "$AZURE_LOCATION",
+      "description": "Location for mgmt Resource Group.",
+      "isEncrypted": false
+    },
+    {
+      "name": "mgmtConfigUrl",
+      "value": "$CONFIG_URL",
+      "description": "Configuration File location.",
+      "isEncrypted": false
+    }
   ]
 }
