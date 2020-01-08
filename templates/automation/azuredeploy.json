@@ -20,11 +20,10 @@
         "description": "The password for the Azure Automation credential."
       }
     },
-    "subscriptionId": {
-      "type": "string",
-      "metadata": {
-        "description": "Your Azure subscription ID."
-      }
+    "variables": {
+      "type": "array",
+      "defaultValue": [
+      ]
     }
   },
   "variables": {
@@ -88,25 +87,27 @@
             "userName": "AutomationKey",
             "password": "[listKeys(resourceId(resourceGroup().name, 'Microsoft.Automation/automationAccounts/', parameters('accountName')), '2015-01-01-preview').Keys[0].value]"
           }
-        },
-        {
-          "name": "[variables('variableName')]",
-          "type": "variables",
-          "apiVersion": "2018-06-30",
-          "location": "[resourceGroup().location]",
-          "dependsOn": [
-            "[concat('Microsoft.Automation/automationAccounts/', parameters('accountName'))]"
-          ],
-          "tags": {
-          },
-          "properties": {
-            "description": "Subscription ID for the Azure account to manage.",
-            "isEncrypted": 0,
-            "type": "[variables('variableType')]",
-            "value": "[concat('\"',parameters('subscriptionId'),'\"')]"
-          }
         }
+
       ]
+    },
+    {
+      "name": "[concat(parameters('accountName'), '/', parameters('variables')[copyIndex()].name)]",
+      "type": "Microsoft.Automation/automationAccounts/variables",
+      "apiVersion": "2015-10-31",
+      "location": "[resourceGroup().location]",
+      "tags": {
+      },
+      "copy": {
+        "name": "installVariables",
+        "count": "[length(parameters('variables'))]"
+      },
+      "properties": {
+        "description": "[parameters('variables')[copyIndex()].description]",
+        "isEncrypted": "[parameters('variables')[copyIndex()].isEncrypted]",
+        "type": "[parameters('variables')[copyIndex()].type]",
+        "value": "[parameters('variables')[copyIndex()].value]"
+      }
     }
   ],
   "outputs": {
