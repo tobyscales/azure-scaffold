@@ -105,8 +105,7 @@
       "properties": {
         "description": "[parameters('variables')[copyIndex()].description]",
         "isEncrypted": "[parameters('variables')[copyIndex()].isEncrypted]",
-        "type": "[parameters('variables')[copyIndex()].type]",
-        "value": "[parameters('variables')[copyIndex()].value]"
+        "value": "[concat('\"',parameters('variables')[copyIndex()].value,'\"')]"
       }
     }
   ],
