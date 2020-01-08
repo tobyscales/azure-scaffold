@@ -20,7 +20,7 @@
         "description": "The password for the Azure Automation credential."
       }
     },
-    "aavariables": {
+    "variables": {
       "type": "array",
       "defaultValue": [
       ]
