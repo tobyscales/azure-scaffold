@@ -43,10 +43,10 @@ Configuration win10
 
     Node "devops"
     {
-        # LocalConfigurationManager {
-        #     DebugMode            = 'ForceModuleImport' #change this for prod
-        #     AllowModuleOverwrite = $True
-        # }
+        LocalConfigurationManager {
+             DebugMode            = 'ForceModuleImport' #change this for prod
+             AllowModuleOverwrite = $True
+        }
         ## Do I want to force this?
         # WindowsOptionalFeature featureHyperV {
         #     Name      = "Microsoft-Hyper-V-All"
@@ -131,11 +131,6 @@ Configuration win10
             Type            = "Directory"
             DestinationPath = "D:\Downloads"
         }
-        File createRG {
-            Ensure          = 'Present'
-            Type            = "Directory"
-            DestinationPath = "D:\$azResourceGroup"
-        }
         File removeFFShortcut {
             Ensure          = 'Absent'
             Type            = 'File'
@@ -174,7 +169,7 @@ Configuration win10
         File removeUserEdgeShortcut {
             Ensure          = 'Absent'
             Type            = 'File'
-            DestinationPath = "$Env:userprofile)\Desktop\Microsoft Edge.lnk"
+            DestinationPath = "$Env:userprofile\Desktop\Microsoft Edge.lnk"
         }
         #endregion
 
@@ -198,14 +193,15 @@ Configuration win10
             Ensure    = 'Present'
             Key       = 'HKLM:\SOFTWARE\Policies\Microsoft\OneDrive'
             ValueName = 'SilentAccountConfig'
-            ValueData = $tenantId
+            ValueType = "Dword"
+            ValueData = '1'
             Force     = $true
         }
         Registry odSilentOptIn {
             Ensure    = 'Present'
             Key       = 'HKLM:\SOFTWARE\Policies\Microsoft\OneDrive'
             ValueName = 'KFMSilentOptIn'
-            ValueData = '1'
+            ValueData = $tenantId
             Force     = $true
         }
         Registry odSilentKFMConfig {
@@ -213,6 +209,7 @@ Configuration win10
             Key       = 'HKLM:\SOFTWARE\Policies\Microsoft\OneDrive'
             ValueName = 'KFMSilentOptInWithNotification'
             ValueData = '1'
+            ValueType = "Dword"
             Force     = $true
         }
         Registry moveDownloadsFolder {
