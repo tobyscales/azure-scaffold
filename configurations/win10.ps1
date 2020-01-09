@@ -97,7 +97,7 @@ Configuration win10
         ####################### 
         Environment updatePathEnvironmentVariable {
             Name   = 'Path'
-            Value  = '%OneDriveCommercial%\Tools\CLI'
+            Value  = "$Env:OneDriveCommercial\Tools\CLI"
             Ensure = 'Present'
             Path   = $true
             Target = @('Process', 'Machine')
@@ -151,16 +151,16 @@ Configuration win10
             Type            = 'File'
             DestinationPath = 'C:\Users\Public\Desktop\Zoom.lnk'
         }
-        File removeGHShortcut {
-            Ensure          = 'Absent'
-            Type            = 'File'
-            DestinationPath = "$Env:OneDriveCommercial\Desktop\Github Desktop.lnk"
-        }
-        File removeEdgeShortcut {
-            Ensure          = 'Absent'
-            Type            = 'File'
-            DestinationPath = "$Env:OneDriveCommercial\Desktop\Microsoft Edge.lnk"
-        }
+        # File removeGHShortcut {
+        #     Ensure          = 'Absent'
+        #     Type            = 'File'
+        #     DestinationPath = "$Env:OneDriveCommercial\Desktop\Github Desktop.lnk"
+        # }
+        # File removeEdgeShortcut {
+        #     Ensure          = 'Absent'
+        #     Type            = 'File'
+        #     DestinationPath = "$Env:OneDriveCommercial\Desktop\Microsoft Edge.lnk"
+        # }
         File removeUserGHShortcut {
             Ensure          = 'Absent'
             Type            = 'File'
