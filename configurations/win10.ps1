@@ -47,12 +47,7 @@ Configuration win10
              DebugMode            = 'ForceModuleImport' #change this for prod
              AllowModuleOverwrite = $True
         }
-        ## Do I want to force this?
-        # WindowsOptionalFeature featureHyperV {
-        #     Name      = "Microsoft-Hyper-V-All"
-        #     Ensure    = "Enable"
-        #     LogLevel  = "All"
-        # }
+
         # PowerShellExecutionPolicy ExecutionPolicy
         # {
         #     ExecutionPolicyScope = 'Process'
@@ -64,14 +59,39 @@ Configuration win10
         #     PreferenceValue = "https://sync.scales.cloud/token/1.0/sync/1.5"
         # }
 
-        WindowsOptionalFeature featureContainers {
-            Name   = 'Containers'
+        #######################
+        #region WindowsOptionalFeatures
+        ####################### 
+        WindowsOptionalFeatureSet enableHyperV
+        {
+            Name = @('Hyper-V Hypervisor', 'Microsoft-Hyper-V-Services', 'Microsoft-Hyper-V-Management-Clients', 'VirtualMachinePlatform')
             Ensure = 'Present'
         }
-        WindowsOptionalFeature featureWSL {
-            Name   = 'Microsoft-Windows-Subsystem-Linux'
+        WindowsOptionalFeatureSet enableWSL
+        {
+            Name = @('Hyper-V Hypervisor', 'Microsoft-Windows-Subsystem-Linux', 'Microsoft-Windows-Subsystem-Linux')
+            Ensure = 'Present' 
+        }
+        WindowsOptionalFeatureSet enableContainers {
+            Name = @('Hyper-V Hypervisor', 'Containers')
             Ensure = 'Present'
         }
+        WindowsOptionalFeatureSet enableNetworkTools {
+            Name = @('ServicesForNFS-ClientOnly ', 'ClientForNFS-Infrastructure', 'TelnetClient')
+            Ensure = 'Present'
+        }
+        WindowsOptionalFeatureSet enableSandbox {
+            Name = @('Containers-DisposableClientVM ')
+            Ensure = 'Present'
+        }
+        WindowsOptionalFeatureSet disableUnused
+        {
+            Name = @('WorkFolders-Client', 'Printing-XPSServices-Features', 'FaxServicesClientPackage', 'Internet-Explorer-Optional-amd64')
+            Ensure = 'Absent'
+            RemoveFilesOnDisable = $true
+        }
+        #endregion 
+        
         #######################
         #region User+Group Settings
         ####################### 
