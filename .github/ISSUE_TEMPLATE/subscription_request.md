@@ -14,10 +14,10 @@ labels: new-subscription
 
 #### PROJECT INFORMATION
 ---------------------
-**Project Name**
+##### Project Name
 ----------------
 
-**Project Short Name** 
+##### Project Short Name
 -----------------------
 (lowercase and hyphens [-] only, please. spaces make the squirrels run slower. 🐱‍👤)
 
