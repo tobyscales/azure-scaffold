@@ -1,13 +1,14 @@
-# .github/workflows/issue-on-push.yml
-on: [push]
-name: Create an issue on push
+name: "Assign to me"
+on:
+  issues:
+    types: [opened]
+
 jobs:
-  create-issue:
-    runs-on: [ubuntu-latest]
+  test:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: JasonEtco/create-an-issue@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: Naturalclar/issue-action@v1.0.0
         with:
-          filename: .github/ISSUE_TEMPLATE/subscription_request.md
+          keywords: '["Azure Subscription"]'
+          assignees: '["tescales"]'
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
