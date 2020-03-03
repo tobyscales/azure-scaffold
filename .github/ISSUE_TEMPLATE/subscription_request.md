@@ -6,8 +6,12 @@ date: {{ date | date('dddd, MMMM Do') }}
 labels: new-subscription
 
 ---
+
+##BASIC INFO##
 - [ ] This is a sandbox subscription. (You will be given a limit of $500 Azure dollars for experimentation.)
 - [ ] This is for a specific project or cost-center.
+
+##PROJECT INFORMATION##
 
 **Project Name**
 
