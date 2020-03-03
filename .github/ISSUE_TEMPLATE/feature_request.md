@@ -1,6 +1,6 @@
 ---
-name: Feature request
-about: Suggest an idea for this project
+name: Request New Azure Subscription
+about: This automatically requests and provisions a new Azure subscription.
 title: ''
 labels: ''
 assignees: ''
