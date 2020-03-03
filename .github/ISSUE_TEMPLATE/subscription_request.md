@@ -12,15 +12,21 @@ labels: new-subscription
 - [ ] This is a sandbox subscription. You will be given a limit of $500 Azure dollars for experimentation.
 - [ ] This is for a specific project or cost-center.
 
-#### PROJECT INFORMATION
+### PROJECT INFORMATION
 ---------------------
 ##### Project Name
+  -->
 ----------------
 
 ##### Project Short Name
------------------------
+  -->
 (lowercase and hyphens [-] only, please. spaces make the squirrels run slower. 🐱‍👤)
+-----------------------
+  -->
 
-**Project Sponsor Email**
-
-**Cost Center**
+##### Project Sponsor Email
+  -->
+---------------------------
+##### Project Cost Center
+  -->
+---------------------------
