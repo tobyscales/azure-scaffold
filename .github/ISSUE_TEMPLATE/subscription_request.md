@@ -18,11 +18,10 @@ labels: new-subscription
   -->
 ----------------
 
-##### Project Short Name
+##### Project Short Name (lowercase and hyphens [-] only, please. spaces make the squirrels run slower. 🐱‍👤)
+
   -->
-(lowercase and hyphens [-] only, please. spaces make the squirrels run slower. 🐱‍👤)
 -----------------------
-  -->
 
 ##### Project Sponsor Email
   -->
