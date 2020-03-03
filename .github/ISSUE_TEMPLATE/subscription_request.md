@@ -1,14 +1,15 @@
 ---
 name: Request New Azure Subscription
 about: This automatically requests and provisions a new Azure subscription.
-title: ''
-labels: ''
-assignees: ''
-
+title: 'New Azure Subscription for {{ payload.sender.login }}'
+date: {{ date | date('dddd, MMMM Do') }}
+labels: new-subscription, {{ payload.sender.login }}
+cost-center: ''
 ---
+Request from: {{ payload.sender.login }}
+cost-center: ''
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+**Is this a sandbox?**
 
 **Describe the solution you'd like**
 A clear and concise description of what you want to happen.
