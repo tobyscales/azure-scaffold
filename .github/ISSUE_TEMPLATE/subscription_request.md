@@ -6,6 +6,8 @@ date: {{ date | date('dddd, MMMM Do') }}
 labels: new-subscription, {{ payload.sender.login }}
 cost-center: ''
 ---
+- [ ] Is this a Sandbox subscription? (You will be given a limit of $500 Azure dollars for experimentation)
+
 Request from: {{ payload.sender.login }}
 cost-center: ''
 
