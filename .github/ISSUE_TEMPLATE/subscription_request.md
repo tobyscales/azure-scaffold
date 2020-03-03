@@ -16,9 +16,7 @@ PROJECT INFORMATION
 ---------------------
 **Project Name**:
 
-**Project Short Name**: 
-
-Lowercase letters and hyphens [-] only, please. Spaces will make the squirrels run slower. 🐱‍👤
+**Project Short Name** (lowercase and hyphens [-] only, please. spaces make the squirrels run slower. 🐱‍👤):
 
 **Project Sponsor Email**
 
