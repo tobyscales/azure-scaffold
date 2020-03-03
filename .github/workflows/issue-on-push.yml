@@ -2,7 +2,8 @@
 on: [push]
 name: Create an issue on push
 jobs:
-  stuff:
+  create-issue:
+    runs-on: [ubuntu-latest]
     steps:
       - uses: JasonEtco/create-an-issue@v2
         env:
