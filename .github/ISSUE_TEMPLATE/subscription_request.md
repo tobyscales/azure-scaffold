@@ -1,23 +1,19 @@
 ---
 name: Request New Azure Subscription
 about: This automatically requests and provisions a new Azure subscription.
-title: 'New Azure Subscription for {{ payload.sender.login }}'
+title: 'New Azure Subscription Request'
 date: {{ date | date('dddd, MMMM Do') }}
-labels: new-subscription, {{ payload.sender.login }}
-cost-center: ''
+labels: new-subscription
+
 ---
-- [ ] Is this a Sandbox subscription? (You will be given a limit of $500 Azure dollars for experimentation)
+- [ ] This is a sandbox subscription. (You will be given a limit of $500 Azure dollars for experimentation.)
+- [ ] This is for a specific project or cost-center.
 
-Request from: {{ payload.sender.login }}
-cost-center: ''
+**Project Name**
 
-**Is this a sandbox?**
+**Project Short Name**
+Lowercase letters and hyphens [-] only, please. Spaces will make the squirrels run slower. 🐱‍👤
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+**Project Sponsor Email**
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
-
-**Additional context**
-Add any other context or screenshots about the feature request here.
+**Cost Center**
