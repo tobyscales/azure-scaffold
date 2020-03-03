@@ -7,12 +7,13 @@ labels: new-subscription
 
 ---
 
-##BASIC INFO##
+BASIC INFORMATION
+-----------------
 - [ ] This is a sandbox subscription. (You will be given a limit of $500 Azure dollars for experimentation.)
 - [ ] This is for a specific project or cost-center.
 
-##PROJECT INFORMATION##
-
+##PROJECT INFORMATION
+---------------------
 **Project Name**
 
 **Project Short Name**
