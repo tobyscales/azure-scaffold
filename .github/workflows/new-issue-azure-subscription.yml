@@ -9,6 +9,6 @@ jobs:
     steps:
       - uses: Naturalclar/issue-action@v1.0.0
         with:
-          keywords: '["Azure Subscription"]'
+          keywords: '["new-subscription"]'
           assignees: '["tescales"]'
           github-token: "${{ secrets.GITHUB_TOKEN }}"
