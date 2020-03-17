@@ -1,0 +1,64 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "keyVaultName": {
+            "type": "string",
+            "defaultValue": "[concat('kv-', resourcegroup().name)]"
+        },
+        "vmName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the virtual machine"
+            },
+            "defaultValue": "[concat('vm-', resourcegroup().name)]"
+        },
+
+        "configUrl": {
+            "type": "string"
+        },
+        "configurations": {
+            "type": "array",
+            "defaultvalue": [
+            ]
+        },
+        "modules": {
+            "type": "array",
+            "defaultvalue": [
+            ]
+        }
+    },
+    "variables": {
+        "encryptVMTemplateUrl": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/201-encrypt-running-windows-vm-without-aad/azuredeploy.json",
+        "keyVaultName": "[concat('kv-',resourceGroup().name )]"
+
+    },
+    "resources": [
+        {
+            "name": "[concat('Encrypt_', parameters('vmName'))]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('encryptVMTemplateUrl')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "vmName": {
+                        "value": "[parameters('vmName')]"
+                    },
+                    "keyVaultName": {
+                        "value": "[parameters('keyVaultName')]"
+                    },
+                    "keyVaultResourceGroup": {
+                        "value": "[resourceGroup().name]"
+                    }
+                }
+            }
+        }
+    ]
+}

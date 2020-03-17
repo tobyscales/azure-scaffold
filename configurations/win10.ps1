@@ -20,10 +20,10 @@ Configuration win10
     (
         #have to keep default values to enable dsc-compilation
         [string]$remoteUserName = (Get-AutomationVariable "mgmtUserName"), 
-        [string]$tenantId= (Get-AutomationVariable "tenantId"),
-        [string]$azResourceGroup= (Get-AutomationVariable "mgmtResourceGroup"),
-        [string]$azLocation= (Get-AutomationVariable "mgmtLocation"),
-        [string]$azConfigUrl= (Get-AutomationVariable "mgmtConfigUrl")
+        [string]$tenantId = (Get-AutomationVariable "tenantId"),
+        [string]$azResourceGroup = (Get-AutomationVariable "mgmtResourceGroup"),
+        [string]$azLocation = (Get-AutomationVariable "mgmtLocation"),
+        [string]$azConfigUrl = (Get-AutomationVariable "mgmtConfigUrl")
         # [string]$remoteUserName = "azureadmin",
         # [string]$tenantId = "72f988bf-86f1-41af-91ab-2d7cd011db47", #MSFT tenantid
         # [string]$azResourceGroup = "dnd-mgmt", #remove for prod
@@ -43,51 +43,39 @@ Configuration win10
 
     Node "devops"
     {
-        LocalConfigurationManager {
-             DebugMode            = 'ForceModuleImport' #change this for prod
-             AllowModuleOverwrite = $True
-        }
-
+        
         # PowerShellExecutionPolicy ExecutionPolicy
         # {
         #     ExecutionPolicyScope = 'Process'
         #     ExecutionPolicy      = 'Unrestricted'
         # }
-        # MSFT_xFirefoxPreference FirefoxSyncSetting
-        # {
-        #     PreferenceName  = "identity.sync.tokenserver.uri"
-        #     PreferenceValue = "https://sync.scales.cloud/token/1.0/sync/1.5"
-        # }
 
         #######################
         #region WindowsOptionalFeatures
         ####################### 
-        WindowsOptionalFeatureSet enableHyperV
-        {
-            Name = @('Hyper-V Hypervisor', 'Microsoft-Hyper-V-Services', 'Microsoft-Hyper-V-Management-Clients', 'VirtualMachinePlatform')
+        WindowsOptionalFeatureSet enableHyperV {
+            Name   = @('Microsoft-Hyper-V', 'HypervisorPlatform', 'Microsoft-Hyper-V-Services', 'Microsoft-Hyper-V-Management-Clients', 'VirtualMachinePlatform')
             Ensure = 'Present'
         }
-        WindowsOptionalFeatureSet enableWSL
-        {
-            Name = @('Hyper-V Hypervisor', 'Microsoft-Windows-Subsystem-Linux', 'Microsoft-Windows-Subsystem-Linux')
+        WindowsOptionalFeatureSet enableWSL {
+            Name   = @('Microsoft-Windows-Subsystem-Linux')
             Ensure = 'Present' 
         }
         WindowsOptionalFeatureSet enableContainers {
-            Name = @('Hyper-V Hypervisor', 'Containers')
+            Name   = @('Containers')
             Ensure = 'Present'
         }
         WindowsOptionalFeatureSet enableNetworkTools {
-            Name = @('ServicesForNFS-ClientOnly ', 'ClientForNFS-Infrastructure', 'TelnetClient')
+            Name   = @('ServicesForNFS-ClientOnly ', 'ClientForNFS-Infrastructure', 'TelnetClient')
             Ensure = 'Present'
         }
         WindowsOptionalFeatureSet enableSandbox {
-            Name = @('Containers-DisposableClientVM ')
+            Name   = @('Containers-DisposableClientVM ')
             Ensure = 'Present'
         }
-        WindowsOptionalFeatureSet disableUnused
-        {
-            Name = @('WorkFolders-Client', 'Printing-XPSServices-Features', 'FaxServicesClientPackage', 'Internet-Explorer-Optional-amd64')
-            Ensure = 'Absent'
+        WindowsOptionalFeatureSet disableUnused {
+            Name                 = @('WindowsMediaPlayer', 'WorkFolders-Client', 'Printing-XPSServices-Features', 'FaxServicesClientPackage', 'Internet-Explorer-Optional-amd64', 'MicrosoftWindowsPowerShellV2', 'MicrosoftWindowsPowerShellV2Root')
+            Ensure               = 'Absent'
             RemoveFilesOnDisable = $true
         }
         #endregion 
@@ -115,13 +103,6 @@ Configuration win10
         #######################
         #region Environment Settings
         ####################### 
-        Environment updatePathEnvironmentVariable {
-            Name   = 'Path'
-            Value  = "$Env:OneDriveCommercial\Tools\CLI"
-            Ensure = 'Present'
-            Path   = $true
-            Target = @('Process', 'Machine')
-        }
         Environment azResourceGroup {
             Name   = 'AZURE_RESOURCE_GROUP'
             Value  = $azResourceGroup
@@ -146,106 +127,12 @@ Configuration win10
         #region  File Settings
         #######################
         
-        File createDownloads {
-            Ensure          = 'Present'
-            Type            = "Directory"
-            DestinationPath = "D:\Downloads"
-        }
-        File removeFFShortcut {
-            Ensure          = 'Absent'
-            Type            = 'File'
-            DestinationPath = 'C:\Users\Public\Desktop\Firefox.lnk'
-        }
-        File removeEdgeBetaShortcut {
-            Ensure          = 'Absent'
-            Type            = 'File'
-            DestinationPath = 'C:\Users\Public\Desktop\Microsoft Edge Beta.lnk'
-        }
-        File removeVSCShortcut {
-            Ensure          = 'Absent'
-            Type            = 'File'
-            DestinationPath = 'C:\Users\Public\Desktop\Visual Studio Code.lnk'
-        }
-        File removeZoomShortcut {
-            Ensure          = 'Absent'
-            Type            = 'File'
-            DestinationPath = 'C:\Users\Public\Desktop\Zoom.lnk'
-        }
-        # File removeGHShortcut {
-        #     Ensure          = 'Absent'
-        #     Type            = 'File'
-        #     DestinationPath = "$Env:OneDriveCommercial\Desktop\Github Desktop.lnk"
-        # }
-        # File removeEdgeShortcut {
-        #     Ensure          = 'Absent'
-        #     Type            = 'File'
-        #     DestinationPath = "$Env:OneDriveCommercial\Desktop\Microsoft Edge.lnk"
-        # }
-        File removeUserGHShortcut {
-            Ensure          = 'Absent'
-            Type            = 'File'
-            DestinationPath = "$Env:userprofile\Desktop\Github Desktop.lnk"
-        }
-        File removeUserEdgeShortcut {
-            Ensure          = 'Absent'
-            Type            = 'File'
-            DestinationPath = "$Env:userprofile\Desktop\Microsoft Edge.lnk"
-        }
         #endregion
 
         #######################
         #region Registry Settings
         #######################
 
-        # Registry odRenameRoot {
-        #     Ensure    = '"Present'
-        #     Key       = "HKEY_CURRENT_USER\Software\Microsoft\OneDrive\Accounts\Business1"
-        #     ValueName = "UserFolder"
-        #     ValueData = "C:\ODFB"
-        # }
-        # Registry odMoveRoot {
-        #     Ensure    = '"Present'
-        #     Key       = "HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\OneDrive\DefaultRootDir"
-        #     ValueName = $tenantId
-        #     ValueData = "C:\"
-        # }
-        Registry odSilentAccountConfig {
-            Ensure    = 'Present'
-            Key       = 'HKLM:\SOFTWARE\Policies\Microsoft\OneDrive'
-            ValueName = 'SilentAccountConfig'
-            ValueType = "Dword"
-            ValueData = '1'
-            Force     = $true
-        }
-        Registry odSilentOptIn {
-            Ensure    = 'Present'
-            Key       = 'HKLM:\SOFTWARE\Policies\Microsoft\OneDrive'
-            ValueName = 'KFMSilentOptIn'
-            ValueData = $tenantId
-            Force     = $true
-        }
-        Registry odSilentKFMConfig {
-            Ensure    = 'Present'
-            Key       = 'HKLM:\SOFTWARE\Policies\Microsoft\OneDrive'
-            ValueName = 'KFMSilentOptInWithNotification'
-            ValueData = '1'
-            ValueType = "Dword"
-            Force     = $true
-        }
-        Registry moveDownloadsFolder {
-            Ensure    = 'Present'
-            Key       = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders'
-            ValueName = '{374DE290-123F-4565-9164-39C4925E467B}'
-            ValueData = 'D:\Downloads'
-            Force     = $true
-        }
-        Registry moveIEDownloadsFolder {
-            Ensure    = 'Present'
-            Key       = 'HKCU:\Software\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppContainer\Storage\microsoft.microsoftedge_8wekyb3d8bbwe\MicrosoftEdge\Main'
-            ValueName = 'DefaultDownloadDirectory'
-            ValueData = 'D:\Downloads'
-            Force     = $true
-        }
         #endregion
 
         #######################
@@ -257,12 +144,6 @@ Configuration win10
         cChocoFeature allowGlobalConfirmation {
             FeatureName = "allowGlobalConfirmation"
             Ensure      = 'Present'
-        }
-        cChocoPackageInstaller installFirefox {
-            Ensure      = 'Present'
-            Name        = "firefox"
-            DependsOn   = "[cChocoInstaller]installChoco"
-            AutoUpgrade = $True
         }
         cChocoPackageInstaller installFunctionsCoreTools {
             Ensure      = 'Present'
@@ -305,12 +186,8 @@ Configuration win10
             Ensure    = 'Present'
             Name      = @(
                 "ms-vscode.azurecli",
-                "vscode-settingssync",
                 "msazurermtools.azurerm-vscode-tools",
-                "ms-vscode.azure-account",
-                "ms-python.python",
-                "ms-vscode.powershell",
-                "peterjausovec.vscode-docker"
+                "ms-vscode.azure-account"
             )
             DependsOn = "[cChocoPackageInstaller]installVSCode"
         }
@@ -320,36 +197,9 @@ Configuration win10
             DependsOn   = "[cChocoInstaller]installChoco"
             AutoUpgrade = $True
         }
-        cChocoPackageInstallerSet installConferenceTools {
-            Ensure    = 'Present'
-            Name      = @(
-                "zoom",
-                "slack",
-                "microsoft-teams"
-            )
-            DependsOn = "[cChocoInstaller]installChoco"
-        }
-        cChocoPackageInstaller installPSCore {
-            Ensure      = 'Present'
-            Name        = "powershell-core"
-            DependsOn   = "[cChocoInstaller]installChoco"
-            AutoUpgrade = $True
-        }
         cChocoPackageInstaller installAzureStorageExplorer {
             Ensure      = 'Present'
             Name        = "microsoftazurestorageexplorer"
-            DependsOn   = "[cChocoInstaller]installChoco"
-            AutoUpgrade = $True
-        }
-        cChocoPackageInstaller installEdgeInsider {
-            Ensure      = 'Present'
-            Name        = "microsoft-edge-insider"
-            DependsOn   = "[cChocoInstaller]installChoco"
-            AutoUpgrade = $True
-        }
-        cChocoPackageInstaller installO365 {
-            Ensure      = 'Present'
-            Name        = "office365business"
             DependsOn   = "[cChocoInstaller]installChoco"
             AutoUpgrade = $True
         }
@@ -360,11 +210,6 @@ Configuration win10
                 "github-desktop",
                 "git.install"
             )
-            DependsOn = "[cChocoInstaller]installChoco"
-        }
-        cChocoPackageInstaller noFlashAllowed {
-            Ensure    = 'Absent'
-            Name      = "flashplayerplugin"
             DependsOn = "[cChocoInstaller]installChoco"
         }
         #endregion

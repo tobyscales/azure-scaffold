@@ -1,0 +1,74 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "gitHubUser": {
+            "type": "string",
+            "metadata": {
+                "description": "Your GitHub username"
+            },
+            "defaultValue": "tescales"
+        },
+        "gitHubRepo": {
+            "type": "string",
+            "metadata": {
+                "description": "Your GitHub repo"
+            },
+            "defaultValue": "azure-scaffold"
+        },
+        "configName": {
+            "type": "string",
+            "metadata": {
+                "description": "The full name of your DSC config (config.node format)."
+            },
+            "defaultvalue": "win10.devOps"
+        },
+        "remoteUser": {
+            "type": "string",
+            "metadata": {
+                "description": "The username for remote access."
+            },
+            "defaultvalue": "azureadmin"
+        }
+    },
+    "variables": {
+        "ghURL": "[concat('https://raw.githubusercontent.com/', parameters('gitHubUser'), '/', parameters('gitHubRepo'), '/master')]",
+        "vmName": "[take(concat('vm-', resourceGroup().name),15)]",
+        "automationAcctName": "[concat('aa-', resourcegroup().name)]"
+    },
+    "resources": [
+
+        {
+            "name": "[concat(variables('vmName'),'/Microsoft.Powershell.DSC')]",
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2019-03-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "publisher": "Microsoft.Powershell",
+                "type": "DSC",
+                "typeHandlerVersion": "2.9",
+                "autoUpgradeMinorVersion": true,
+                "protectedSettings": {
+                    "configurationArguments": {
+                        "RegistrationKey": {
+                            "userName": "NOT_USED",
+                            "Password": "[listKeys(resourceId(resourceGroup().name,'Microsoft.Automation/automationAccounts/', variables('automationAcctName')), '2018-01-15').Keys[0].value]"
+                        }
+                    }
+                },
+                "settings": {
+                    "advancedOptions": {
+                        "forcePullandApply": true
+                    },
+                    "configurationArguments": {
+                        "NodeConfigurationName": "[parameters('configName')]",
+                        "RegistrationUrl": "[reference(resourceId(resourceGroup().name, 'Microsoft.Automation/automationAccounts/', variables('automationAcctName')),'2018-01-15').RegistrationUrl]",
+                        "configurationMode": "ApplyandAutoCorrect",
+                        "RefreshFrequencyMins": "30",
+                        "RebootNodeIfNeeded": true
+                    }
+                }
+            }
+        }
+    ]
+}
