@@ -99,7 +99,7 @@
         }
     ],
     "outputs": {
-        "kvName": {
+        "kvId": {
             "type": "string",
             "value": "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
         },
