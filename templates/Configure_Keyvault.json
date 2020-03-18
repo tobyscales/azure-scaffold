@@ -66,35 +66,12 @@
     },
     "resources": [
         {
-            "type": "Microsoft.KeyVault/vaults",
-            "name": "[parameters('keyVaultName')]",
-            "apiVersion": "2018-02-14",
-            "location": "[resourceGroup().location]",
-            "tags": {
-                "displayName": "KeyVault"
-            },
-            "properties": {
-                "enabledForDeployment": "[parameters('enabledForDeployment')]",
-                "enabledForTemplateDeployment": "[parameters('enabledForTemplateDeployment')]",
-                "enabledForDiskEncryption": "[parameters('enabledForDiskEncryption')]",
-                "tenantId": "[parameters('tenantId')]",
-                "sku": {
-                    "name": "[parameters('vaultSku')]",
-                    "family": "A"
-                },
-                "accesspolicies": []
-            }
-        },
-        {
             "type": "Microsoft.KeyVault/vaults/secrets",
             "name": "[concat(parameters('keyVaultName'), '/', parameters('secrets')[copyIndex()].secretName)]",
             "apiVersion": "2018-02-14",
             "properties": {
                 "value": "[parameters('secrets')[copyIndex()].secretValue]"
             },
-            "dependsOn": [
-                "[concat('Microsoft.KeyVault/vaults/', parameters('keyVaultName'))]"
-            ],
             "copy": {
                 "name": "secretsCopy",
                 "count": "[length(parameters('secrets'))]"
@@ -104,9 +81,6 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
             "name": "[concat('AccessPolicy_',copyIndex())]",
-            "dependsOn": [
-                "[concat('Microsoft.KeyVault/vaults/', parameters('keyVaultName'))]"
-            ],
             "copy": {
                 "name": "policiesCopy",
                 "count": "[length(parameters('accessPolicies'))]"
