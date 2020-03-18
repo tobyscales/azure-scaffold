@@ -113,12 +113,12 @@
     ],
     "outputs": {
         "secrets": {
-            "value": "[concat(parameters('keyVaultName'), '/', parameters('secrets')).secretName]",
+            "value": "[concat(parameters('keyVaultName'), '/', parameters('secrets')).secretName)]",
             "type": "array"
         },
         "secret0Uri": {
             "type": "string",
-            "value": "[concat(parameters('keyVaultName'), '/', parameters('secrets'), '0').secretName.id]"
+            "value": "[concat(parameters('keyVaultName'), '/', parameters('secrets'), '0').secretName.id)]"
         }
     }
 }
