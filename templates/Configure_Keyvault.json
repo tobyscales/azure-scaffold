@@ -15,8 +15,8 @@
             }
         },
         "accessPolicies": {
-            "type": "object",
-            "defaultValue": {},
+            "type": "array",
+            "defaultValue": [],
             "metadata": {
                 "description": "Access policies object {\"tenantId\":\"\",\"objectId\":\"\",\"permissions\":{\"keys\":[\"\"],\"secrets\":[\"\"]}}"
             }
