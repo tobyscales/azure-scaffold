@@ -16,7 +16,7 @@
         },
         "accessPolicies": {
             "type": "array",
-            "defaultValue": "{}",
+            "defaultValue": [],
             "metadata": {
                 "description": "Access policies object {\"tenantId\":\"\",\"objectId\":\"\",\"permissions\":{\"keys\":[\"\"],\"secrets\":[\"\"]}}"
             }
@@ -55,11 +55,14 @@
         },
         "secrets": {
             "type": "array",
-            "defaultValue": "{}",
+            "defaultValue": [],
             "metadata": {
                 "description": "all secrets {\"secretName\":\"\",\"secretValue\":\"\"}"
             }
         }
+    },
+    "variables": {
+        "ghUrl": "https://raw.githubusercontent.com/tescales/azure-scaffold/master/templates/keyvault/add/policy.json"
     },
     "resources": [
         {
@@ -82,41 +85,6 @@
             }
         },
         {
-            "name": "[concat(parameters('keyVaultName'), '/', parameters('accessPolicies')[copyIndex()].displayName)]",
-            "type": "Microsoft.KeyVault/vaults/accessPolicies",
-            "apiVersion": "2018-02-14",
-            "dependsOn": [
-                "[concat('Microsoft.KeyVault/vaults/', parameters('keyVaultName'))]"
-            ],
-            "copy": {
-                "name": "policiesCopy",
-                "count": "[length(parameters('accessPolicies'))]"
-            },
-            "properties": {
-                "accessPolicies": [
-                    {
-                        "displayname": "[parameters('accessPolicies')[copyIndex()].displayName]",
-                        "tenantId": "[parameters('accessPolicies')[copyIndex()].tenantId]",
-                        "objectId": "[parameters('accessPolicies')[copyIndex()].objectId]",
-                        "permissions": {
-                            "keys": [
-                                "[parameters('accessPolicies')[copyIndex()].permissions.keys]"
-                            ],
-                            "secrets": [
-                                "[parameters('accessPolicies')[copyIndex()].permissions.secrets]"
-                            ],
-                            "certificates": [
-                                "[parameters('accessPolicies')[copyIndex()].permissions.certificates]"
-                            ],
-                            "storage": [
-                                "[parameters('accessPolicies')[copyIndex()].permissions.storage]"
-                            ]
-                        }
-                    }
-                ]
-            }
-        },
-        {
             "type": "Microsoft.KeyVault/vaults/secrets",
             "name": "[concat(parameters('keyVaultName'), '/', parameters('secrets')[copyIndex()].secretName)]",
             "apiVersion": "2018-02-14",
@@ -129,6 +97,39 @@
             "copy": {
                 "name": "secretsCopy",
                 "count": "[length(parameters('secrets'))]"
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "name": "[concat('AccessPolicy_',copyIndex())]",
+            "copy": {
+                "name": "policiesCopy",
+                "count": "[length(parameters('accessPolicies'))]"
+            },
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('ghUrl')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "keyVaultName": {
+                        "value": "[parameters('keyVaultName')]"
+                    },
+                    "displayName": {
+                        "value": "[parameters('accessPolicies')[copyIndex()].displayname]"
+                    },
+                    "tenantId": {
+                        "value": "[parameters('accessPolicies')[copyIndex()].tenantId]"
+                    },
+                    "objectId": {
+                        "value": "[parameters('accessPolicies')[copyIndex()].objectId]"
+                    },
+                    "permissions": {
+                        "value": "[parameters('accessPolicies')[copyIndex()].permissions]"
+                    }
+                }
             }
         }
     ],
