@@ -26,6 +26,12 @@
             "metadata": {
                 "description": "ObjectId for the AAD object assigned access to the vault."
             }
+        },
+        "permissions": {
+            "type": "object",
+            "metadata": {
+                "description": "Permissions for the AAD object in the vault."
+            }
         }
     },
     "resources": [
@@ -39,20 +45,7 @@
                         "displayName": "[parameters('displayName')]",
                         "tenantId": "[parameters('tenantId')]",
                         "objectId": "[parameters('objectId')]",
-                        "permissions": {
-                            "keys": [
-                                "all"
-                            ],
-                            "secrets": [
-                                "all"
-                            ],
-                            "certificates": [
-                                "all"
-                            ],
-                            "storage": [
-                                "all"
-                            ]
-                        }
+                        "permissions": "[parameters('permissions')]",
                     }
                 ]
             }
