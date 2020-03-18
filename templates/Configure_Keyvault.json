@@ -74,7 +74,8 @@
             },
             "copy": {
                 "name": "secretsCopy",
-                "count": "[length(parameters('secrets'))]"
+                "count": "[length(parameters('secrets'))]",
+                "mode": "serial"
             }
         },
         {
