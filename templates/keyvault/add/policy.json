@@ -2,11 +2,17 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "keyVaultName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the Key Vault"
+            }
+        },
         "tenantId": {
             "type": "string",
             "metadata": {
                 "description": "Tenant Id for the subscription and user/app assigned access to the vault."
-            }
+            },
             "defaultValue": "[subscription().tenantid]"
         },
         "objectId": {
