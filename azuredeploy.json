@@ -1,559 +1,576 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-    "gitHubUser": {
-      "type": "string",
-      "metadata": {
-        "description": "Your GitHub username"
-      },
-      "defaultValue": "tescales"
-    },
-    "gitHubRepo": {
-      "type": "string",
-      "metadata": {
-        "description": "Your GitHub repo"
-      },
-      "defaultValue": "azure-scaffold"
-    },
-    "subscriptionId": {
-      "type": "string",
-      "metadata": {
-        "description": "Your Azure Subscription Id"
-      },
-      "defaultValue": "[subscription().subscriptionId]"
-    },
-    "aadTenantId": {
-      "type": "string",
-      "metadata": {
-        "description": "Your AzureAD TenantId"
-      },
-      "defaultValue": "[subscription().tenantId]"
-    },
-    "userObjectId": {
-      "type": "string",
-      "metadata": {
-        "description": "Your User ObjectId"
-      },
-      "defaultvalue": "00000000-0000-0000-0000-000000000000"
-    },
-    "configName": {
-      "type": "string",
-      "metadata": {
-        "description": "The full name of your DSC config (config.node format)."
-      },
-      "defaultvalue": "win10.devOps"
-    },
-    "remoteUser": {
-      "type": "string",
-      "metadata": {
-        "description": "The username for remote access."
-      },
-      "defaultvalue": "azureadmin"
-    },
-    "remoteUserPass": {
-      "type": "securestring",
-      "metadata": {
-        "description": "The password for your remote user."
-      }
-    },
-    "roleName": {
-      "type": "string",
-      "metadata": {
-        "description": "Choose the Role to Assign to your Dev VM"
-      },
-      "defaultValue": "Owner"
-    },
-    "newVaultName": {
-      "type": "string",
-      "metadata": {
-        "description": "Enter a name to deploy a new KeyVault and grant access to the bootstrapper script, or type 'none' to skip."
-      },
-      "defaultValue": "kv-bootstrap"
-    }
-  },
-  "variables": {
-    "ghURL": "[concat('https://raw.githubusercontent.com/', parameters('gitHubUser'), '/', parameters('gitHubRepo'), '/master')]",
-    "keyVaultDeployUri": "[concat(variables('ghURL'), '/templates/keyvault/azuredeploy.json')]",
-    "automationAcctDeployUri": "[concat(variables('ghURL'), '/templates/automation/azuredeploy.json')]",
-    "workspaceDeployUri": "[concat(variables('ghURL'), '/templates/workspace/azuredeploy.json')]",
-    "vmDeployUri": "[concat(variables('ghURL'), '/templates/vm/azuredeploy.json')]",
-    "dscDeployUri": "[concat(variables('ghURL'), '/templates/dsc/azuredeploy.json')]",
-    "keyVaultName": "[concat('kv-', resourcegroup().name)]",
-    "automationAcctName": "[concat('aa-', resourcegroup().name)]",
-    "workspaceName": "[concat('logs-', resourcegroup().name)]",
-    "vmName": "[take(concat('vm-', resourceGroup().name),15)]",
-    "storageAccountName": "[take(concat('stor', replace( resourceGroup().name, '-', '')),15)]",
-    "containerName": "scripts",
-    "roleAssignmentId": "[guid(resourceGroup().name)]",
-    "cgName": "[concat('deploy', take(toLower( replace( resourceGroup().name, '-', '') ),23))]",
-    "roleDefinitions": {
-      "Owner": {
-        "id": "8e3af657-a8ff-443c-a75c-2fe8c4bcb635"
-      },
-      "Contributor": {
-        "id": "b24988ac-6180-42a0-ab88-20f7382dd24c"
-      },
-      "Reader": {
-        "id": "acdd72a7-3385-48ef-bd42-f606fba81ae7"
-      },
-      "StorageBlobDataOwner": {
-        "id": "b7e6dc6d-f1e8-4753-8033-0f276bb0955b"
-      },
-      "StorageBlobDataContributor": {
-        "id": "ba92f5b4-2d11-453d-a403-e96b0029c9fe"
-      },
-      "StorageBlobDataReader": {
-        "value": "2a2b9908-6ea1-4ae2-8e65-a410df84e7d1"
-      },
-      "None": {
-        "id": "none"
-      },
-      "none": {
-        "id": "none"
-      }
-    },
-    "chosenRole": "[variables('roleDefinitions')[parameters('roleName')].id]",
-    "roleDefinitionId": "[concat('/subscriptions/', parameters('subscriptionId'), '/providers/Microsoft.Authorization/roleDefinitions/', variables('chosenRole'))]"
-  },
-  "resources": [
-    {
-      "name": "[concat('Main_', variables('automationAcctName'))]",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-01-01",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('automationAcctDeployUri')]",
-          "contentVersion": "1.0.0.0"
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "gitHubUser": {
+            "defaultValue": "tescales",
+            "type": "String",
+            "metadata": {
+                "description": "Your GitHub username"
+            }
         },
-        "parameters": {
-          "accountName": {
-            "value": "[variables('automationAcctName')]"
-          },
-          "userName": {
-            "value": "[parameters('remoteUser')]"
-          },
-          "password": {
-            "value": "[parameters('remoteUserPass')]"
-          },
-          "variables": {
-            "value": [
-              {
-                "name": "subscriptionId",
-                "value": "[parameters('subscriptionId')]",
-                "description": "SubscriptionID for mgmt Resource Group.",
-                "isEncrypted": false
-              },
-              {
-                "name": "tenantId",
-                "value": "[subscription().tenantId]",
-                "description": "tenantID for mgmt Resource Group.",
-                "isEncrypted": false
-              },
-              {
-                "name": "mgmtUserName",
-                "value": "[parameters('remoteUser')]",
-                "description": "Remote Username for mgmt Resource Group.",
-                "isEncrypted": false
-              },
-              {
-                "name": "mgmtResourceGroup",
-                "value": "[resourceGroup().name]",
-                "description": "Name of mgmt Resource Group.",
-                "isEncrypted": false
-              },
-              {
-                "name": "mgmtLocation",
-                "value": "[resourceGroup().location]",
-                "description": "Location for mgmt Resource Group.",
-                "isEncrypted": false
-              },
-              {
-                "name": "mgmtConfigUrl",
-                "value": "[variables('ghURL')]",
-                "description": "Configuration File location.",
-                "isEncrypted": false
-              }
-            ]
-          }
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2017-05-10",
-      "name": "[concat('Main_',variables('workspaceName'))]",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('workspaceDeployUri')]",
-          "contentVersion": "1.0.0.0"
+        "gitHubRepo": {
+            "defaultValue": "azure-scaffold",
+            "type": "String",
+            "metadata": {
+                "description": "Your GitHub repo"
+            }
         },
-        "parameters": {
-          "workspaceName": {
-            "value": "[variables('workspaceName')]"
-          }
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2017-05-10",
-      "name": "Main_LinkAccountWithWorkspace",
-      "dependsOn": [
-        "[concat('Microsoft.Resources/deployments/', 'Main_', variables('workspaceName'))]",
-        "[concat('Microsoft.Resources/deployments/', 'Main_', variables('automationAcctName'))]"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "https://raw.githubusercontent.com/azureautomation/automation-packs/master/managed-vm/linked-templates/linkedworkspaceaccount.json",
-          "contentVersion": "1.0.0.0"
+        "subscriptionId": {
+            "defaultValue": "[subscription().subscriptionId]",
+            "type": "String",
+            "metadata": {
+                "description": "Your Azure Subscription Id"
+            }
         },
-        "parameters": {
-          "accountName": {
-            "value": "[variables('automationAcctName')]"
-          },
-          "accountResourceGroupName": {
-            "value": "[resourceGroup().name]"
-          },
-          "workspaceName": {
-            "value": "[variables('workspaceName')]"
-          },
-          "workspaceRegion": {
-            "value": "[resourceGroup().location]"
-          }
+        "aadTenantId": {
+            "defaultValue": "[subscription().tenantId]",
+            "type": "String",
+            "metadata": {
+                "description": "Your AzureAD TenantId"
+            }
+        },
+        "userObjectId": {
+            "defaultValue": "00000000-0000-0000-0000-000000000000",
+            "type": "String",
+            "metadata": {
+                "description": "Your User ObjectId"
+            }
+        },
+        "configName": {
+            "defaultValue": "win10.devOps",
+            "type": "String",
+            "metadata": {
+                "description": "The full name of your DSC config (config.node format)."
+            }
+        },
+        "remoteUser": {
+            "defaultValue": "azureadmin",
+            "type": "String",
+            "metadata": {
+                "description": "The username for remote access."
+            }
+        },
+        "remoteUserPass": {
+            "type": "SecureString",
+            "metadata": {
+                "description": "The password for your remote user."
+            }
+        },
+        "roleName": {
+            "defaultValue": "Owner",
+            "type": "String",
+            "metadata": {
+                "description": "Choose the Role to Assign to your Dev VM"
+            }
+        },
+        "newVaultName": {
+            "defaultValue": "kv-bootstrap",
+            "type": "String",
+            "metadata": {
+                "description": "Enter a name to deploy a new KeyVault and grant access to the bootstrapper script, or type 'none' to skip."
+            }
         }
-      }
     },
-    {
-      "name": "[variables('cgName')]",
-      "type": "Microsoft.ContainerInstance/containerGroups",
-      "apiVersion": "2018-10-01",
-      "location": "[resourcegroup().location]",
-      "dependson": [
-        "[concat('Microsoft.Resources/deployments/', 'Main_', variables('automationAcctName'))]"
-      ],
-      "comments": "",
-      "identity": {
-        "type": "SystemAssigned"
-      },
-      "properties": {
-        "containers": [
-          {
-            "name": "bootstrapper",
+    "variables": {
+        "ghURL": "[concat('https://raw.githubusercontent.com/', parameters('gitHubUser'), '/', parameters('gitHubRepo'), '/master')]",
+        "keyVaultDeployUri": "[concat(variables('ghURL'), '/templates/keyvault/azuredeploy.json')]",
+        "automationAcctDeployUri": "[concat(variables('ghURL'), '/templates/automation/azuredeploy.json')]",
+        "workspaceDeployUri": "[concat(variables('ghURL'), '/templates/workspace/azuredeploy.json')]",
+        "vmDeployUri": "[concat(variables('ghURL'), '/templates/vm/azuredeploy.json')]",
+        "dscDeployUri": "[concat(variables('ghURL'), '/templates/dsc/azuredeploy.json')]",
+        "keyVaultConfigUri": "[concat(variables('ghURL'), '/templates/Configure_Keyvault.json')]",
+        "keyVaultName": "[concat('kv-', resourcegroup().name)]",
+        "automationAcctName": "[concat('aa-', resourcegroup().name)]",
+        "workspaceName": "[concat('logs-', resourcegroup().name)]",
+        "vmName": "[take(concat('vm-', resourceGroup().name),15)]",
+        "storageAccountName": "[take(concat('stor', replace( resourceGroup().name, '-', '')),15)]",
+        "containerName": "scripts",
+        "roleAssignmentId": "[guid(resourceGroup().name)]",
+        "cgName": "[concat('deploy', take(toLower( replace( resourceGroup().name, '-', '') ),23))]",
+        "roleDefinitions": {
+            "Owner": {
+                "id": "8e3af657-a8ff-443c-a75c-2fe8c4bcb635"
+            },
+            "Contributor": {
+                "id": "b24988ac-6180-42a0-ab88-20f7382dd24c"
+            },
+            "Reader": {
+                "id": "acdd72a7-3385-48ef-bd42-f606fba81ae7"
+            },
+            "StorageBlobDataOwner": {
+                "id": "b7e6dc6d-f1e8-4753-8033-0f276bb0955b"
+            },
+            "StorageBlobDataContributor": {
+                "id": "ba92f5b4-2d11-453d-a403-e96b0029c9fe"
+            },
+            "StorageBlobDataReader": {
+                "value": "2a2b9908-6ea1-4ae2-8e65-a410df84e7d1"
+            },
+            "None": {
+                "id": "none"
+            },
+            "none": {
+                "id": "none"
+            }
+        },
+        "chosenRole": "[variables('roleDefinitions')[parameters('roleName')].id]",
+        "roleDefinitionId": "[concat('/subscriptions/', parameters('subscriptionId'), '/providers/Microsoft.Authorization/roleDefinitions/', variables('chosenRole'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "name": "[concat('Main_', variables('automationAcctName'))]",
             "properties": {
-              "image": "microsoft/azure-cli",
-              "command": [
-                "/bin/bash",
-                "-c",
-                "chmod +x /$BOOTSTRAP_REPO/bootstrap/bootstrap.sh; /$BOOTSTRAP_REPO/bootstrap/bootstrap.sh"
-              ],
-              "volumeMounts": [
-                {
-                  "name": "git-bootstrapper",
-                  "mountPath": "[concat('/', parameters('gitHubUser'))]"
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('automationAcctDeployUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "accountName": {
+                        "value": "[variables('automationAcctName')]"
+                    },
+                    "userName": {
+                        "value": "[parameters('remoteUser')]"
+                    },
+                    "password": {
+                        "value": "[parameters('remoteUserPass')]"
+                    },
+                    "variables": {
+                        "value": [
+                            {
+                                "name": "subscriptionId",
+                                "value": "[parameters('subscriptionId')]",
+                                "description": "SubscriptionID for mgmt Resource Group.",
+                                "isEncrypted": false
+                            },
+                            {
+                                "name": "tenantId",
+                                "value": "[subscription().tenantId]",
+                                "description": "tenantID for mgmt Resource Group.",
+                                "isEncrypted": false
+                            },
+                            {
+                                "name": "mgmtUserName",
+                                "value": "[parameters('remoteUser')]",
+                                "description": "Remote Username for mgmt Resource Group.",
+                                "isEncrypted": false
+                            },
+                            {
+                                "name": "mgmtResourceGroup",
+                                "value": "[resourceGroup().name]",
+                                "description": "Name of mgmt Resource Group.",
+                                "isEncrypted": false
+                            },
+                            {
+                                "name": "mgmtLocation",
+                                "value": "[resourceGroup().location]",
+                                "description": "Location for mgmt Resource Group.",
+                                "isEncrypted": false
+                            },
+                            {
+                                "name": "mgmtConfigUrl",
+                                "value": "[variables('ghURL')]",
+                                "description": "Configuration File location.",
+                                "isEncrypted": false
+                            }
+                        ]
+                    }
                 }
-              ],
-              "environmentVariables": [
-                {
-                  "name": "BOOTSTRAP_REPO",
-                  "value": "[concat(parameters('gitHubUser'), '/', parameters('gitHubRepo'))]"
-                },
-                {
-                  "name": "GITHUB_REPO",
-                  "value": "[parameters('gitHubRepo')]"
-                },
-                {
-                  "name": "GITHUB_USER",
-                  "value": "[parameters('gitHubUser')]"
-                },
-                {
-                  "name": "AZURE_RESOURCE_GROUP",
-                  "value": "[resourceGroup().name]"
-                },
-                {
-                  "name": "AZURE_LOCATION",
-                  "value": "[resourceGroup().location]"
-                },
-                {
-                  "name": "AZURE_SUBSCRIPTION_ID",
-                  "value": "[parameters('subscriptionId')]"
-                },
-                {
-                  "name": "AZURE_AADTENANT_ID",
-                  "value": "[parameters('aadTenantId')]"
-                },
-                {
-                  "name": "AZURE_KEYVAULT",
-                  "value": "[parameters('newVaultName')]"
-                },
-                {
-                  "name": "AZURE_AUTOMATIONACCOUNT",
-                  "value": "[variables('automationAcctName')]"
-                },
-                {
-                  "name": "AZURE_WORKSPACENAME",
-                  "value": "[variables('workspaceName')]"
-                }
-              ],
-              "resources": {
-                "requests": {
-                  "cpu": "1",
-                  "memoryInGb": "1"
-                }
-              }
             }
-          }
-        ],
-        "restartPolicy": "OnFailure",
-        "osType": "Linux",
-        "volumes": [
-          {
-            "name": "git-bootstrapper",
-            "gitRepo": {
-              "repository": "[concat('https://github.com/', parameters('gitHubUser'), '/', parameters('gitHubRepo'))]"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "condition": "[not(equals(variables('chosenRole'),'none'))]",
-      "type": "Microsoft.Authorization/roleAssignments",
-      "apiVersion": "2017-09-01",
-      "name": "[variables('roleAssignmentId')]",
-      "dependsOn": [
-        "[concat('Microsoft.ContainerInstance/containerGroups/', variables('cgName'))]"
-      ],
-      "properties": {
-        "roleDefinitionId": "[variables('roleDefinitionId')]",
-        "principalId": "[reference(concat('Microsoft.ContainerInstance/containerGroups/', variables('cgName')), '2018-10-01', 'Full').identity.principalId]",
-        "scope": "[resourcegroup().id]"
-      }
-    },
-    {
-      "name": "[concat('Main_', variables('keyVaultName'))]",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-01-01",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('keyVaultDeployUri')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "keyVaultName": {
-            "value": "[variables('keyVaultName')]"
-          },
-          "tenantId": {
-            "value": "[parameters('aadTenantId')]"
-          },
-          "accessPolicies": {
-            "value": [
-              {
-                "tenantId": "[parameters('aadTenantId')]",
-                "objectId": "[parameters('userObjectId')]",
-                "displayname": "deployedByUser",
-                "permissions": {
-                  "certificates": [
-                    "all"
-                  ],
-                  "keys": [
-                    "all"
-                  ],
-                  "secrets": [
-                    "all"
-                  ]
-                }
-              },
-              {
-                "tenantId": "[reference(concat('Microsoft.ContainerInstance/containerGroups/', variables('cgName')), '2018-10-01', 'Full').identity.tenantId]",
-                "objectId": "[reference(concat('Microsoft.ContainerInstance/containerGroups/', variables('cgName')), '2018-10-01', 'Full').identity.principalId]",
-                "permissions": {
-                  "keys": [
-                  ],
-                  "secrets": [
-                    "all"
-                  ],
-                  "certificates": [
-                    "all"
-                  ],
-                  "storage": [
-                  ]
-                }
-              }
-            ]
-          },
-          "enabledForDeployment": {
-            "value": true
-          },
-          "enabledForTemplateDeployment": {
-            "value": true
-          },
-          "enabledForDiskEncryption": {
-            "value": true
-          },
-          "secrets": {
-            "value": [
-              {
-                "secretName": "adminPassword",
-                "secretValue": "[guid(concat(resourceGroup().id,deployment().name))]"
-              }
-            ]
-          }
-        }
-      }
-    },
-    {
-      "name": "[concat('Main_', variables('vmName'))]",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-01-01",
-      "dependsOn": [
-        "[concat('Microsoft.ContainerInstance/containerGroups/', variables('cgName'))]",
-        "[concat('Microsoft.Resources/deployments/', 'Main_', variables('keyVaultName'))]"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('vmDeployUri')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "vmName": {
-            "value": "[variables('vmName')]"
-          },
-          "keyVaultName": {
-            "value": "[variables('keyVaultName')]"
-          },
-          "adminPassword": {
-            "reference": {
-              "keyVault": {
-                "id": "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
-              },
-              "secretName": "adminPassword"
-            }
-          },
-          "diagnosticsStorageAccount": {
-            "value": "[variables('storageAccountName')]"
-          }
-        }
-      }
-    },
-    {
-      "name": "[variables('storageAccountName')]",
-      "type": "Microsoft.Storage/storageAccounts",
-      "apiVersion": "2018-02-01",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "description": "Used for ScriptStorage"
-      },
-      "sku": {
-        "name": "Standard_LRS"
-      },
-      "kind": "StorageV2",
-      "properties": {
-      },
-      "resources": [
-        {
-          "name": "[concat('default/', variables('containerName'))]",
-          "type": "blobServices/containers",
-          "apiVersion": "2018-07-01",
-          "dependsOn": [
-            "[variables('storageAccountName')]"
-          ]
         },
         {
-          "name": "default/logs",
-          "type": "blobServices/containers",
-          "apiVersion": "2018-07-01",
-          "dependsOn": [
-            "[variables('storageAccountName')]"
-          ]
-        }
-      ]
-    },
-    {
-      "type": "Microsoft.Compute/virtualMachines/extensions",
-      "apiVersion": "2017-03-30",
-      "name": "[concat(variables('vmName'),'/Microsoft.Monitoring')]",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[concat('Microsoft.Resources/deployments/', 'Main_', variables('workspaceName'))]",
-        "[concat('Microsoft.Resources/deployments/', 'Main_', variables('vmName'))]"
-      ],
-      "properties": {
-        "publisher": "Microsoft.EnterpriseCloud.Monitoring",
-        "type": "MicrosoftMonitoringAgent",
-        "typeHandlerVersion": "1.0",
-        "autoUpgradeMinorVersion": true,
-        "settings": {
-          "workspaceId": "[reference(resourceId('Microsoft.OperationalInsights/workspaces/', variables('workspaceName')), '2015-11-01-preview').customerId]",
-          "azureResourceId": "[resourceId('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
-        },
-        "protectedSettings": {
-          "workspaceKey": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces/', variables('workspaceName')), '2015-11-01-preview').primarySharedKey]"
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Compute/virtualMachines/extensions",
-      "apiVersion": "2017-03-30",
-      "name": "[concat(variables('vmName'),'/AADLoginForWindows')]",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[concat('Microsoft.Resources/deployments/', 'Main_', variables('workspaceName'))]",
-        "[concat('Microsoft.Resources/deployments/', 'Main_', variables('vmName'))]"
-      ],
-      "properties": {
-        "publisher": "Microsoft.Azure.ActiveDirectory",
-        "type": "AADLoginForWindows",
-        "typeHandlerVersion": "0.4",
-        "autoUpgradeMinorVersion": true
-      }
-    },
-    {
-      "name": "[concat(variables('vmName'),'/Microsoft.Powershell.DSC')]",
-      "type": "Microsoft.Compute/virtualMachines/extensions",
-      "apiVersion": "2019-03-01",
-      "location": "[resourceGroup().location]",
-      "dependson": [
-        "[concat('Microsoft.Resources/deployments/', 'Main_', variables('automationAcctName'))]"
-      ],
-      "properties": {
-        "publisher": "Microsoft.Powershell",
-        "type": "DSC",
-        "typeHandlerVersion": "2.9",
-        "autoUpgradeMinorVersion": true,
-        "protectedSettings": {
-          "configurationArguments": {
-            "RegistrationKey": {
-              "userName": "NOT_USED",
-              "Password": "[listKeys(resourceId(resourceGroup().name,'Microsoft.Automation/automationAccounts/', variables('automationAcctName')), '2018-01-15').Keys[0].value]"
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "name": "[concat('Main_',variables('workspaceName'))]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('workspaceDeployUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "workspaceName": {
+                        "value": "[variables('workspaceName')]"
+                    }
+                }
             }
-          }
         },
-        "settings": {
-          "configurationArguments": {
-            "NodeConfigurationName": "[parameters('configName')]",
-            "RegistrationUrl": "[reference(resourceId(resourceGroup().name, 'Microsoft.Automation/automationAccounts/', variables('automationAcctName')),'2018-01-15').RegistrationUrl]",
-            "configurationMode": "ApplyandAutoCorrect",
-            "RefreshFrequencyMins": "30",
-            "RebootNodeIfNeeded": true
-          },
-          "properties": {
-            "remoteUserName": "[parameters('remoteUser')]",
-            "tenantId": "[subscription().tenantId]",
-            "azResourceGroup": "[resourceGroup().name]",
-            "azLocation": "[resourceGroup().location]",
-            "azConfigUrl": "[variables('ghURL')]"
-
-          }
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "name": "Main_LinkAccountWithWorkspace",
+            "dependsOn": [
+                "[concat('Microsoft.Resources/deployments/', 'Main_', variables('workspaceName'))]",
+                "[concat('Microsoft.Resources/deployments/', 'Main_', variables('automationAcctName'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/azureautomation/automation-packs/master/managed-vm/linked-templates/linkedworkspaceaccount.json",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "accountName": {
+                        "value": "[variables('automationAcctName')]"
+                    },
+                    "accountResourceGroupName": {
+                        "value": "[resourceGroup().name]"
+                    },
+                    "workspaceName": {
+                        "value": "[variables('workspaceName')]"
+                    },
+                    "workspaceRegion": {
+                        "value": "[resourceGroup().location]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.ContainerInstance/containerGroups",
+            "apiVersion": "2018-10-01",
+            "name": "[variables('cgName')]",
+            "location": "[resourcegroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Resources/deployments/', 'Main_', variables('automationAcctName'))]"
+            ],
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "containers": [
+                    {
+                        "name": "bootstrapper",
+                        "properties": {
+                            "image": "microsoft/azure-cli",
+                            "command": [
+                                "/bin/bash",
+                                "-c",
+                                "chmod +x /$BOOTSTRAP_REPO/bootstrap/bootstrap.sh; /$BOOTSTRAP_REPO/bootstrap/bootstrap.sh"
+                            ],
+                            "volumeMounts": [
+                                {
+                                    "name": "git-bootstrapper",
+                                    "mountPath": "[concat('/', parameters('gitHubUser'))]"
+                                }
+                            ],
+                            "environmentVariables": [
+                                {
+                                    "name": "BOOTSTRAP_REPO",
+                                    "value": "[concat(parameters('gitHubUser'), '/', parameters('gitHubRepo'))]"
+                                },
+                                {
+                                    "name": "GITHUB_REPO",
+                                    "value": "[parameters('gitHubRepo')]"
+                                },
+                                {
+                                    "name": "GITHUB_USER",
+                                    "value": "[parameters('gitHubUser')]"
+                                },
+                                {
+                                    "name": "AZURE_RESOURCE_GROUP",
+                                    "value": "[resourceGroup().name]"
+                                },
+                                {
+                                    "name": "AZURE_LOCATION",
+                                    "value": "[resourceGroup().location]"
+                                },
+                                {
+                                    "name": "AZURE_SUBSCRIPTION_ID",
+                                    "value": "[parameters('subscriptionId')]"
+                                },
+                                {
+                                    "name": "AZURE_AADTENANT_ID",
+                                    "value": "[parameters('aadTenantId')]"
+                                },
+                                {
+                                    "name": "AZURE_KEYVAULT",
+                                    "value": "[parameters('newVaultName')]"
+                                },
+                                {
+                                    "name": "AZURE_AUTOMATIONACCOUNT",
+                                    "value": "[variables('automationAcctName')]"
+                                },
+                                {
+                                    "name": "AZURE_WORKSPACENAME",
+                                    "value": "[variables('workspaceName')]"
+                                }
+                            ],
+                            "resources": {
+                                "requests": {
+                                    "cpu": "1",
+                                    "memoryInGb": "1"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "restartPolicy": "OnFailure",
+                "osType": "Linux",
+                "volumes": [
+                    {
+                        "name": "git-bootstrapper",
+                        "gitRepo": {
+                            "repository": "[concat('https://github.com/', parameters('gitHubUser'), '/', parameters('gitHubRepo'))]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2017-09-01",
+            "name": "[variables('roleAssignmentId')]",
+            "dependsOn": [
+                "[concat('Microsoft.ContainerInstance/containerGroups/', variables('cgName'))]"
+            ],
+            "properties": {
+                "roleDefinitionId": "[variables('roleDefinitionId')]",
+                "principalId": "[reference(concat('Microsoft.ContainerInstance/containerGroups/', variables('cgName')), '2018-10-01', 'Full').identity.principalId]",
+                "scope": "[resourcegroup().id]"
+            },
+            "condition": "[not(equals(variables('chosenRole'),'none'))]"
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "name": "[concat('Main_', variables('keyVaultName'))]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('keyVaultDeployUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "keyVaultName": {
+                        "value": "[variables('keyVaultName')]"
+                    },
+                    "tenantId": {
+                        "value": "[parameters('aadTenantId')]"
+                    },
+                    "enabledForDeployment": {
+                        "value": true
+                    },
+                    "enabledForTemplateDeployment": {
+                        "value": true
+                    },
+                    "enabledForDiskEncryption": {
+                        "value": true
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "[concat('Config_', variables('keyVaultName'))]",
+            "dependsOn": [
+                "[concat('Microsoft.ContainerInstance/containerGroups/', variables('cgName'))]",
+                "[concat('Microsoft.Resources/deployments/', 'Main_', variables('keyVaultName'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('keyVaultConfigUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "keyVaultName": {
+                        "value": "[variables('keyVaultName')]"
+                    },
+                    "tenantId": {
+                        "value": "[parameters('aadTenantId')]"
+                    },
+                    "accessPolicies": {
+                        "value": [
+                            {
+                                "displayname": "deployedByUser",
+                                "tenantId": "[parameters('aadTenantId')]",
+                                "objectId": "[parameters('userObjectId')]",
+                                "permissions": {
+                                    "keys": [
+                                        "all"
+                                    ],
+                                    "secrets": [
+                                        "all"
+                                    ],
+                                    "certificates": [
+                                        "all"
+                                    ],
+                                    "storage": [
+                                        "all"
+                                    ]
+                                }
+                            },
+                            {
+                                "displayname": "deploymentContainerGroup",
+                                "tenantId": "[reference(concat('Microsoft.ContainerInstance/containerGroups/', variables('cgName')), '2018-10-01', 'Full').identity.tenantId]",
+                                "objectId": "[reference(concat('Microsoft.ContainerInstance/containerGroups/', variables('cgName')), '2018-10-01', 'Full').identity.principalId]",
+                                "permissions": {
+                                    "keys": [
+                                        "all"
+                                    ],
+                                    "secrets": [
+                                        "all"
+                                    ],
+                                    "certificates": [
+                                        "all"
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "secrets": {
+                        "value": [
+                            {
+                                "secretName": "adminPassword",
+                                "secretValue": "[guid(concat(resourceGroup().id,deployment().name))]"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "name": "[concat('Main_', variables('vmName'))]",
+            "dependsOn": [
+                "[concat('Microsoft.ContainerInstance/containerGroups/', variables('cgName'))]",
+                "[concat('Microsoft.Resources/deployments/', 'Main_', variables('keyVaultName'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('vmDeployUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "vmName": {
+                        "value": "[variables('vmName')]"
+                    },
+                    "keyVaultName": {
+                        "value": "[variables('keyVaultName')]"
+                    },
+                    "adminPassword": {
+                        "reference": {
+                            "keyVault": {
+                                "id": "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+                            },
+                            "secretName": "adminPassword"
+                        }
+                    },
+                    "diagnosticsStorageAccount": {
+                        "value": "[variables('storageAccountName')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2018-02-01",
+            "name": "[variables('storageAccountName')]",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "description": "Used for ScriptStorage"
+            },
+            "sku": {
+                "name": "Standard_LRS"
+            },
+            "kind": "StorageV2",
+            "properties": {},
+            "resources": [
+                {
+                    "type": "blobServices/containers",
+                    "apiVersion": "2018-07-01",
+                    "name": "[concat('default/', variables('containerName'))]",
+                    "dependsOn": [
+                        "[variables('storageAccountName')]"
+                    ]
+                },
+                {
+                    "type": "blobServices/containers",
+                    "apiVersion": "2018-07-01",
+                    "name": "default/logs",
+                    "dependsOn": [
+                        "[variables('storageAccountName')]"
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2017-03-30",
+            "name": "[concat(variables('vmName'),'/Microsoft.Monitoring')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Resources/deployments/', 'Main_', variables('workspaceName'))]",
+                "[concat('Microsoft.Resources/deployments/', 'Main_', variables('vmName'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.EnterpriseCloud.Monitoring",
+                "type": "MicrosoftMonitoringAgent",
+                "typeHandlerVersion": "1.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "workspaceId": "[reference(resourceId('Microsoft.OperationalInsights/workspaces/', variables('workspaceName')), '2015-11-01-preview').customerId]",
+                    "azureResourceId": "[resourceId('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+                },
+                "protectedSettings": {
+                    "workspaceKey": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces/', variables('workspaceName')), '2015-11-01-preview').primarySharedKey]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2017-03-30",
+            "name": "[concat(variables('vmName'),'/AADLoginForWindows')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Resources/deployments/', 'Main_', variables('workspaceName'))]",
+                "[concat('Microsoft.Resources/deployments/', 'Main_', variables('vmName'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.ActiveDirectory",
+                "type": "AADLoginForWindows",
+                "typeHandlerVersion": "0.4",
+                "autoUpgradeMinorVersion": true
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2019-03-01",
+            "name": "[concat(variables('vmName'),'/Microsoft.Powershell.DSC')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Resources/deployments/', 'Main_', variables('automationAcctName'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Powershell",
+                "type": "DSC",
+                "typeHandlerVersion": "2.9",
+                "autoUpgradeMinorVersion": true,
+                "protectedSettings": {
+                    "configurationArguments": {
+                        "RegistrationKey": {
+                            "userName": "NOT_USED",
+                            "Password": "[listKeys(resourceId(resourceGroup().name,'Microsoft.Automation/automationAccounts/', variables('automationAcctName')), '2018-01-15').Keys[0].value]"
+                        }
+                    }
+                },
+                "settings": {
+                    "configurationArguments": {
+                        "NodeConfigurationName": "[parameters('configName')]",
+                        "RegistrationUrl": "[reference(resourceId(resourceGroup().name, 'Microsoft.Automation/automationAccounts/', variables('automationAcctName')),'2018-01-15').RegistrationUrl]",
+                        "configurationMode": "ApplyandAutoCorrect",
+                        "RefreshFrequencyMins": "30",
+                        "RebootNodeIfNeeded": true
+                    }
+                }
+            }
         }
-      }
-    }
-  ],
-  "outputs": {
-  }
+    ],
+    "outputs": {}
 }
