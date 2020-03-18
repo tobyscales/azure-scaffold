@@ -8,6 +8,12 @@
                 "description": "Name of the Key Vault"
             }
         },
+        "displayName": {
+            "type": "string",
+            "metadata": {
+                "description": "Display name of the access policy."
+            }
+        }
         "tenantId": {
             "type": "string",
             "metadata": {
@@ -30,6 +36,7 @@
             "properties": {
                 "accessPolicies": [
                     {
+                        "displayName": "[parameters('displayName')]",
                         "tenantId": "[parameters('tenantId')]",
                         "objectId": "[parameters('objectId')]",
                         "permissions": {
