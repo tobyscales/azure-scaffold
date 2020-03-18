@@ -81,7 +81,8 @@
                 "sku": {
                     "name": "[parameters('vaultSku')]",
                     "family": "A"
-                }
+                },
+                "accesspolicies": []
             }
         },
         {
