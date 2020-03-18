@@ -82,7 +82,7 @@
             }
         },
         {
-            "name": "[concat(parameters('keyVaultName'), '/', parameters('accessPolicies')[copyIndex()].policyName)]",
+            "name": "[concat(parameters('keyVaultName'), '/', parameters('accessPolicies')[copyIndex()].displayName)]",
             "type": "Microsoft.KeyVault/vaults/accessPolicies",
             "apiVersion": "2018-02-14",
             "dependsOn": [
