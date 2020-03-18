@@ -13,7 +13,7 @@
             "metadata": {
                 "description": "Display name of the access policy."
             }
-        }
+        },
         "tenantId": {
             "type": "string",
             "metadata": {
