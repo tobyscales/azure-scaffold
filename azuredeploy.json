@@ -80,6 +80,7 @@
         "vmDeployUri": "[concat(variables('ghURL'), '/templates/vm/azuredeploy.json')]",
         "dscDeployUri": "[concat(variables('ghURL'), '/templates/dsc/azuredeploy.json')]",
         "keyVaultConfigUri": "[concat(variables('ghURL'), '/templates/Configure_Keyvault.json')]",
+        "configKVDeploymentName": "[concat('Config_', variables('keyVaultName'))]",
         "keyVaultName": "[concat('kv-', resourcegroup().name)]",
         "automationAcctName": "[concat('aa-', resourcegroup().name)]",
         "workspaceName": "[concat('logs-', resourcegroup().name)]",
@@ -455,12 +456,7 @@
                         "value": "[variables('keyVaultName')]"
                     },
                     "adminPassword": {
-                        "reference": {
-                            "keyVault": {
-                                "id": "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
-                            },
-                            "secretName": "adminPassword"
-                        }
+                        "value": "[reference(concat('Main_', variables('keyVaultName'))).outputs.kvId.value]"
                     },
                     "diagnosticsStorageAccount": {
                         "value": "[variables('storageAccountName')]"
