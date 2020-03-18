@@ -104,6 +104,9 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
             "name": "[concat('AccessPolicy_',copyIndex())]",
+            "dependsOn": [
+                "[concat('Microsoft.KeyVault/vaults/', parameters('keyVaultName'))]"
+            ],
             "copy": {
                 "name": "policiesCopy",
                 "count": "[length(parameters('accessPolicies'))]"
