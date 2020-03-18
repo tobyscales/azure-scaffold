@@ -16,7 +16,7 @@
         },
         "accessPolicies": {
             "type": "array",
-            "defaultValue": "{}",
+            "defaultValue": [],
             "metadata": {
                 "description": "Access policies object {\"tenantId\":\"\",\"objectId\":\"\",\"permissions\":{\"keys\":[\"\"],\"secrets\":[\"\"]}}"
             }
@@ -55,7 +55,7 @@
         },
         "secrets": {
             "type": "array",
-            "defaultValue": "{}",
+            "defaultValue": [],
             "metadata": {
                 "description": "all secrets {\"secretName\":\"\",\"secretValue\":\"\"}"
             }
@@ -81,35 +81,12 @@
                     "family": "A"
                 }
             }
-        },
-        {
-            "type": "Microsoft.KeyVault/vaults/secrets",
-            "name": "[concat(parameters('keyVaultName'), '/', parameters('secrets')[copyIndex()].secretName)]",
-            "apiVersion": "2015-06-01",
-            "properties": {
-                "value": "[parameters('secrets')[copyIndex()].secretValue]"
-            },
-            "dependsOn": [
-                "[concat('Microsoft.KeyVault/vaults/', parameters('keyVaultName'))]"
-            ],
-            "copy": {
-                "name": "secretsCopy",
-                "count": "[length(parameters('secrets'))]"
-            }
         }
     ],
     "outputs": {
         "kvId": {
             "type": "string",
             "value": "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
-        },
-        "secrets": {
-            "value": "[concat(parameters('keyVaultName'), '/', parameters('secrets')).secretName]",
-            "type": "array"
-        },
-        "secret0Uri": {
-            "type": "string",
-            "value": "[concat(parameters('keyVaultName'), '/', parameters('secrets'), '0').secretName.id]"
         }
     }
 }
