@@ -99,6 +99,10 @@
         }
     ],
     "outputs": {
+        "kvName": {
+            "type": "string",
+            "value": "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+        }
         "secrets": {
             "value": "[concat(parameters('keyVaultName'), '/', parameters('secrets')).secretName]",
             "type": "array"
