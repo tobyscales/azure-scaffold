@@ -113,7 +113,7 @@
     ],
     "outputs": {
         "secrets": {
-            "value": "[concat(parameters('keyVaultName'), '/', parameters('secrets')).secretName)]",
+            "value": "[concat(parameters('keyVaultName'), '/', parameters('secrets')).secretName]",
             "type": "array"
         }
     }
