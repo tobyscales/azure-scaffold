@@ -35,11 +35,30 @@
         {
             "name": "PowerShellForGitHub",
             "location": "PSGallery"
+        },
+        {
+            "name": "xFirefox",
+            "location": "PSGallery"
+        },
+        {
+            "name": "PSDscResources",
+            "location": "PSGallery"
+        }
+    ],
+    "automationModules": [
+        {
+            "name": "AzureRM.OperationalInsights",
+            "location": "PSGallery"
         }
     ],
     "automationRunBooks": [
         {
             "name": "Azure Inventory using Powershell",
+            "location": "TechNet",
+            "run": "now"
+        },
+        {
+            "name": "Update and Change Tracking",
             "location": "TechNet",
             "run": "now"
         },
@@ -68,6 +87,26 @@
         },
         {
             "name": "AzureActivity",
+            "publisher": "Microsoft"
+        },
+        {
+            "name": "SecurityCenterFree",
+            "publisher": "Microsoft"
+        },
+        {
+            "name": "ChangeTracking",
+            "publisher": "Microsoft"
+        },
+        {
+            "name": "Updates",
+            "publisher": "Microsoft"
+        },
+        {
+            "name": "InfrastructureInsights",
+            "publisher": "Microsoft"
+        },
+        {
+            "name": "ServiceMap",
             "publisher": "Microsoft"
         }
     ]

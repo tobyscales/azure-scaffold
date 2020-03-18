@@ -21,9 +21,8 @@ This project is notable for its use of my [Azure Bootstrapper](https://github.co
 
 ## TODO: 
  * Add bastion host support
- * figure out how to get userObjectId gracefully
+ * figure out how to get userObjectId gracefully (see deploy.azcli for commands list)
  * move VM deployment logic to sidecar (to solve Deploy to Azure button issue)
- * Fix PSGallery deployment type not working for Runbooks
  * Refactor RunNow logic using a .runnow value (collect true/false and deploy jobs for them)
  * Add scheduling logic for runbooks
  * Use KV to generate cert for VM authentication:

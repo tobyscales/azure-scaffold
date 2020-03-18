@@ -27,7 +27,7 @@
       "metadata": {
         "description": "Desired Size of the VM."
       },
-      "defaultValue": "Standard_E4s_v3"
+      "defaultValue": "Standard_D2s_v3"
     },
     "ImagePublisher": {
       "type": "string",
@@ -41,6 +41,10 @@
     "keyVaultName": {
       "type": "string",
       "defaultValue": "[concat('kv-', resourcegroup().name)]"
+    },
+    "diagnosticsStorageAccount": {
+      "type": "string",
+      "defaultValue": "[take(concat('stor', replace( resourceGroup().name, '-', '')),15)]"
     }
   },
   "variables": {
@@ -161,6 +165,12 @@
               "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
             }
           ]
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "storageUri": "[concat('http://',parameters('diagnosticsStorageAccount'), '.blob.core.windows.net')]",
+            "enabled": true
+          }
         }
       }
     },

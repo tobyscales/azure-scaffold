@@ -31,7 +31,7 @@ param (
     [Parameter(Mandatory = $false)]
     [string]$rootUrl,
     [Parameter(Mandatory = $false)]
-    [switch]$UpdateInPlace = $false
+    [switch]$UpdateInPlace = $true
 )
 function get-TechNetItem {
     param(
@@ -68,18 +68,21 @@ function get-PSGalleryItem {
     [hashtable]$return = @{ }
 
     switch ($itemType) {
-        "module" { $info = find-module $itemName }
+        "module" { $info = find-module $itemName; $return.type = "Module" }
         "script" { $info = find-script $itemName; $return.type = "Script" }
     }
     
     try { $response = (invoke-webrequest "https://www.powershellgallery.com/api/v2/package/$($info.name)/$($info.version)" -method Get -MaximumRedirection 0).BaseRequest } catch { $response = $_.Exception.Response } 
     $return.fullUrl = $response.Headers.Location.AbsoluteUri
     $return.description = $info.description
-
-    # return AbsoluteUri for scripts... probably a better place to get this info from
-    if ($itemType -eq "script") { $return.fullUrl = $info.ProjectUri.AbsoluteUri }
-    
     $return.name = (split-path -leaf $return.fullUrl).split('.')[0]
+    
+    # return AbsoluteUri for scripts... probably a better place to get this info from
+    if ($itemType -eq "script") { $return.fullUrl = $info.ProjectUri.AbsoluteUri } 
+    
+    # modules return weird names, so use the default
+    if ($itemType -eq "module") { $return.name = $itemName } 
+    
     return $return
 }
 
@@ -101,11 +104,23 @@ $solutionsFile = (Join-Path $rootPath "solutions.json")
 $configFile = (Join-Path $rootPath config.json)
 $j = get-content -Raw $configFile | ConvertFrom-Json
 
+$runbookModules = @()
 $runbookParams = @()
 $runnowParams = @()
 $dscConfigParams = @()
 $dscModuleParams = @()
 $solutionsParams = @()
+
+foreach ($module in $j.automationModules) {
+    $item = get-PSGalleryItem -itemName $module.name -itemType "module"
+
+    $runbookModules += [ordered]@{
+        'name'        = $item.name
+        'description' = $item.description
+        'runbookType' = $item.type
+        'uri'         = $item.fullUrl
+    }
+}
 
 foreach ($runbook in $j.automationRunbooks) {
 
@@ -164,6 +179,7 @@ $solutionsParams = $j.solutions
 
 $j | add-member -MemberType NoteProperty -Name "automationRunbooks" -Value $runbookParams -Force
 $j | add-member -MemberType NoteProperty -Name "automationRunnowbooks" -Value $runnowParams -Force
+$j | add-member -MemberType NoteProperty -Name "automationModules" -Value $runbookModules -Force
 $j | add-member -MemberType NoteProperty -Name "dscConfigs" -Value $dscConfigParams -Force
 $j | add-member -MemberType NoteProperty -Name "dscModules" -Value $dscModuleParams -Force
 $j | add-member -MemberType NoteProperty -Name "solutions" -Value $solutionsParams -Force

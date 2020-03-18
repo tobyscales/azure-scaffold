@@ -1,11 +1,13 @@
 ## Variables
-$resourceGroup = "dnd-devopsmgmt"
+$resourceGroup = "mgmt"
 $location = "westus2"
 $userObjectId = $(az ad signed-in-user show --query objectId --out tsv)
-$kvName = "kv-devopsmgmt"
+$kvName = "kv-mgmt"
 $gitHubUser = "tescales"
 $gitHubRepo = "azure-scaffold"
 $roleName = "Owner"
+$configName = "win10.devops"
+$remoteUserAcct = "azureadmin"
 
 # Set defaults
 az configure --defaults location=$location
@@ -13,4 +15,12 @@ az configure --defaults group=$resourceGroup
 
 ## Full Deployment
 az group create --name $resourceGroup
-az group deployment create --template-file azuredeploy.json --resource-group $resourceGroup --parameters gitHubUser=$gitHubUser gitHubRepo=$gitHubRepo roleName=$roleName newVaultName=$kvName userObjectId=$userObjectId
+az group deployment create --template-file azuredeploy.json --resource-group $resourceGroup --parameters gitHubUser=$gitHubUser gitHubRepo=$gitHubRepo roleName=$roleName newVaultName=$kvName userObjectId=$userObjectId configName=$configName remoteUser=$remoteUserAcct
+
+#add yourself to AzureAD logon
+$username=$(az account show --query user.name --output tsv)
+$myVMID=az vm list -o tsv --query "[].id" --resource-group $resourceGroup
+az role assignment create --role "Virtual Machine Administrator Login" --assignee $username --scope $myVMID
+
+#test DSC arm template deploy
+az group deployment create --template-file deployDSC.json --resource-group $resourceGroup --parameters gitHubUser=$gitHubUser gitHubRepo=$gitHubRepo configName=$configName remoteUser=$remoteUserAcct

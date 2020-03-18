@@ -434,6 +434,9 @@
               },
               "secretName": "adminPassword"
             }
+          },
+          "diagnosticsStorageAccount": {
+            "value": "[variables('storageAccountName')]"
           }
         }
       }
@@ -455,6 +458,14 @@
       "resources": [
         {
           "name": "[concat('default/', variables('containerName'))]",
+          "type": "blobServices/containers",
+          "apiVersion": "2018-07-01",
+          "dependsOn": [
+            "[variables('storageAccountName')]"
+          ]
+        },
+        {
+          "name": "default/logs",
           "type": "blobServices/containers",
           "apiVersion": "2018-07-01",
           "dependsOn": [
@@ -507,6 +518,9 @@
       "type": "Microsoft.Compute/virtualMachines/extensions",
       "apiVersion": "2019-03-01",
       "location": "[resourceGroup().location]",
+      "dependson": [
+        "[concat('Microsoft.Resources/deployments/', 'Main_', variables('automationAcctName'))]"
+      ],
       "properties": {
         "publisher": "Microsoft.Powershell",
         "type": "DSC",
