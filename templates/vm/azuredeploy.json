@@ -16,12 +16,6 @@
       },
       "defaultValue": "winadmin"
     },
-    "adminPassword": {
-      "type": "securestring",
-      "metadata": {
-        "description": "Admin password for the virtual machine"
-      }
-    },
     "vmSize": {
       "type": "string",
       "metadata": {
@@ -145,7 +139,14 @@
         "osProfile": {
           "computerName": "[parameters('vmName')]",
           "adminUsername": "[parameters('adminUsername')]",
-          "adminPassword": "[parameters('adminPassword')]"
+          "adminPassword": {
+            "reference": {
+              "keyVault": {
+                "id": "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+              },
+              "secretName": "adminPassword"
+            }
+          }
         },
         "storageProfile": {
           "imageReference": {
