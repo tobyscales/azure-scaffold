@@ -564,7 +564,14 @@
                         "RefreshFrequencyMins": "30",
                         "RebootNodeIfNeeded": true
                     }
-                }
+                },
+                        "properties": {
+          "remoteUserName": "[parameters('remoteUser')]",
+          "tenantId": "[subscription().tenantId]",
+          "azResourceGroup": "[resourceGroup().name]",
+          "azLocation": "[resourceGroup().location]",
+          "azConfigUrl": "[variables('ghURL')]"
+        }
             }
         }
     ],
