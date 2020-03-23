@@ -24,17 +24,11 @@ Configuration win10
         [string]$azResourceGroup = (Get-AutomationVariable "mgmtResourceGroup"),
         [string]$azLocation = (Get-AutomationVariable "mgmtLocation"),
         [string]$azConfigUrl = (Get-AutomationVariable "mgmtConfigUrl")
-        # [string]$remoteUserName = "azureadmin",
-        # [string]$tenantId = "72f988bf-86f1-41af-91ab-2d7cd011db47", #MSFT tenantid
-        # [string]$azResourceGroup = "dnd-mgmt", #remove for prod
-        # [string]$azLocation = "westus2", #remove for prod
-        # [string]$azConfigUrl = "https://raw.github.com/user/tescales/az-scaffold/etc" #remove for prod
     )
     Import-DscResource -ModuleName 'cChoco'
     Import-DscResource -ModuleName 'PSDscResources'
-    #Import-DscResource -ModuleName 'PSDesiredStateConfiguration' DO NOT USE
     Import-DscResource -ModuleName 'ComputerManagementDsc'
-    #Import-DscResource -ModuleName 'xFirefox'
+    #Import-DscResource -ModuleName 'PSDesiredStateConfiguration' DO NOT USE
     
     $remoteUserCred = Get-AutomationPSCredential $remoteUserName
     
@@ -44,11 +38,11 @@ Configuration win10
     Node "devops"
     {
         
-        # PowerShellExecutionPolicy ExecutionPolicy
-        # {
-        #     ExecutionPolicyScope = 'Process'
-        #     ExecutionPolicy      = 'Unrestricted'
-        # }
+         PowerShellExecutionPolicy ExecutionPolicy
+         {
+             ExecutionPolicyScope = 'Process'
+             ExecutionPolicy      = 'Unrestricted'
+         }
 
         #######################
         #region WindowsOptionalFeatures
