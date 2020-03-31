@@ -42,9 +42,6 @@
             "name": "[concat('Encrypt_', parameters('vmName'))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2015-01-01",
-            "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
-            ],
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -69,9 +66,6 @@
             "apiVersion": "2017-03-30",
             "name": "[concat(parameters('vmName'),'/Microsoft.Monitoring')]",
             "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[concat('Microsoft.Resources/deployments/', 'Main_', parameters('vmName'))]"
-            ],
             "properties": {
                 "publisher": "Microsoft.EnterpriseCloud.Monitoring",
                 "type": "MicrosoftMonitoringAgent",
@@ -91,10 +85,6 @@
             "apiVersion": "2017-03-30",
             "name": "[concat(parameters('vmName'),'/AADLoginForWindows')]",
             "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[concat('Microsoft.Resources/deployments/', 'Main_', parameters('workspaceName'))]",
-                "[concat('Microsoft.Resources/deployments/', 'Main_', parameters('vmName'))]"
-            ],
             "properties": {
                 "publisher": "Microsoft.Azure.ActiveDirectory",
                 "type": "AADLoginForWindows",
@@ -107,9 +97,6 @@
             "apiVersion": "2019-03-01",
             "name": "[concat(parameters('vmName'),'/Microsoft.Powershell.DSC')]",
             "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[concat('Microsoft.Resources/deployments/', 'Main_', parameters('automationAcctName'))]"
-            ],
             "properties": {
                 "publisher": "Microsoft.Powershell",
                 "type": "DSC",
