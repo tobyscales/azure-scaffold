@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+$ErrorActionPreference='SilentlyContinue'
 
 Configuration win10
 {
@@ -25,7 +26,7 @@ Configuration win10
         [string]$azLocation = (Get-AutomationVariable "mgmtLocation"),
         [string]$azConfigUrl = (Get-AutomationVariable "mgmtConfigUrl")
     )
-    
+
     Import-DscResource -ModuleName 'cChoco'
     Import-DscResource -ModuleName 'PSDscResources'
     Import-DscResource -ModuleName 'ComputerManagementDsc'
@@ -45,21 +46,21 @@ Configuration win10
             Name   = @('Microsoft-Hyper-V', 'HypervisorPlatform', 'Microsoft-Hyper-V-Services', 'Microsoft-Hyper-V-Management-Clients', 'VirtualMachinePlatform')
             Ensure = 'Present'
         }
-        WindowsOptionalFeatureSet enableWSL {
-            Name   = @('Microsoft-Windows-Subsystem-Linux')
-            Ensure = 'Present' 
-        }
-        WindowsOptionalFeatureSet enableContainers {
-            Name   = @('Containers')
-            Ensure = 'Present'
-        }
         WindowsOptionalFeatureSet enableNetworkTools {
-            Name   = @('ServicesForNFS-ClientOnly ', 'ClientForNFS-Infrastructure', 'TelnetClient')
+            Name   = @('ServicesForNFS-ClientOnly', 'ClientForNFS-Infrastructure', 'TelnetClient')
             Ensure = 'Present'
         }
-        WindowsOptionalFeatureSet enableSandbox {
-            Name   = @('Containers-DisposableClientVM ')
+        WindowsOptionalFeature enableContainers {
+            Name   = 'Containers'
             Ensure = 'Present'
+        }
+        WindowsOptionalFeature enableSandbox {
+            Name   = 'Containers-DisposableClientVM'
+            Ensure = 'Present'
+        }
+        WindowsOptionalFeature enableWSL {
+            Name   = 'Microsoft-Windows-Subsystem-Linux'
+            Ensure = 'Present' 
         }
         WindowsOptionalFeatureSet disableUnused {
             Name                 = @('WindowsMediaPlayer', 'WorkFolders-Client', 'Printing-XPSServices-Features', 'FaxServicesClientPackage', 'Internet-Explorer-Optional-amd64', 'MicrosoftWindowsPowerShellV2', 'MicrosoftWindowsPowerShellV2Root')
@@ -127,47 +128,46 @@ Configuration win10
         #region cChoco Installer
         #######################
         cChocoInstaller installChoco {
-            InstallDir = "c:\choco"
+            InstallDir = 'c:\choco'
         }
         cChocoFeature allowGlobalConfirmation {
-            FeatureName = "allowGlobalConfirmation"
+            FeatureName = 'allowGlobalConfirmation'
             Ensure      = 'Present'
         }
         cChocoPackageInstaller installFunctionsCoreTools {
             Ensure      = 'Present'
-            Name        = "azure-functions-core-tools"
+            Name        = 'azure-functions-core-tools'
             DependsOn   = "[cChocoInstaller]installChoco"
-            AutoUpgrade = $True
+            AutoUpgrade = $True             #This will automatically try to upgrade if available, only if a version is not explicitly specified.
         }
         cChocoPackageInstaller installdotNetCore {
             Ensure      = 'Present'
-            Name        = "dotnetcore-sdk"
-            DependsOn   = "[cChocoInstaller]installChoco"
+            Name        = 'dotnetcore-sdk'
+            DependsOn   = '[cChocoInstaller]installChoco'
             AutoUpgrade = $True
         }
         cChocoPackageInstaller installPostman {
             Ensure      = 'Present'
-            Name        = "postman"
+            Name        = 'postman'
             DependsOn   = "[cChocoInstaller]installChoco"
             AutoUpgrade = $True
         }
         cChocoPackageInstaller installNodeJS {
             Ensure      = 'Present'
-            Name        = "nodejs"
-            DependsOn   = "[cChocoInstaller]installChoco"
+            Name        = 'nodejs'
+            DependsOn   = '[cChocoInstaller]installChoco'
             AutoUpgrade = $True
         }
         cChocoPackageInstaller installAzureCLI {
             Ensure      = 'Present'
-            Name        = "azure-cli"
-            DependsOn   = "[cChocoInstaller]installChoco"
-            #This will automatically try to upgrade if available, only if a version is not explicitly specified.
+            Name        = 'azure-cli'
+            DependsOn   = '[cChocoInstaller]installChoco'
             AutoUpgrade = $True
         }
         cChocoPackageInstaller installVSCode {
             Ensure      = 'Present'
-            Name        = "vscode"
-            DependsOn   = "[cChocoInstaller]installChoco"
+            Name        = 'vscode'
+            DependsOn   = '[cChocoInstaller]installChoco'
             AutoUpgrade = $True
         }
         cChocoPackageInstallerSet installVSCodeExtensions {
@@ -177,18 +177,18 @@ Configuration win10
                 "msazurermtools.azurerm-vscode-tools",
                 "ms-vscode.azure-account"
             )
-            DependsOn = "[cChocoPackageInstaller]installVSCode"
+            DependsOn = '[cChocoPackageInstaller]installVSCode'
         }
         cChocoPackageInstaller installNotepadPlusPlus {
             Ensure      = 'Present'
-            Name        = "notepadplusplus.install"
-            DependsOn   = "[cChocoInstaller]installChoco"
+            Name        = 'notepadplusplus.install'
+            DependsOn   = '[cChocoInstaller]installChoco'
             AutoUpgrade = $True
         }
         cChocoPackageInstaller installAzureStorageExplorer {
             Ensure      = 'Present'
-            Name        = "microsoftazurestorageexplorer"
-            DependsOn   = "[cChocoInstaller]installChoco"
+            Name        = 'microsoftazurestorageexplorer'
+            DependsOn   = '[cChocoInstaller]installChoco'
             AutoUpgrade = $True
         }
         cChocoPackageInstallerSet installGitStuff {
@@ -198,7 +198,7 @@ Configuration win10
                 "github-desktop",
                 "git.install"
             )
-            DependsOn = "[cChocoInstaller]installChoco"
+            DependsOn = '[cChocoInstaller]installChoco'
         }
         #endregion
     }

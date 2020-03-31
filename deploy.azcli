@@ -1,5 +1,5 @@
 ## Variables
-$resourceGroup = "gotit"
+$resourceGroup = "mngd"
 $location = "westus2"
 $userObjectId = $(az ad signed-in-user show --query objectId --out tsv)
 $kvName = "kv-$resourceGroup"
@@ -8,6 +8,8 @@ $gitHubRepo = "azure-scaffold"
 $roleName = "Owner"
 $configName = "win10.devops"
 $remoteUserAcct = "azureadmin"
+$shutdownTimeZone = "Pacific Standard Time"
+$shutdownTime = "2000"
 
 # Set defaults
 az configure --defaults location=$location
@@ -15,9 +17,10 @@ az configure --defaults group=$resourceGroup
 
 # create/update config2.json
 powershell -noprofile -file scripts/Update-Config.ps1 -CreateConfig2
+
 ## Full Deployment
 az group create --name $resourceGroup
-az deployment group create --template-file azuredeploy.json --resource-group $resourceGroup --parameters gitHubUser=$gitHubUser gitHubRepo=$gitHubRepo roleName=$roleName newVaultName=$kvName userObjectId=$userObjectId configName=$configName remoteUser=$remoteUserAcct
+az deployment group create --template-file azuredeploy.json --resource-group $resourceGroup --parameters gitHubUser=$gitHubUser gitHubRepo=$gitHubRepo roleName=$roleName newVaultName=$kvName userObjectId=$userObjectId configName=$configName remoteUser=$remoteUserAcct vmShutdownTime=$shutdownTime vmShutdownTimeZone=$vmShutdownTimeZone
 
 #add yourself to AzureAD logon
 $username=$(az account show --query user.name --output tsv)

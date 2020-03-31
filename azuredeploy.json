@@ -57,6 +57,20 @@
         "description": "The password for your remote user."
       }
     },
+    "vmShutdownTimeZone": {
+      "defaultValue": "Pacific Standard Time",
+      "type": "string",
+      "metadata": {
+        "description": "The Time Zone used for scheduling, long-form ('Pacific Standard Time')"
+      }
+    },
+    "vmShutdownTime": {
+      "defaultValue": "2000",
+      "type": "string",
+      "metadata": {
+        "description": "Enter time in 4-digit, 24-hour format (2000 = 8pm)"
+      }
+    },
     "roleName": {
       "defaultValue": "Owner",
       "type": "String",
@@ -496,6 +510,18 @@
           },
           "configName": {
             "value": "[parameters('configName')]"
+          },
+          "shutdownTimeZone": {
+            "value": "[parameters('vmShutdownTimeZone')]"
+          },
+          "shutdownTime": {
+            "value": "[parameters('vmShutdownTime')]"
+          },
+          "encryptVM": {
+            "value": false
+          },
+          "useAADLogin": {
+            "value": true
           }
         }
       }
