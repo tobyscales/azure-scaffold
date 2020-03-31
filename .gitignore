@@ -11,6 +11,7 @@
 *.vCAF
 .vscode/
 
+v2/
 archive/
 
 # User-specific files (MonoDevelop/Xamarin Studio)
