@@ -31,7 +31,22 @@
             "type": "string",
             "metadata": {
                 "description": "Name of the DSC Configuration to apply."
-            }
+            },
+            "defaultValue": "none"
+        },
+        "encryptVM": {
+            "type": "bool",
+            "metadata": {
+                "description": "Determines whether encryption is deployed to the VM."
+            },
+            "defaultValue": true
+        },
+        "useAADLogin": {
+            "type": "bool",
+            "metadata": {
+                "description": "Determines whether to use AAD to login to the VM."
+            },
+            "defaultValue": true
         }
     },
     "variables": {
@@ -42,6 +57,7 @@
             "name": "[concat('Encrypt_', parameters('vmName'))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2015-01-01",
+            "condition": "[parameters('encryptVM')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -84,6 +100,7 @@
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2017-03-30",
             "name": "[concat(parameters('vmName'),'/AADLoginForWindows')]",
+            "condition": "[parameters('useAADLogin')]",
             "location": "[resourceGroup().location]",
             "properties": {
                 "publisher": "Microsoft.Azure.ActiveDirectory",
@@ -96,6 +113,7 @@
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2019-03-01",
             "name": "[concat(parameters('vmName'),'/Microsoft.Powershell.DSC')]",
+            "condition": "[not(equals(parameters('configName'),'none'))]",
             "location": "[resourceGroup().location]",
             "properties": {
                 "publisher": "Microsoft.Powershell",
