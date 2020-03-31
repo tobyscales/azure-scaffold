@@ -1,119 +1,120 @@
 {
-  "automationRunbooks": [
-    {
-      "name": "StartAzureV2Vm",
-      "description": "Start Azure V2 VMs This Graphical PowerShell runbook connects to Azure using an Automation Run As account and starts all V2 VMs in an Azure subscription or in a resource group or a single named V2 VM. You can attach a recurring schedule to this runbook to run it at a specific time. The asso",
-      "runbookType": "Graph",
-      "uri": "https://gallery.technet.microsoft.com/scriptcenter/Start-Azure-ARM-VMs-66fb875d/file/162482/1/StartAzureV2Vm.graphrunbook"
-    },
-    {
-      "name": "StopAzureV2Vm",
-      "description": "Stop Azure V2 VMs This Graphical PowerShell runbook connects to Azure using an Automation Run As account and stops all V2 VMs in an Azure subscription or in a resource group or a single named V2 VM. You can attach a recurring schedule to this runbook to run it at a specific time.",
-      "runbookType": "Graph",
-      "uri": "https://gallery.technet.microsoft.com/scriptcenter/Stop-Azure-ARM-VMs-1ba96d5b/file/162480/1/StopAzureV2Vm.graphrunbook"
-    },
-    {
-      "name": "Register-VMDSC",
-      "description": "This runbook registers Azure resource manager virtual machines with automation DSC service. These can either be Windows or Linux virtual machines that are supported with DSC. You can specify the whole subscription, a specific resource group, or an individual VM.",
-      "runbookType": "Graph",
-      "uri": "https://gallery.technet.microsoft.com/scriptcenter/Registers-Azure-resource-31979771/file/160035/1/Register-VMDSC.graphrunbook"
-    },
-    {
-      "name": "Enable-MultipleSolution",
-      "description": "Onboard Azure VMs to update and change tracking at scale This sample automation runbook onboards Azure VMs for either the Update or ChangeTracking (which includes Inventory) solution. It requires an existing Azure VM to already be onboarded to the solution.",
-      "runbookType": "Script",
-      "uri": "https://gallery.technet.microsoft.com/scriptcenter/This-sample-automation-f72ce469/file/200880/1/Enable-MultipleSolution.ps1"
-    }
-  ],
-  "automationRunnowbooks": [
-    {
-      "name": "AzureInventory_V2",
-      "description": "Azure Inventory using Powershell Want to know about innovative and interesting ideas in Azure and automation? Check out my blog: https://manjunathrao.com.Version 2.0:I have changed the design of this script.",
-      "runbookType": "Script",
-      "uri": "https://gallery.technet.microsoft.com/scriptcenter/Azure-Inventory-using-3db0f658/file/218278/1/AzureInventory_V2.ps1"
-    }
-  ],
-  "automationModules": [
-    {
-      "name": "AzureRM.OperationalInsights",
-      "description": "Microsoft Azure PowerShell - OperationalInsights service cmdlets for Azure Resource Manager",
-      "runbookType": "Module",
-      "uri": "https://psg-prod-eastus.azureedge.net/packages/azurerm.operationalinsights.5.0.6.nupkg"
-    }
-  ],
-  "dscConfigs": [
-    {
-      "name": "win10",
-      "description": "Installs Win10 with DevOps Tools",
-      "uri": "configurations/win10.ps1"
-    },
-    {
-      "name": "basic",
-      "description": "Two configs: basic.Chocolatey and basic.BoxStarter are available.",
-      "uri": "configurations/basic.ps1"
-    }
-  ],
-  "dscModules": [
-    {
-      "name": "ActiveDirectoryCSDsc",
-      "uri": "https://psg-prod-eastus.azureedge.net/packages/activedirectorycsdsc.4.1.0.nupkg"
-    },
-    {
-      "name": "cChoco",
-      "uri": "https://psg-prod-eastus.azureedge.net/packages/cchoco.2.4.0.nupkg"
-    },
-    {
-      "name": "CertificateDsc",
-      "uri": "https://psg-prod-eastus.azureedge.net/packages/certificatedsc.4.7.0.nupkg"
-    },
-    {
-      "name": "PSSlack",
-      "uri": "https://psg-prod-eastus.azureedge.net/packages/psslack.1.0.1.nupkg"
-    },
-    {
-      "name": "AzureAD",
-      "uri": "https://psg-prod-eastus.azureedge.net/packages/azuread.2.0.2.76.nupkg"
-    },
-    {
-      "name": "PowerShellForGitHub",
-      "uri": "https://psg-prod-eastus.azureedge.net/packages/powershellforgithub.0.9.2.nupkg"
-    },
-    {
-      "name": "PSDscResources",
-      "uri": "https://psg-prod-eastus.azureedge.net/packages/psdscresources.2.12.0.nupkg"
-    }
-  ],
-  "solutions": [
-    {
-      "name": "AzureAutomation",
-      "publisher": "Microsoft"
-    },
-    {
-      "name": "AzureActivity",
-      "publisher": "Microsoft"
-    },
-    {
-      "name": "SecurityCenterFree",
-      "publisher": "Microsoft"
-    },
-    {
-      "name": "ChangeTracking",
-      "publisher": "Microsoft"
-    },
-    {
-      "name": "Updates",
-      "publisher": "Microsoft"
-    },
-    {
-      "name": "InfrastructureInsights",
-      "publisher": "Microsoft"
-    },
-    {
-      "name": "ServiceMap",
-      "publisher": "Microsoft"
-    }
-  ],
-  "automationVariables": [
-    
-  ]
+    "automationRunbooks":  [
+                               {
+                                   "name":  "AzureSqlScale",
+                                   "description":  "AzureSqlScale",
+                                   "runbookType":  "Script",
+                                   "uri":  "https://psg-prod-eastus.azureedge.net/packages/azuresqlscale.1.0.0.nupkg"
+                               },
+                               {
+                                   "name":  "AzureAppServicePlanScale",
+                                   "description":  "AzureAppServicePlanScale",
+                                   "runbookType":  "Script",
+                                   "uri":  "https://psg-prod-eastus.azureedge.net/packages/azureappserviceplanscale.1.0.0.nupkg"
+                               },
+                               {
+                                   "name":  "FreezeResourceGroup",
+                                   "description":  "Freeze Resource Group",
+                                   "runbookType":  "Script",
+                                   "uri":  "https://psg-prod-eastus.azureedge.net/packages/freezeresourcegroup.1.4.0.nupkg"
+                               }
+                           ],
+    "automationRunnowbooks":  [
+                                  {
+                                      "name":  "Install-RequiredModule",
+                                      "description":  "Parses a RequiredModules.psd1 listing modules and attempts to import those modules.\nIf it can\u0027t find the module in the PSModulePath, attempts to install it from PowerShellGet.\n\nThe RequiredModules list looks like this (uses nuget version range syntax):\n@{\n    \"PowerShellGet\" = \"2.0.4\"\n    \"Configuration\" = \"[1.3.1,2.0)\"\n    \"Pester\"        = \"[4.4.2,4.7.0]\"\n}\n\nhttps://docs.microsoft.com/en-us/nuget/reference/package-versioning#version-ranges-and-wildcards",
+                                      "runbookType":  "Script",
+                                      "uri":  "https://psg-prod-eastus.azureedge.net/packages/install-requiredmodule.4.0.6.nupkg"
+                                  },
+                                  {
+                                      "name":  "Image-Factory",
+                                      "description":  "This script will create disposable Hyper-V virtual machines to generate WIM files from Microsoft Deployment\nToolkit task sequences.\n\nThis script should be run on a device with the MDT and Hyper-V PowerShell management modules installed.\n\nTo send a log file via e-mail using ssl and an SMTP password you must generate an encrypted password file.\nThe password file is unique to both the user and machine.\n\nTo create the password file run this command as the user and on the machine that will use the file:\n\n$creds = Get-Credential\n$creds.Password | ConvertFrom-SecureString | Set-Content c:\\foo\\ps-script-pwd.txt",
+                                      "runbookType":  "Script",
+                                      "uri":  "https://psg-prod-eastus.azureedge.net/packages/image-factory.20.3.20.nupkg"
+                                  }
+                              ],
+    "automationModules":  [
+                              {
+                                  "name":  "AzureRM.OperationalInsights",
+                                  "description":  "Microsoft Azure PowerShell - OperationalInsights service cmdlets for Azure Resource Manager",
+                                  "runbookType":  "Module",
+                                  "uri":  "https://psg-prod-eastus.azureedge.net/packages/azurerm.operationalinsights.5.0.6.nupkg"
+                              }
+                          ],
+    "dscConfigs":  [
+                       {
+                           "name":  "win10",
+                           "description":  "Installs Win10 with DevOps Tools",
+                           "uri":  "configurations/win10.ps1"
+                       },
+                       {
+                           "name":  "basic",
+                           "description":  "Two configs: basic.Chocolatey and basic.BoxStarter are available.",
+                           "uri":  "configurations/basic.ps1"
+                       }
+                   ],
+    "dscModules":  [
+                       {
+                           "name":  "ActiveDirectoryCSDsc",
+                           "uri":  "https://psg-prod-eastus.azureedge.net/packages/activedirectorycsdsc.4.1.0.nupkg"
+                       },
+                       {
+                           "name":  "cChoco",
+                           "uri":  "https://psg-prod-eastus.azureedge.net/packages/cchoco.2.4.0.nupkg"
+                       },
+                       {
+                           "name":  "CertificateDsc",
+                           "uri":  "https://psg-prod-eastus.azureedge.net/packages/certificatedsc.4.7.0.nupkg"
+                       },
+                       {
+                           "name":  "PSSlack",
+                           "uri":  "https://psg-prod-eastus.azureedge.net/packages/psslack.1.0.2.nupkg"
+                       },
+                       {
+                           "name":  "AzureAD",
+                           "uri":  "https://psg-prod-eastus.azureedge.net/packages/azuread.2.0.2.76.nupkg"
+                       },
+                       {
+                           "name":  "PowerShellForGitHub",
+                           "uri":  "https://psg-prod-eastus.azureedge.net/packages/powershellforgithub.0.10.0.nupkg"
+                       },
+                       {
+                           "name":  "xFirefox",
+                           "uri":  "https://psg-prod-eastus.azureedge.net/packages/xfirefox.1.3.0.nupkg"
+                       },
+                       {
+                           "name":  "PSDscResources",
+                           "uri":  "https://psg-prod-eastus.azureedge.net/packages/psdscresources.2.12.0.nupkg"
+                       }
+                   ],
+    "solutions":  [
+                      {
+                          "name":  "AzureAutomation",
+                          "publisher":  "Microsoft"
+                      },
+                      {
+                          "name":  "AzureActivity",
+                          "publisher":  "Microsoft"
+                      },
+                      {
+                          "name":  "SecurityCenterFree",
+                          "publisher":  "Microsoft"
+                      },
+                      {
+                          "name":  "ChangeTracking",
+                          "publisher":  "Microsoft"
+                      },
+                      {
+                          "name":  "Updates",
+                          "publisher":  "Microsoft"
+                      },
+                      {
+                          "name":  "InfrastructureInsights",
+                          "publisher":  "Microsoft"
+                      },
+                      {
+                          "name":  "ServiceMap",
+                          "publisher":  "Microsoft"
+                      }
+                  ]
 }

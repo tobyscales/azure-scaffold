@@ -37,8 +37,9 @@ cd /$BOOTSTRAP_REPO
 CONFIG_URL="https://raw.githubusercontent.com/$GITHUB_USER/$GITHUB_REPO/master/"
 echo Configurations from: $CONFIG_URL
 
-#TODO -- refactor my Update-Config powershell script into bash, to run in a container
+#TODO -- refactor my Update-Config powershell script into bash, to run in this container
 #pwsh -noprofile -nologo -executionpolicy Bypass -File ./scripts/Update-Config.ps1
+pwsh
 
 jq -r .solutions config2.json > solutions.json
 jq -r .automationModules config2.json > automationModules.json
@@ -48,9 +49,9 @@ jq -r .automationRunnowbooks config2.json > runnowbooks.json
 jq -r .dscConfigs config2.json > dscConfigs.json
 jq -r .dscModules config2.json > dscModules.json
 
-az group deployment create --template-file ./templates/Configure_Workspace.json --parameters workspacename=$AZURE_WORKSPACENAME solutions=@solutions.json --no-wait
-az group deployment create --template-file ./templates/Configure_AutomationAccount.json --parameters accountname=$AZURE_AUTOMATIONACCOUNT runbooks=@runbooks.json modules=@automationModules.json runnowbooks=@runnowbooks.json variables=@automationVariables.json --no-wait
-az group deployment create --template-file ./templates/Configure_DSC.json --parameters accountname=$AZURE_AUTOMATIONACCOUNT configUrl=$CONFIG_URL modules=@dscModules.json configurations=@dscConfigs.json
+az deployment group create --template-file ./templates/Configure_Workspace.json --parameters workspacename=$AZURE_WORKSPACENAME solutions=@solutions.json --no-wait
+az deployment group create --template-file ./templates/Configure_AutomationAccount.json --parameters accountname=$AZURE_AUTOMATIONACCOUNT runbooks=@runbooks.json modules=@automationModules.json runnowbooks=@runnowbooks.json variables=@automationVariables.json --no-wait
+az deployment group create --template-file ./templates/Configure_DSC.json --parameters accountname=$AZURE_AUTOMATIONACCOUNT configUrl=$CONFIG_URL modules=@dscModules.json configurations=@dscConfigs.json
 
 ## from https://docs.microsoft.com/en-us/cli/azure/keyvault/certificate?view=azure-cli-latest#az-keyvault-certificate-create
 az keyvault certificate get-default-policy > kvpolicy.json
