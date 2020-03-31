@@ -53,31 +53,21 @@
     ],
     "automationRunBooks": [
         {
-            "name": "Azure Inventory using Powershell",
-            "location": "TechNet",
+            "name": "Install-RequiredModule",
             "run": "now"
         },
         {
-            "name": "Update and Change Tracking",
-            "location": "TechNet",
+            "name": "Image-Factory",
             "run": "now"
         },
         {
-            "name": "Authenticate to Azure using Azure RunAs account",
-            "location": "TechNet",
-            "run": "now"
+            "name": "AzureSqlScale"
         },
         {
-            "name": "StartAzureV2VMs",
-            "location": "TechNet"
+            "name": "AzureAppServicePlanScale"
         },
         {
-            "name": "StopAzureV2VMs",
-            "location": "TechNet"
-        },
-        {
-            "name": "Register-VMDSC",
-            "location": "TechNet"
+            "name": "FreezeResourceGroup"
         }
     ],
     "solutions": [
