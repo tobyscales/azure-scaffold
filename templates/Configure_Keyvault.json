@@ -16,7 +16,8 @@
         },
         "accessPolicies": {
             "type": "array",
-            "defaultValue": [],
+            "defaultValue": [
+            ],
             "metadata": {
                 "description": "Access policies object {\"tenantId\":\"\",\"objectId\":\"\",\"permissions\":{\"keys\":[\"\"],\"secrets\":[\"\"]}}"
             }
@@ -55,7 +56,8 @@
         },
         "secrets": {
             "type": "array",
-            "defaultValue": [],
+            "defaultValue": [
+            ],
             "metadata": {
                 "description": "all secrets {\"secretName\":\"\",\"secretValue\":\"\"}"
             }
@@ -84,7 +86,8 @@
             "name": "[concat('AccessPolicy_',copyIndex())]",
             "copy": {
                 "name": "policiesCopy",
-                "count": "[length(parameters('accessPolicies'))]"
+                "count": "[length(parameters('accessPolicies'))]",
+                "mode": "serial"
             },
             "properties": {
                 "mode": "Incremental",
