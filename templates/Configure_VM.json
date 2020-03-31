@@ -13,25 +13,29 @@
             },
             "defaultValue": "[concat('vm-', resourcegroup().name)]"
         },
-
-        "configUrl": {
-            "type": "string"
+        "automationAcctName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the workspace for logs and alerts"
+            },
+            "defaultValue": "[concat('logs-', resourcegroup().name)]"
         },
-        "configurations": {
-            "type": "array",
-            "defaultvalue": [
-            ]
+        "workspaceName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the Azure Automation account for configurations."
+            },
+            "defaultValue": "[concat('aa-', resourcegroup().name)]"
         },
-        "modules": {
-            "type": "array",
-            "defaultvalue": [
-            ]
+        "configName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the DSC Configuration to apply."
+            }
         }
     },
     "variables": {
-        "encryptVMTemplateUrl": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/201-encrypt-running-windows-vm-without-aad/azuredeploy.json",
-        "keyVaultName": "[concat('kv-',resourceGroup().name )]"
-
+        "encryptVMTemplateUrl": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/201-encrypt-running-windows-vm-without-aad/azuredeploy.json"
     },
     "resources": [
         {
@@ -57,6 +61,79 @@
                     "keyVaultResourceGroup": {
                         "value": "[resourceGroup().name]"
                     }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2017-03-30",
+            "name": "[concat(parameters('vmName'),'/Microsoft.Monitoring')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Resources/deployments/', 'Main_', parameters('vmName'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.EnterpriseCloud.Monitoring",
+                "type": "MicrosoftMonitoringAgent",
+                "typeHandlerVersion": "1.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "workspaceId": "[reference(resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName')), '2015-11-01-preview').customerId]",
+                    "azureResourceId": "[resourceId('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
+                },
+                "protectedSettings": {
+                    "workspaceKey": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName')), '2015-11-01-preview').primarySharedKey]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2017-03-30",
+            "name": "[concat(parameters('vmName'),'/AADLoginForWindows')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Resources/deployments/', 'Main_', parameters('workspaceName'))]",
+                "[concat('Microsoft.Resources/deployments/', 'Main_', parameters('vmName'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.ActiveDirectory",
+                "type": "AADLoginForWindows",
+                "typeHandlerVersion": "0.4",
+                "autoUpgradeMinorVersion": true
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2019-03-01",
+            "name": "[concat(parameters('vmName'),'/Microsoft.Powershell.DSC')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Resources/deployments/', 'Main_', parameters('automationAcctName'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Powershell",
+                "type": "DSC",
+                "typeHandlerVersion": "2.9",
+                "autoUpgradeMinorVersion": true,
+                "protectedSettings": {
+                    "configurationArguments": {
+                        "RegistrationKey": {
+                            "userName": "NOT_USED",
+                            "Password": "[listKeys(resourceId(resourceGroup().name,'Microsoft.Automation/automationAccounts/', parameters('automationAcctName')), '2018-01-15').Keys[0].value]"
+                        }
+                    }
+                },
+                "settings": {
+                    "configurationArguments": {
+                        "NodeConfigurationName": "[parameters('configName')]",
+                        "RegistrationUrl": "[reference(resourceId(resourceGroup().name, 'Microsoft.Automation/automationAccounts/', parameters('automationAcctName')),'2018-01-15').RegistrationUrl]",
+                        "configurationMode": "ApplyandAutoCorrect",
+                        "RefreshFrequencyMins": "30",
+                        "RebootNodeIfNeeded": true
+                    }
+                },
+                "properties": {
+
                 }
             }
         }

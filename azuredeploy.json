@@ -79,6 +79,7 @@
     "workspaceDeployUri": "[concat(variables('ghURL'), '/templates/workspace/azuredeploy.json')]",
     "vmDeployUri": "[concat(variables('ghURL'), '/templates/vm/azuredeploy.json')]",
     "dscDeployUri": "[concat(variables('ghURL'), '/templates/dsc/azuredeploy.json')]",
+    "vmConfigUri": "[concat(variables('ghURL'), '/templates/Configure_VM.json')]",
     "keyVaultConfigUri": "[concat(variables('ghURL'), '/templates/Configure_Keyvault.json')]",
     "keyVaultName": "[concat('kv-', resourcegroup().name)]",
     "automationAcctName": "[concat('aa-', resourcegroup().name)]",
@@ -465,9 +466,40 @@
       }
     },
     {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "name": "[concat('Config_', variables('vmName'))]",
+      "dependsOn": [
+        "[concat('Microsoft.ContainerInstance/containerGroups/', variables('cgName'))]",
+        "[concat('Microsoft.Resources/deployments/', 'Main_', variables('keyVaultName'))]",
+        "[concat('Microsoft.Resources/deployments/', 'Main_', variables('workspaceName'))]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('vmConfigUri')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vmName": {
+            "value": "[variables('vmName')]"
+          },
+          "keyVaultName": {
+            "value": "[variables('keyVaultName')]"
+          },
+          "workspaceName": {
+            "value": "[variables('workspaceName')]"
+          },
+          "automationAcctName": {
+            "value": "[variables('automationAcctName')]"
+          }
+        }
+      }
+    },
+    {
       "type": "Microsoft.Storage/storageAccounts",
       "apiVersion": "2018-02-01",
-      "name": "[variables('storageAccountName')]",
+      "name": "[concat('Main_',variables('storageAccountName')]",
       "location": "[resourceGroup().location]",
       "tags": {
         "description": "Used for ScriptStorage"
@@ -496,84 +528,6 @@
           ]
         }
       ]
-    },
-    {
-      "type": "Microsoft.Compute/virtualMachines/extensions",
-      "apiVersion": "2017-03-30",
-      "name": "[concat(variables('vmName'),'/Microsoft.Monitoring')]",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[concat('Microsoft.Resources/deployments/', 'Main_', variables('workspaceName'))]",
-        "[concat('Microsoft.Resources/deployments/', 'Main_', variables('vmName'))]"
-      ],
-      "properties": {
-        "publisher": "Microsoft.EnterpriseCloud.Monitoring",
-        "type": "MicrosoftMonitoringAgent",
-        "typeHandlerVersion": "1.0",
-        "autoUpgradeMinorVersion": true,
-        "settings": {
-          "workspaceId": "[reference(resourceId('Microsoft.OperationalInsights/workspaces/', variables('workspaceName')), '2015-11-01-preview').customerId]",
-          "azureResourceId": "[resourceId('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
-        },
-        "protectedSettings": {
-          "workspaceKey": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces/', variables('workspaceName')), '2015-11-01-preview').primarySharedKey]"
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Compute/virtualMachines/extensions",
-      "apiVersion": "2017-03-30",
-      "name": "[concat(variables('vmName'),'/AADLoginForWindows')]",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[concat('Microsoft.Resources/deployments/', 'Main_', variables('workspaceName'))]",
-        "[concat('Microsoft.Resources/deployments/', 'Main_', variables('vmName'))]"
-      ],
-      "properties": {
-        "publisher": "Microsoft.Azure.ActiveDirectory",
-        "type": "AADLoginForWindows",
-        "typeHandlerVersion": "0.4",
-        "autoUpgradeMinorVersion": true
-      }
-    },
-    {
-      "type": "Microsoft.Compute/virtualMachines/extensions",
-      "apiVersion": "2019-03-01",
-      "name": "[concat(variables('vmName'),'/Microsoft.Powershell.DSC')]",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[concat('Microsoft.Resources/deployments/', 'Main_', variables('automationAcctName'))]"
-      ],
-      "properties": {
-        "publisher": "Microsoft.Powershell",
-        "type": "DSC",
-        "typeHandlerVersion": "2.9",
-        "autoUpgradeMinorVersion": true,
-        "protectedSettings": {
-          "configurationArguments": {
-            "RegistrationKey": {
-              "userName": "NOT_USED",
-              "Password": "[listKeys(resourceId(resourceGroup().name,'Microsoft.Automation/automationAccounts/', variables('automationAcctName')), '2018-01-15').Keys[0].value]"
-            }
-          }
-        },
-        "settings": {
-          "configurationArguments": {
-            "NodeConfigurationName": "[parameters('configName')]",
-            "RegistrationUrl": "[reference(resourceId(resourceGroup().name, 'Microsoft.Automation/automationAccounts/', variables('automationAcctName')),'2018-01-15').RegistrationUrl]",
-            "configurationMode": "ApplyandAutoCorrect",
-            "RefreshFrequencyMins": "30",
-            "RebootNodeIfNeeded": true
-          }
-        },
-        "properties": {
-          "remoteUserName": "[parameters('remoteUser')]",
-          "tenantId": "[subscription().tenantId]",
-          "azResourceGroup": "[resourceGroup().name]",
-          "azLocation": "[resourceGroup().location]",
-          "azConfigUrl": "[variables('ghURL')]"
-        }
-      }
     }
   ],
   "outputs": {

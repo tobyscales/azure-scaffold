@@ -62,7 +62,7 @@
         }
     },
     "variables": {
-        "ghUrl": "https://raw.githubusercontent.com/tescales/azure-scaffold/master/templates/keyvault/add/policy.json"
+        "kvPolicyTemplate": "https://raw.githubusercontent.com/tescales/azure-scaffold/master/templates/keyvault/policy/azuredeploy.json"
     },
     "resources": [
         {
@@ -89,7 +89,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[variables('ghUrl')]",
+                    "uri": "[variables('kvPolicyTemplate')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
