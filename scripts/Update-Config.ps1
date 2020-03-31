@@ -23,17 +23,20 @@
 .PARAMETER rootURL
     OPTIONAL - If you store your DSC configs in a dedicated GH repo, you can specify it here to maintain links.
 
-.PARAMETER UpdateInPlace
-    OPTIONAL - Updates config.json in place rather than parsing into dedicated files. Defaults to false.
+.PARAMETER CreateConfig2
+    OPTIONAL - Switch to enable creating a config2.json file rather than parsing content into dedicated files.
 #>
 
 param (
     [Parameter(Mandatory = $false)]
     [string]$rootUrl,
     [Parameter(Mandatory = $false)]
-    [switch]$UpdateInPlace = $true
+    [switch]$CreateConfig2
 )
-function get-TechNetItem {
+
+$ErrorActionPreference = 'Stop'
+
+function get-TechNetItem { #Deprecated, no more TechNet...
     param(
         [string]$itemName
     )
@@ -68,32 +71,31 @@ function get-PSGalleryItem {
     [hashtable]$return = @{ }
 
     switch ($itemType) {
-        "module" { $info = find-module $itemName; $return.type = "Module" }
-        "script" { $info = find-script $itemName; $return.type = "Script" }
+        "module" { $info = find-module -name $itemName -repository PSGallery ; $return.type = "Module" }
+        "script" { $info = find-script -name $itemName; $return.type = "Script" }
     }
     
-    try { $response = (invoke-webrequest "https://www.powershellgallery.com/api/v2/package/$($info.name)/$($info.version)" -method Get -MaximumRedirection 0).BaseRequest } catch { $response = $_.Exception.Response } 
-    $return.fullUrl = $response.Headers.Location.AbsoluteUri
+    $response = Invoke-WebRequest "https://www.powershellgallery.com/api/v2/package/$($info.name)/$($info.version)" -UseBasicParsing -method Get -MaximumRedirection 0 -ErrorAction SilentlyContinue
+         
+    $return.fullUrl = $response.Headers.Location
+    write-Verbose "Update-Config.ps1: Using $($return.fullUrl) for $itemname... "
     $return.description = $info.description
-    $return.name = (split-path -leaf $return.fullUrl).split('.')[0]
-    
-    # return AbsoluteUri for scripts... probably a better place to get this info from
-    if ($itemType -eq "script") { $return.fullUrl = $info.ProjectUri.AbsoluteUri } 
+    $return.name = $itemname
+    #$return.name = (split-path -leaf $return.fullUrl).split('.')[0]
     
     # modules return weird names, so use the default
-    if ($itemType -eq "module") { $return.name = $itemName } 
-    
+    #if ($itemType -eq "module") { $return.name = $itemName } 
     return $return
 }
 
 $startPath = $pwd.path
 $rootPath = (get-item $PSScriptRoot).Parent.FullName
 
+if ($CreateConfig2) {write-host -ForegroundColor Yellow "Creating/updating config2.json..."}
 #$dscParamsFile = (Join-Path $rootPath "templates" -AdditionalChildPath "dsc", "azuredeploy.parameters.json")
 #$runbooksParamsFile = (Join-Path $rootPath "templates" -AdditionalChildPath "runbooks", "azuredeploy.parameters.json")
 #$runnowbooksParamsFile = (Join-Path $rootPath "templates" -AdditionalChildPath "automation", "azuredeploy.parameters.json")
 #$solutionsParamsFile = (Join-Path $rootPath "templates" -AdditionalChildPath "solutions", "azuredeploy.parameters.json")
-
 
 $dscConfigsFile = (Join-Path $rootPath "dscConfigs.json")
 $dscModulesFile = (Join-Path $rootPath "dscModules.json")
@@ -111,7 +113,9 @@ $dscConfigParams = @()
 $dscModuleParams = @()
 $solutionsParams = @()
 
+Write-Host "Adding Automation Modules..."
 foreach ($module in $j.automationModules) {
+    Write-Verbose "Update-Config.ps1: Adding Automation Module $($module.name)..."
     $item = get-PSGalleryItem -itemName $module.name -itemType "module"
 
     $runbookModules += [ordered]@{
@@ -122,10 +126,14 @@ foreach ($module in $j.automationModules) {
     }
 }
 
+Write-Host "Adding Automation Runbooks..."
 foreach ($runbook in $j.automationRunbooks) {
+    Write-Verbose "Update-Config.ps1: Adding Automation Runbook $($runbook.name)..."
+    ## TechNet functionality no longer supported (3/20/20)
+#    if ( $runbook.location -eq "TechNet" ) { $item = get-TechNetItem -itemName $runbook.name } 
+#    elseif ( $runbook.location -eq "PSGallery" ) { $item = get-PSGalleryItem -itemName $runbook.name -itemType "script" }
 
-    if ( $runbook.location -eq "TechNet" ) { $item = get-TechNetItem -itemName $runbook.name } 
-    elseif ( $runbook.location -eq "PSGallery" ) { $item = get-PSGalleryItem -itemName $runbook.name -itemType "script" }
+$item = get-PSGalleryItem -itemName $runbook.name -itemType "script"
 
     if ($runbook.run -eq "now") {
         $runnowParams += [ordered]@{ 
@@ -145,8 +153,9 @@ foreach ($runbook in $j.automationRunbooks) {
     }
 }
 
+Write-Host "Adding DSC Configurations..."
 foreach ($config in $j.dscConfigs) {
-
+    Write-Verbose "Update-Config.ps1: Adding DSC Configuration $($config.name)..."
     if ($rootUrl) {
         $dscConfigParams += [ordered]@{ 
             'name'        = $config.name
@@ -163,7 +172,9 @@ foreach ($config in $j.dscConfigs) {
     }
 }
 
+Write-Host "Adding DSC Modules..."
 foreach ($dscModule in $j.dscModules) {
+    Write-Verbose "Update-Config.ps1: Adding DSC Module $($dscModule.name)..."
 
     if ($dscModule.location -eq "PSGallery") { 
         $item = Get-PSGalleryItem -itemName $dscModule.name -itemType "module"
@@ -175,6 +186,7 @@ foreach ($dscModule in $j.dscModules) {
     }
 }
 
+Write-Host "Adding Solutions..."
 $solutionsParams = $j.solutions
 
 $j | add-member -MemberType NoteProperty -Name "automationRunbooks" -Value $runbookParams -Force
@@ -185,8 +197,8 @@ $j | add-member -MemberType NoteProperty -Name "dscModules" -Value $dscModulePar
 $j | add-member -MemberType NoteProperty -Name "solutions" -Value $solutionsParams -Force
 
 
-# Optional behavior: save over original config.json file
-if ($UpdateInPlace) {
+# Optional behavior: save to config2.json file
+if ($CreateConfig2) {
     $j | convertto-json | set-content config2.json -Force
 } 
 # Default behavior: save to dedicated .json files
