@@ -34,6 +34,18 @@
             },
             "defaultValue": "none"
         },
+        "shutdownTimeZone": {
+            "type": "string",
+            "metadata": {
+                "description": "The Time Zone used for scheduling, long-form ('Pacific Standard Time')"
+            }
+        },
+        "shutdownTime": {
+            "type": "string",
+            "metadata": {
+                "description": "Enter time in 4-digit, 24-hour format (2000 = 8pm)"
+            }
+        },
         "encryptVM": {
             "type": "bool",
             "metadata": {
@@ -136,6 +148,26 @@
                         "RefreshFrequencyMins": "30",
                         "RebootNodeIfNeeded": true
                     }
+                }
+            }
+        },
+        {
+            "name": "[concat('shutdown-computevm-',parameters('vmName'))]",
+            "type": "Microsoft.DevTestLab/schedules",
+            "apiVersion": "2016-05-15",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "status": "Enabled",
+                "timeZoneId": "[parameters('shutdownTimeZone')]",
+                "taskType": "ComputeVmShutdownTask",
+                "notificationSettings": {
+                    "status": "Disabled",
+                    "timeInMinutes": 15,
+                    "webhookUrl": null
+                },
+                "targetResourceId": "[resourceId('Microsoft.Compute/VirtualMachines',parameters('vmName'))]",
+                "dailyRecurrence": {
+                    "time": "[parameters('shutdownTime')]"
                 }
             }
         }
