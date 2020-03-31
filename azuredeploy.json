@@ -472,7 +472,8 @@
       "dependsOn": [
         "[concat('Microsoft.ContainerInstance/containerGroups/', variables('cgName'))]",
         "[concat('Microsoft.Resources/deployments/', 'Main_', variables('keyVaultName'))]",
-        "[concat('Microsoft.Resources/deployments/', 'Main_', variables('workspaceName'))]"
+        "[concat('Microsoft.Resources/deployments/', 'Main_', variables('workspaceName'))]",
+        "[concat('Microsoft.Resources/deployments/', 'Main_', variables('vmName'))]"
       ],
       "properties": {
         "mode": "Incremental",
@@ -492,6 +493,9 @@
           },
           "automationAcctName": {
             "value": "[variables('automationAcctName')]"
+          },
+          "configName": {
+            "value": "[parameters('configName')]"
           }
         }
       }
@@ -499,7 +503,7 @@
     {
       "type": "Microsoft.Storage/storageAccounts",
       "apiVersion": "2018-02-01",
-      "name": "[concat('Main_',variables('storageAccountName')]",
+      "name": "[variables('storageAccountName')]",
       "location": "[resourceGroup().location]",
       "tags": {
         "description": "Used for ScriptStorage"

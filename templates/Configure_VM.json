@@ -118,9 +118,6 @@
                         "RefreshFrequencyMins": "30",
                         "RebootNodeIfNeeded": true
                     }
-                },
-                "properties": {
-
                 }
             }
         }

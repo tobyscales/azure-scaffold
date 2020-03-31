@@ -13,6 +13,7 @@ Configuration basic
             InstallDir = "c:\choco"
         }
     }
+    
     Node "installBoxstarter"
     {
         cChocoInstaller InstallChoco

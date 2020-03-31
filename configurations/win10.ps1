@@ -25,6 +25,7 @@ Configuration win10
         [string]$azLocation = (Get-AutomationVariable "mgmtLocation"),
         [string]$azConfigUrl = (Get-AutomationVariable "mgmtConfigUrl")
     )
+    
     Import-DscResource -ModuleName 'cChoco'
     Import-DscResource -ModuleName 'PSDscResources'
     Import-DscResource -ModuleName 'ComputerManagementDsc'
@@ -37,13 +38,6 @@ Configuration win10
 
     Node "devops"
     {
-        
-         PowerShellExecutionPolicy ExecutionPolicy
-         {
-             ExecutionPolicyScope = 'Process'
-             ExecutionPolicy      = 'Unrestricted'
-         }
-
         #######################
         #region WindowsOptionalFeatures
         ####################### 
