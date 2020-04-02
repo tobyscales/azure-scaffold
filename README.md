@@ -14,15 +14,11 @@ This project is notable for its use of my [Azure Bootstrapper](https://github.co
     <img src="http://armviz.io/visualizebutton.png"/>
 </a>
 
-^^^ these buttons are currently broken due to a sequencing limitation in the Azure Portal. If you '''git clone''' the repo and deploy from a command-line, it will work.
-
-
-
 
 ## TODO: 
- * Add bastion host support
+ * Refactor network deployment logic, add bastion host support
+ * Add AutomationAccount sync to GH repo
  * figure out how to get userObjectId gracefully (see deploy.azcli for commands list)
- * move VM deployment logic to sidecar (to solve Deploy to Azure button issue)
  * Refactor RunNow logic using a .runnow value (collect true/false and deploy jobs for them)
  * Add scheduling logic for runbooks
  * Use KV to generate cert for VM authentication:

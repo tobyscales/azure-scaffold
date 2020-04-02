@@ -13,11 +13,13 @@
     },
     "configurations": {
       "type": "array",
-      "defaultvalue": []
+      "defaultvalue": [
+      ]
     },
     "modules": {
       "type": "array",
-      "defaultvalue": []
+      "defaultvalue": [
+      ]
     }
   },
   "variables": {
@@ -28,7 +30,8 @@
     "compilationjobTemplate": "https://raw.githubusercontent.com/tescales/azure-scaffold/master/templates/dsc/jobs/azuredeploy.json",
     "moduleCount": "[length(parameters('modules'))]",
     "configCount": "[length(parameters('configurations'))]"
-    },
+  },
+
   "resources": [
     {
       "apiVersion": "2015-01-01",
@@ -125,5 +128,6 @@
       }
     }
   ],
-  "outputs": {}
+  "outputs": {
+  }
 }

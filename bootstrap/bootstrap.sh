@@ -37,21 +37,57 @@ cd /$BOOTSTRAP_REPO
 CONFIG_URL="https://raw.githubusercontent.com/$GITHUB_USER/$GITHUB_REPO/master/"
 echo Configurations from: $CONFIG_URL
 
-#TODO -- refactor my Update-Config powershell script into bash, to run in this container
-#pwsh -noprofile -nologo -executionpolicy Bypass -File ./scripts/Update-Config.ps1
-pwsh
+jq -r .solutions config.json > solutions.json
+jq -r .dscConfigs config.json > dscConfigs.json
+jq -r .automationVariables config.json > automationVariables.json
 
-jq -r .solutions config2.json > solutions.json
-jq -r .automationModules config2.json > automationModules.json
-jq -r .automationVariables config2.json > automationVariables.json
-jq -r .automationRunbooks config2.json > runbooks.json
-jq -r .automationRunnowbooks config2.json > runnowbooks.json
-jq -r .dscConfigs config2.json > dscConfigs.json
-jq -r .dscModules config2.json > dscModules.json
+# updates dscModules with actual uri
+printf '[\n' >dscModules.json
+jq -M -r '.dscModules[] | .name, .location' config.json | while read -r name; read -r location; do
+ if [ "${location,,}" = "psgallery" ]; then
+  echo "Retrieving $name..."
+  uri="$(curl -sD - -o -L https://www.powershellgallery.com/api/v2/package/$name | awk '/location/ {print $2}' | tr -d '\r')"
+  printf '  {\n    "name": "%s",\n"uri": "%s"\n  },\n' "$name" "$uri" >>dscModules.json
+ fi
+done
+sed -i '$ s/.$/\n]/' dscModules.json
 
-az deployment group create --template-file ./templates/Configure_Workspace.json --parameters workspacename=$AZURE_WORKSPACENAME solutions=@solutions.json --no-wait
-az deployment group create --template-file ./templates/Configure_AutomationAccount.json --parameters accountname=$AZURE_AUTOMATIONACCOUNT runbooks=@runbooks.json modules=@automationModules.json runnowbooks=@runnowbooks.json variables=@automationVariables.json --no-wait
-az deployment group create --template-file ./templates/Configure_DSC.json --parameters accountname=$AZURE_AUTOMATIONACCOUNT configUrl=$CONFIG_URL modules=@dscModules.json configurations=@dscConfigs.json
+# updates automationModules with description, type and actual uri
+printf '[\n' >automationModules.json
+jq -M -r '.automationModules[] | .name, .location' config.json | while read -r name; read -r location; do
+  echo "Retrieving $name..."
+  type="$(curl -s -L "https://www.powershellgallery.com/api/v2/FindPackagesById?id='$name'" | grep -oP -m 1 '(?<=<d:ItemType>).*?(?=</d:ItemType>)' | head -n1)"
+  description="$(curl -s -L "https://www.powershellgallery.com/api/v2/FindPackagesById?id='$name'" | grep -m 1 -oP '(?<=<d:Description>).*?(?=</d:Description>)' | head -n1)"
+  uri="$(curl -sD - -o -L https://www.powershellgallery.com/api/v2/package/$name | awk '/location/ {print $2}' | tr -d '\r')"
+ printf '  {\n    "name": "%s",\n"uri": "%s",\n"type": "%s",\n"description": "%s"\n  },\n' "$name" "$uri" "$type" "$description" >>automationModules.json
+done
+sed -i '$ s/.$/\n]/' automationModules.json
+
+# updates automationRunbooks with type and actual uri
+printf '[\n' >automationRunbooks.json
+printf '[\n' >automationRunnowbooks.json
+jq -M -r '.automationRunbooks[] | .name, .location, .run' config.json | while read -r name; read -r location; read -r run; do
+  echo "Retrieving $name..."
+  type="$(curl -s -L "https://www.powershellgallery.com/api/v2/FindPackagesById?id='$name'" | grep -m 1 -oP '(?<=<d:ItemType>).*?(?=</d:ItemType>)' | head -n1)"
+  description="$(curl -s -L "https://www.powershellgallery.com/api/v2/FindPackagesById?id='$name'" | grep -m 1 -oP '(?<=<d:Description>).*?(?=</d:Description>)' | head -n1)"
+  uri="$(curl -sD - -o -L https://www.powershellgallery.com/api/v2/package/$name | awk '/location/ {print $2}' | tr -d '\r')"
+  if [ "${run,,}" = "now" ]; then
+   printf '  {\n    "name": "%s",\n"uri": "%s",\n"type": "%s",\n"description": "%s"\n  },\n' "$name" "$uri" "$type" "$description" >>automationRunnowbooks.json
+  else
+   printf '  {\n    "name": "%s",\n"uri": "%s",\n"type": "%s",\n"description": "%s"\n  },\n' "$name" "$uri" "$type" "$description" >>automationRunbooks.json
+  fi
+done
+sed -i '$ s/.$/\n]/' automationRunbooks.json
+sed -i '$ s/.$/\n]/' automationRunnowbooks.json
+
+# xargs -I '{}' curl -sD - -o -L https://www.powershellgallery.com/api/v2/package/'{}' | awk '/location/ {print $2}'
+# jq -r '.dscModules[].name' config.json | xargs -I '{}' curl -sD - -o -L https://www.powershellgallery.com/api/v2/package/'{}' | awk '/location/ {print $2}'
+# jq -r '.automationModules[].name' config.json | xargs -I '{}' curl -sD - -o -L https://www.powershellgallery.com/api/v2/package/'{}' | awk '/location/ {print $2}'
+# jq -r '.automationRunBooks[].name' config.json | xargs -I '{}' curl -sD - -o -L https://www.powershellgallery.com/api/v2/package/'{}' | awk '/location/ {print $2}'
+
+az deployment group create --resource-group $AZURE_RESOURCE_GROUP --template-file ./templates/Configure_Workspace.json --parameters workspacename=$AZURE_WORKSPACENAME solutions=@solutions.json --no-wait
+az deployment group create --resource-group $AZURE_RESOURCE_GROUP --template-file ./templates/Configure_AutomationAccount.json --parameters accountname=$AZURE_AUTOMATIONACCOUNT runbooks=@automationRunbooks.json modules=@automationModules.json runnowbooks=@automationRunnowbooks.json variables=@automationVariables.json --no-wait
+az deployment group create --resource-group $AZURE_RESOURCE_GROUP --template-file ./templates/Configure_DSC.json --parameters accountname=$AZURE_AUTOMATIONACCOUNT configUrl=$CONFIG_URL modules=@dscModules.json configurations=@dscConfigs.json
 
 ## from https://docs.microsoft.com/en-us/cli/azure/keyvault/certificate?view=azure-cli-latest#az-keyvault-certificate-create
 az keyvault certificate get-default-policy > kvpolicy.json

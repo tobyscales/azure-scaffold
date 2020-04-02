@@ -13,6 +13,7 @@
             "defaultvalue": []
         }
     },
+    "variables": {},
     "resources": [
         {
             "apiVersion": "2015-11-01-preview",

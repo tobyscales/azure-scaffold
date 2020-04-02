@@ -51,7 +51,7 @@
             "location": "PSGallery"
         }
     ],
-    "automationRunBooks": [
+    "automationRunbooks": [
         {
             "name": "Install-RequiredModule",
             "run": "now"
