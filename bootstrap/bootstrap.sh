@@ -80,6 +80,7 @@ done
 sed -i '$ s/.$/\n]/' automationRunbooks.json
 sed -i '$ s/.$/\n]/' automationRunnowbooks.json
 
+echo "Finished updating files."
 # xargs -I '{}' curl -sD - -o -L https://www.powershellgallery.com/api/v2/package/'{}' | awk '/location/ {print $2}'
 # jq -r '.dscModules[].name' config.json | xargs -I '{}' curl -sD - -o -L https://www.powershellgallery.com/api/v2/package/'{}' | awk '/location/ {print $2}'
 # jq -r '.automationModules[].name' config.json | xargs -I '{}' curl -sD - -o -L https://www.powershellgallery.com/api/v2/package/'{}' | awk '/location/ {print $2}'
@@ -89,12 +90,12 @@ az deployment group create --resource-group $AZURE_RESOURCE_GROUP --template-fil
 az deployment group create --resource-group $AZURE_RESOURCE_GROUP --template-file ./templates/Configure_AutomationAccount.json --parameters accountname=$AZURE_AUTOMATIONACCOUNT runbooks=@automationRunbooks.json modules=@automationModules.json runnowbooks=@automationRunnowbooks.json variables=@automationVariables.json --no-wait
 az deployment group create --resource-group $AZURE_RESOURCE_GROUP --template-file ./templates/Configure_DSC.json --parameters accountname=$AZURE_AUTOMATIONACCOUNT configUrl=$CONFIG_URL modules=@dscModules.json configurations=@dscConfigs.json
 
-## from https://docs.microsoft.com/en-us/cli/azure/keyvault/certificate?view=azure-cli-latest#az-keyvault-certificate-create
-az keyvault certificate get-default-policy > kvpolicy.json
-az keyvault certificate create --vault-name $AZURE_KEYVAULT --name vmcert --policy kvpolicy.json
-secrets=$(az keyvault secret list-versions --vault-name vaultname -n cert1 --query "[?attributes.enabled].id" -o tsv)
-vm_secrets=$(az vm secret format -s "$secrets")
 ##TODO: assign to vm at deployment time
+## from https://docs.microsoft.com/en-us/cli/azure/keyvault/certificate?view=azure-cli-latest#az-keyvault-certificate-create
+#az keyvault certificate get-default-policy > kvpolicy.json
+#az keyvault certificate create --vault-name $AZURE_KEYVAULT --name vmcert --policy kvpolicy.json
+#secrets=$(az keyvault secret list-versions --vault-name vaultname -n cert1 --query "[?attributes.enabled].id" -o tsv)
+#vm_secrets=$(az vm secret format -s "$secrets")
 
 ## uncomment the below statement to troubleshoot your startup script interactively in ACI (on the Connect tab)
 #tail -f /dev/null

@@ -72,7 +72,7 @@
     ],
     "solutions": [
         {
-            "name": "AzureAutomation",
+            "name": "AntiMalware",
             "publisher": "Microsoft"
         },
         {
@@ -80,7 +80,7 @@
             "publisher": "Microsoft"
         },
         {
-            "name": "SecurityCenterFree",
+            "name": "AzureAutomation",
             "publisher": "Microsoft"
         },
         {
@@ -88,15 +88,27 @@
             "publisher": "Microsoft"
         },
         {
-            "name": "Updates",
-            "publisher": "Microsoft"
-        },
-        {
             "name": "InfrastructureInsights",
             "publisher": "Microsoft"
         },
         {
+            "name": "KeyVaultAnalytics",
+            "publisher": "Microsoft"
+        },
+        {
+            "name": "Security",
+            "publisher": "Microsoft"
+        },
+        {
+            "name": "SecurityCenterFree",
+            "publisher": "Microsoft"
+        },
+        {
             "name": "ServiceMap",
+            "publisher": "Microsoft"
+        },
+        {
+            "name": "Updates",
             "publisher": "Microsoft"
         }
     ],
