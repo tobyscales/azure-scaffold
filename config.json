@@ -99,5 +99,11 @@
             "name": "ServiceMap",
             "publisher": "Microsoft"
         }
+    ],
+    "automationVariables": [
+        {
+            "name": "AzureAutomation",
+            "publisher": "Microsoft"
+        }
     ]
 }
