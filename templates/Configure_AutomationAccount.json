@@ -43,7 +43,8 @@
             "type": "Microsoft.Resources/deployments",
             "copy": {
                 "name": "installModules",
-                "count": "[variables('moduleCount')]"
+                "count": "[variables('moduleCount')]",
+                "mode": "serial"
             },
             "properties": {
                 "mode": "Incremental",
@@ -81,7 +82,8 @@
             },
             "copy": {
                 "name": "deployRunbooks",
-                "count": "[length(parameters('runbooks'))]"
+                "count": "[length(parameters('runbooks'))]",
+                "mode": "serial"
             }
         },
         {
@@ -101,7 +103,8 @@
             },
             "copy": {
                 "name": "deployRunnowbooks",
-                "count": "[length(parameters('runnowbooks'))]"
+                "count": "[length(parameters('runnowbooks'))]",
+                "mode": "serial"
             }
         },
         {

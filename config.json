@@ -102,8 +102,11 @@
     ],
     "automationVariables": [
         {
-            "name": "AzureAutomation",
-            "publisher": "Microsoft"
+            "name": "AzureAutomationVariable",
+            "value": "Value",
+            "description": "Just a Test",
+            "type": "string",
+            "isEncrypted": false
         }
     ]
 }

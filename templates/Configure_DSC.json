@@ -39,7 +39,8 @@
       "type": "Microsoft.Resources/deployments",
       "copy": {
         "name": "installModules",
-        "count": "[variables('moduleCount')]"
+        "count": "[variables('moduleCount')]",
+        "mode": "serial"
       },
       "properties": {
         "mode": "Incremental",
