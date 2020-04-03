@@ -56,8 +56,8 @@ sed -i '$ s/.$/\n]/' dscModules.json
 printf '[\n' >automationModules.json
 jq -M -r '.automationModules[] | .name, .location' config.json | while read -r name; read -r location; do
   echo "Retrieving $name..."
-  type="$(curl -s -L "https://www.powershellgallery.com/api/v2/FindPackagesById?id='$name'" | grep -oP -m 1 '(?<=<d:ItemType>).*?(?=</d:ItemType>)' | head -n1)"
-  description="$(curl -s -L "https://www.powershellgallery.com/api/v2/FindPackagesById?id='$name'" | grep -m 1 -oP '(?<=<d:Description>).*?(?=</d:Description>)' | head -n1)"
+  type="$(curl -s -L "https://www.powershellgallery.com/api/v2/FindPackagesById?id='$name'" | grep -m 1 -oiE '<d:ItemType>(.*?)</d:ItemType>' | sed -e 's,.*<d:ItemType>\([^<]*\)</d:ItemType>.*,\1,g' | head -n1)"
+  description="$(curl -s -L "https://www.powershellgallery.com/api/v2/FindPackagesById?id='$name'" | grep -m 1 -oiE '<d:Description>(.*?)</d:Description>' | sed -e 's,.*<d:Description>\([^<]*\)</d:Description>.*,\1,g' | head -n1)"
   uri="$(curl -sD - -o -L https://www.powershellgallery.com/api/v2/package/$name | awk '/location/ {print $2}' | tr -d '\r')"
  printf '  {\n    "name": "%s",\n"uri": "%s",\n"type": "%s",\n"description": "%s"\n  },\n' "$name" "$uri" "$type" "$description" >>automationModules.json
 done
@@ -68,8 +68,8 @@ printf '[\n' >automationRunbooks.json
 printf '[\n' >automationRunnowbooks.json
 jq -M -r '.automationRunbooks[] | .name, .location, .run' config.json | while read -r name; read -r location; read -r run; do
   echo "Retrieving $name..."
-  type="$(curl -s -L "https://www.powershellgallery.com/api/v2/FindPackagesById?id='$name'" | grep -m 1 -oP '(?<=<d:ItemType>).*?(?=</d:ItemType>)' | head -n1)"
-  description="$(curl -s -L "https://www.powershellgallery.com/api/v2/FindPackagesById?id='$name'" | grep -m 1 -oP '(?<=<d:Description>).*?(?=</d:Description>)' | head -n1)"
+  type="$(curl -s -L "https://www.powershellgallery.com/api/v2/FindPackagesById?id='$name'" | grep -m 1 -oiE '<d:ItemType>(.*?)</d:ItemType>' | sed -e 's,.*<d:ItemType>\([^<]*\)</d:ItemType>.*,\1,g' | head -n1)"
+  description="$(curl -s -L "https://www.powershellgallery.com/api/v2/FindPackagesById?id='$name'" | grep -m 1 -oiE '<d:Description>(.*?)</d:Description>' | sed -e 's,.*<d:Description>\([^<]*\)</d:Description>.*,\1,g' | head -n1)"
   uri="$(curl -sD - -o -L https://www.powershellgallery.com/api/v2/package/$name | awk '/location/ {print $2}' | tr -d '\r')"
   if [ "${run,,}" = "now" ]; then
    printf '  {\n    "name": "%s",\n"uri": "%s",\n"type": "%s",\n"description": "%s"\n  },\n' "$name" "$uri" "$type" "$description" >>automationRunnowbooks.json
