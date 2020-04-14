@@ -22,6 +22,9 @@
                                 "timeZoneId": {
                                     "type": "string"
                                 },
+                                "shutdownTime": {
+                                    "type": "string"
+                                },
                                 "location": {
                                     "type": "string"
                                 },

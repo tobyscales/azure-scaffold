@@ -1,5 +1,5 @@
 ## Variables
-$resourceGroup = "mngd"
+$resourceGroup = "gitops"
 $location = "westus2"
 $userObjectId = $(az ad signed-in-user show --query objectId --out tsv)
 $kvName = "kv-$resourceGroup"
@@ -29,3 +29,8 @@ az role assignment create --role "Virtual Machine Administrator Login" --assigne
 
 #test DSC arm template deploy
 az deployment group create --template-file deployDSC.json --resource-group $resourceGroup --parameters gitHubUser=$gitHubUser gitHubRepo=$gitHubRepo configName=$configName remoteUser=$remoteUserAcct
+
+#test activity log policy deployment
+$workspaceName="logs-mgmt"
+$workspaceRG="mgmt"
+az deployment sub create --template-file policies\deploy-activitylog.json --parameters workspaceName=$workspaceName workspaceRG=$workspaceRG
