@@ -1,0 +1,111 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualMachineName": {
+            "defaultValue": "default",
+            "type": "String"
+        },
+        "numberOfMachines": {
+            "defaultValue": 1,
+            "type": "int"
+        },
+        "suffixLength": {
+            "type": "int",
+            "defaultValue": 2,
+            "metadata": {
+                "description": "Number of digits to append to vmname (NOTE: VM names must be less than 15 characters)."
+            }
+        },
+        "startWith": {
+            "type": "int",
+            "defaultValue": 1,
+            "metadata": {
+                "description": "Start joining VMs from this machine number."
+            }
+        },
+        "storageAccountName": {
+            "type": "string",
+            "defaultValue": "[concat(resourceGroup().name, 'stor')]",
+            "metadata": {
+                "description": "Storage Account where Logon Script is stored."
+            }
+        },
+        "scriptShareName": {
+            "type": "string",
+            "defaultValue": "[concat(resourceGroup().name, 'stor')]",
+            "metadata": {
+                "description": "File Share where Logon Script is stored."
+            }
+        },
+        "startupScriptName": {
+            "type": "string",
+            "defaultValue": "installMountDrive.ps1",
+            "metadata": {
+                "description": "Script to execute from Custom Script Extension. Should be under /scripts relative to deployment."
+            }
+        }
+    },
+    "variables": {
+        "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]",
+        "scripturi": "[uri(deployment().properties.templateLink.uri, concat('/', parameters('startupScriptName')))]",
+        //"scripturi": "[concat('/', parameters('startupScriptName'))]",
+        "psIwrCmd": "[concat ('invoke-webrequest ', variables('scripturi'), ' | new-item ', parameters('startupScriptName'))]",
+        "psAutoLogonCmd": "[concat ('new-itemproperty -path \"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\" -name AzureLogonScript -Force -Value \"C:\\WindowsAzure\\\"', parameters('startupScriptName'))]",
+        "psCmd": "[concat('powershell.exe -ExecutionPolicy Unrestricted -command {', variables('psIwrcmd'), '; ', variables('psAutoLogonCmd'), '}')]"
+    },
+    "resources": [
+        {
+            "apiVersion": "2018-06-01",
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(parameters('virtualMachineName'),padleft(string(copyIndex(parameters('startWith'))),parameters('suffixLength'),'0'),'/startupScript')]",
+            "location": "[resourceGroup().location]",
+            "copy": {
+                "name": "mapDrive",
+                "count": "[parameters('numberOfMachines')]"
+            },
+            "properties": {
+                "publisher": "Microsoft.Compute",
+                "type": "CustomScriptExtension",
+                "typeHandlerVersion": "1.9",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": [
+                        "[variables('scripturi')]"
+                    ],
+                    "commandToExecute": "[variables('psCmd')]"
+                }
+                // "protectedSettings": {
+                //     "commandToExecute": "myExecutionCommand",
+                //     "storageAccountName": "[reference(parameters('storageAccountName'))]",
+                //     "storageAccountKey": "[listKeys(variables('storageAccountId'), '2019-04-01').keys[0].value]"
+                // }
+            }
+        }
+        // {
+        //     "name": "[parameters('storageAccountName')]",
+        //     "type": "Microsoft.Storage/storageAccounts",
+        //     "apiVersion": "2018-02-01",
+        //     "location": "[resourceGroup().location]",
+        //     "tags": {
+        //         "description": "Used for LogonScript Storage"
+        //     },
+        //     "sku": {
+        //         "name": "Standard_LRS"
+        //     },
+        //     "kind": "StorageV2",
+        //     "properties": {
+        //     }
+        // },
+        // {
+        //     "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+        //     "apiVersion": "2019-06-01",
+        //     "name": "[concat(parameters('storageAccountName'), '/default/', parameters('scriptShareName'))]",
+        //     "dependsOn": [
+        //         "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+        //     ]
+        // }
+    ],
+    "outputs": {
+    }
+}

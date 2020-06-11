@@ -1,0 +1,7 @@
+# Deploy A Custom Startup Script to a set of VMs
+
+Just put your logon script in the /scripts folder and run this against your VM set.
+
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Ftescales%2Fazure-scaffold%2Fmaster%2Fvm%2Fdeploy-customscript.json" target="_blank">
+    <img src="http://azuredeploy.net/deploybutton.png"/>
+</a>
