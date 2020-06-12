@@ -88,7 +88,7 @@ sed -i '$ s/.$/\n]/' automationRunbooks.json
 sed -i '$ s/.$/\n]/' automationRunnowbooks.json
 
 cat automationModules.json
-cat automationRunBooks.json
+cat automationRunbooks.json
 cat automationRunnowbooks.json
 
 echo Finished updating files.
