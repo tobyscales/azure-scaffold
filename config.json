@@ -110,10 +110,9 @@
     ],
     "automationVariables": [
         {
-            "name": "AzureAutomationVariable",
-            "value": "Value",
+            "name": "testVariable",
             "description": "Just a Test",
-            "type": "string",
+            "value": "testvalue",
             "isEncrypted": false
         }
     ]
