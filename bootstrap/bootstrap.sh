@@ -41,7 +41,9 @@ jq -r .solutions config.json > solutions.json
 jq -r .dscConfigs config.json > dscConfigs.json
 jq -r .automationVariables config.json > automationVariables.json
 
-cat automationVariables.json
+touch automationRunbooks.json
+touch automationRunnowbooks.json
+
 echo Creating parameters files...
 
 # updates dscModules with actual uri
