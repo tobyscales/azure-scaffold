@@ -87,6 +87,10 @@ done
 sed -i '$ s/.$/\n]/' automationRunbooks.json
 sed -i '$ s/.$/\n]/' automationRunnowbooks.json
 
+cat automationModules.json
+cat automationRunBooks.json
+cat automationRunnowbooks.json
+
 echo Finished updating files.
 # xargs -I '{}' curl -sD - -o -L https://www.powershellgallery.com/api/v2/package/'{}' | awk '/location/ {print $2}'
 # jq -r '.dscModules[].name' config.json | xargs -I '{}' curl -sD - -o -L https://www.powershellgallery.com/api/v2/package/'{}' | awk '/location/ {print $2}'
