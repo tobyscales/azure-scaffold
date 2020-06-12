@@ -43,7 +43,7 @@
     ],
     "automationModules": [
         {
-            "name": "AzureRM.OperationalInsights",
+            "name": "PSLogging",
             "location": "PSGallery"
         }
     ],

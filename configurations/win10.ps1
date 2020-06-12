@@ -202,4 +202,371 @@ Configuration win10
         }
         #endregion
     }
+
+    Node "tescales"
+    {
+        # OPTIONAL/TODOs:
+        # Force OneDrive to E:\
+        # [HKCU\SOFTWARE\Policies\Microsoft\OneDrive\DefaultRootDir] "1111-2222-3333-4444"="{User path}"
+        # (where "1111-2222-3333-4444" is the tenant ID)
+
+        #automatically sync certain library IDs
+        #Enabling this policy sets the following registry key, using the entire URL from the library you copied:
+        #[HKCU\Software\Policies\Microsoft\OneDrive\TenantAutoMount]"LibraryName"="LibraryID"
+
+        # PowerShellExecutionPolicy ExecutionPolicy
+        # {
+        #     ExecutionPolicyScope = 'Process'
+        #     ExecutionPolicy      = 'Unrestricted'
+        # }
+        # MSFT_xFirefoxPreference FirefoxSyncSetting
+        # {
+        #     PreferenceName  = "identity.sync.tokenserver.uri"
+        #     PreferenceValue = "https://sync.scales.cloud/token/1.0/sync/1.5"
+        # }
+
+        #######################
+        #region WindowsOptionalFeatures
+        ####################### 
+        WindowsOptionalFeatureSet enableHyperV {
+            Name   = @('Microsoft-Hyper-V', 'HypervisorPlatform', 'Microsoft-Hyper-V-Services', 'Microsoft-Hyper-V-Management-Clients', 'VirtualMachinePlatform')
+            Ensure = 'Present'
+        }
+        WindowsOptionalFeatureSet enableNetworkTools {
+            Name   = @('ServicesForNFS-ClientOnly', 'ClientForNFS-Infrastructure', 'TelnetClient')
+            Ensure = 'Present'
+        }
+        WindowsOptionalFeature enableContainers {
+            Name   = 'Containers'
+            Ensure = 'Present'
+        }
+        WindowsOptionalFeature enableSandbox {
+            Name   = 'Containers-DisposableClientVM'
+            Ensure = 'Present'
+        }
+        WindowsOptionalFeature enableWSL {
+            Name   = 'Microsoft-Windows-Subsystem-Linux'
+            Ensure = 'Present' 
+        }
+        WindowsOptionalFeatureSet disableUnused {
+            Name                 = @('WindowsMediaPlayer', 'WorkFolders-Client', 'Printing-XPSServices-Features', 'FaxServicesClientPackage', 'Internet-Explorer-Optional-amd64', 'MicrosoftWindowsPowerShellV2', 'MicrosoftWindowsPowerShellV2Root')
+            Ensure               = 'Absent'
+            RemoveFilesOnDisable = $true
+        }
+        #endregion 
+        
+        #######################
+        #region User+Group Settings
+        ####################### 
+        User remoteUser {
+            Ensure   = 'Present'
+            UserName = $remoteUserCred.UserName
+            Password = $remoteUserCred # This needs to be a credential object
+        }
+        Group remoteUserAdmin {
+            GroupName        = 'Administrators'
+            Ensure           = 'Present'
+            MembersToInclude = @($remoteUserCred.UserName)
+        }
+        Group remoteUserRA {
+            GroupName        = 'Remote Desktop Users'
+            Ensure           = 'Present'
+            MembersToInclude = @($remoteUserCred.UserName)
+        }
+        Group remoteUserFSLExclude {
+            GroupName        = 'FSLogix Profile Exclude List'
+            Ensure           = 'Present'
+            MembersToInclude = @($remoteUserCred.UserName)
+        }
+        #endregion
+
+        #######################
+        #region Environment Settings
+        ####################### 
+        Environment updatePathEnvironmentVariable {
+            Name   = 'Path'
+            Value  = '$Env:OneDriveCommercial\Tools\CLI'
+            Ensure = 'Present'
+            Path   = $true
+            #Target = @('Process', 'Machine')
+        }
+        #endregion
+
+        #######################
+        #region  File Settings
+        #######################
+        
+        File createDownloads {
+            Ensure          = 'Present'
+            Type            = 'Directory'
+            DestinationPath = 'D:\Downloads'
+        }
+        File removeFFShortcut {
+            Ensure          = 'Absent'
+            Type            = 'File'
+            DestinationPath = 'C:\Users\Public\Desktop\Firefox.lnk'
+        }
+        File removeEdgeBetaShortcut {
+            Ensure          = 'Absent'
+            Type            = 'File'
+            DestinationPath = 'C:\Users\Public\Desktop\Microsoft Edge Beta.lnk'
+        }
+        File removeVSCShortcut {
+            Ensure          = 'Absent'
+            Type            = 'File'
+            DestinationPath = 'C:\Users\Public\Desktop\Visual Studio Code.lnk'
+        }
+        File removeZoomShortcut {
+            Ensure          = 'Absent'
+            Type            = 'File'
+            DestinationPath = 'C:\Users\Public\Desktop\Zoom.lnk'
+        }
+        # File removeGHShortcut {
+        #     Ensure          = 'Absent'
+        #     Type            = 'File'
+        #     DestinationPath = "$Env:OneDriveCommercial\Desktop\Github Desktop.lnk"
+        # }
+        # File removeEdgeShortcut {
+        #     Ensure          = 'Absent'
+        #     Type            = 'File'
+        #     DestinationPath = "$Env:OneDriveCommercial\Desktop\Microsoft Edge.lnk"
+        # }
+        File removeUserGHShortcut {
+            Ensure          = 'Absent'
+            Type            = 'File'
+            DestinationPath = "$Env:userprofile\Desktop\Github Desktop.lnk"
+        }
+        File removeUserEdgeShortcut {
+            Ensure          = 'Absent'
+            Type            = 'File'
+            DestinationPath = "$Env:userprofile\Desktop\Microsoft Edge.lnk"
+        }
+        #endregion
+
+        #######################
+        #region Registry Settings
+        #######################
+
+        # Registry odRenameRoot {
+        #     Ensure    = '"Present'
+        #     Key       = "HKEY_CURRENT_USER\Software\Microsoft\OneDrive\Accounts\Business1"
+        #     ValueName = "UserFolder"
+        #     ValueData = "C:\ODFB"
+        # }
+        # Registry odMoveRoot {
+        #     Ensure    = '"Present'
+        #     Key       = "HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\OneDrive\DefaultRootDir"
+        #     ValueName = $tenantId
+        #     ValueData = "C:\"
+        # }
+        Registry fsLogixEnable {
+            Ensure    = 'Present'
+            Key       = 'HKLM:\SOFTWARE\FSLogix\Profiles'
+            ValueName = 'Enabled'
+            ValueType = 'Dword'
+            ValueData = '1'
+            Force     = $true
+        }
+        Registry fsLogixVHDLocation {
+            Ensure    = 'Present'
+            Key       = 'HKLM:\SOFTWARE\FSLogix\Profiles'
+            ValueName = 'VHDLocations'
+            ValueData = '1'
+            Force     = $true
+        }
+        Registry fsLogixUsableNames {
+            Ensure    = 'Present'
+            Key       = 'HKLM:\SOFTWARE\FSLogix\Profiles'
+            ValueName = 'FlipFlopProfileDirectoryName'
+            ValueType = 'Dword'
+            ValueData = '1'
+            Force     = $true
+        }
+        Registry fsLogixPreventTempProfile {
+            Ensure    = 'Present'
+            Key       = 'HKLM:\SOFTWARE\FSLogix\Profiles'
+            ValueName = 'PreventLoginWithTempProfile'
+            ValueType = 'Dword'
+            ValueData = '1'
+            Force     = $true
+        }
+        
+        Registry odSilentAccountConfig {
+            Ensure    = 'Present'
+            Key       = 'HKLM:\SOFTWARE\Policies\Microsoft\OneDrive'
+            ValueName = 'SilentAccountConfig'
+            ValueData = '1'
+            Force     = $true
+        }
+        Registry odSilentOptIn {
+            Ensure    = 'Present'
+            Key       = 'HKLM:\SOFTWARE\Policies\Microsoft\OneDrive'
+            ValueName = 'KFMSilentOptIn'
+            ValueData = $tenantId
+            Force     = $true
+        }
+        Registry odSilentKFMConfig {
+            Ensure    = 'Present'
+            Key       = 'HKLM:\SOFTWARE\Policies\Microsoft\OneDrive'
+            ValueName = 'KFMSilentOptInWithNotification'
+            ValueData = '1'
+            ValueType = "Dword"
+            Force     = $true
+        }
+        Registry odDisableOnDemand {
+            Ensure    = 'Present'
+            Key       = 'HKLM:\SOFTWARE\Policies\Microsoft\OneDrive'
+            ValueName = 'FilesOnDemandEnabled'
+            ValueData = '0'
+            ValueType = "Dword"
+            Force     = $true
+        }
+        Registry moveDownloadsFolder {
+            Ensure    = 'Present'
+            Key       = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders'
+            ValueName = '{374DE290-123F-4565-9164-39C4925E467B}'
+            ValueData = 'D:\Downloads'
+            Force     = $true
+        }
+        Registry moveIEDownloadsFolder {
+            Ensure    = 'Present'
+            Key       = 'HKCU:\Software\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppContainer\Storage\microsoft.microsoftedge_8wekyb3d8bbwe\MicrosoftEdge\Main'
+            ValueName = 'DefaultDownloadDirectory'
+            ValueData = 'D:\Downloads'
+            Force     = $true
+        }
+        #endregion
+
+        #######################
+        #region cChoco Installer
+        #######################
+        cChocoInstaller installChoco {
+            InstallDir = "c:\choco"
+        }
+        cChocoFeature allowGlobalConfirmation {
+            FeatureName = "allowGlobalConfirmation"
+            Ensure      = 'Present'
+        }
+        cChocoPackageInstaller installFunctionsCoreTools {
+            Ensure      = 'Present'
+            Name        = 'azure-functions-core-tools'
+            DependsOn   = "[cChocoInstaller]installChoco"
+            AutoUpgrade = $True             #This will automatically try to upgrade if available, only if a version is not explicitly specified.
+        }
+        cChocoPackageInstaller installdotNetCore {
+            Ensure      = 'Present'
+            Name        = 'dotnetcore-sdk'
+            DependsOn   = '[cChocoInstaller]installChoco'
+            AutoUpgrade = $True
+        }
+        cChocoPackageInstaller installPostman {
+            Ensure      = 'Present'
+            Name        = 'postman'
+            DependsOn   = "[cChocoInstaller]installChoco"
+            AutoUpgrade = $True
+        }
+        cChocoPackageInstaller installNodeJS {
+            Ensure      = 'Present'
+            Name        = 'nodejs'
+            DependsOn   = '[cChocoInstaller]installChoco'
+            AutoUpgrade = $True
+        }
+        cChocoPackageInstaller installAzureCLI {
+            Ensure      = 'Present'
+            Name        = 'azure-cli'
+            DependsOn   = '[cChocoInstaller]installChoco'
+            AutoUpgrade = $True
+        }
+        cChocoPackageInstaller installVSCode {
+            Ensure      = 'Present'
+            Name        = 'vscode'
+            DependsOn   = '[cChocoInstaller]installChoco'
+            AutoUpgrade = $True
+        }
+        cChocoPackageInstaller installFirefox {
+            Ensure      = 'Present'
+            Name        = "firefox"
+            DependsOn   = "[cChocoInstaller]installChoco"
+            AutoUpgrade = $True
+        }
+        cChocoPackageInstaller install1Password {
+            Ensure      = 'Present'
+            Name        = '1password'
+            DependsOn   = "[cChocoInstaller]installChoco"
+            AutoUpgrade = $True
+        }
+        cChocoPackageInstaller installFSLogix {
+            Ensure      = 'Present'
+            Name        = 'fslogix'
+            DependsOn   = "[cChocoInstaller]installChoco"
+            AutoUpgrade = $True
+        }
+        cChocoPackageInstallerSet installVSCodeExtensions {
+            Ensure    = 'Present'
+            Name      = @(
+                "vscode-settingssync",
+                "ms-python.python",
+                "ms-vscode.powershell",
+                "peterjausovec.vscode-docker",
+                "ms-vscode.azurecli",
+                "msazurermtools.azurerm-vscode-tools",
+                "ms-vscode.azure-account"
+            )
+            DependsOn = "[cChocoPackageInstaller]installVSCode"
+        }
+        cChocoPackageInstaller installNotepadPlusPlus {
+            Ensure      = 'Present'
+            Name        = 'notepadplusplus.install'
+            DependsOn   = '[cChocoInstaller]installChoco'
+            AutoUpgrade = $True
+        }
+        cChocoPackageInstaller installAzureStorageExplorer {
+            Ensure      = 'Present'
+            Name        = 'microsoftazurestorageexplorer'
+            DependsOn   = '[cChocoInstaller]installChoco'
+            AutoUpgrade = $True
+        }
+        cChocoPackageInstallerSet installGitStuff {
+            Ensure    = 'Present'
+            Name      = @(
+                "git-credential-manager-for-windows",
+                "github-desktop",
+                "git.install"
+            )
+            DependsOn = '[cChocoInstaller]installChoco'
+        }
+        cChocoPackageInstallerSet installConferenceTools {
+            Ensure    = 'Present'
+            Name      = @(
+                "zoom",
+                "slack",
+                "microsoft-teams"
+            )
+            DependsOn = "[cChocoInstaller]installChoco"
+        }
+        cChocoPackageInstaller installEdge {
+            Ensure      = 'Present'
+            Name        = "microsoft-edge"
+            DependsOn   = "[cChocoInstaller]installChoco"
+            AutoUpgrade = $True
+        }
+        cChocoPackageInstaller installO365 {
+            Ensure      = 'Present'
+            Name        = "office365business"
+            DependsOn   = "[cChocoInstaller]installChoco"
+            AutoUpgrade = $True
+        }
+        cChocoPackageInstaller installPSCore {
+            Ensure      = 'Present'
+            Name        = "powershell-core"
+            DependsOn   = "[cChocoInstaller]installChoco"
+            AutoUpgrade = $True
+        }
+        cChocoPackageInstaller noFlashAllowed {
+            Ensure    = 'Absent'
+            Name      = "flashplayerplugin"
+            DependsOn = "[cChocoInstaller]installChoco"
+        }
+        #endregion
+    }
 }
