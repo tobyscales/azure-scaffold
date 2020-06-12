@@ -82,7 +82,7 @@ jq -M -r '.automationRunbooks[] | .name, .location, .run' config.json | while re
 done
 printf '\n]' >>automationRunbooks.json
 printf '\n]' >>automationRunnowbooks.json
-
+echo failedornot
 #sed -i '$ s/.$/\n]/' automationRunbooks.json
 #sed -i '$ s/.$/\n]/' automationRunnowbooks.json
 
