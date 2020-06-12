@@ -66,7 +66,7 @@
             }
         },
         {
-            "name": "[parameters('runbooks')[copyIndex()].name]",
+            "name": "[concat(parameters('accountName'), '/', parameters('runbooks')[copyIndex()].name)]",
             "type": "Microsoft.Automation/automationAccounts/runbooks",
             "apiVersion": "2015-10-31",
             "location": "[resourceGroup().location]",
