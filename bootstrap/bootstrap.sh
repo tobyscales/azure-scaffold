@@ -80,12 +80,11 @@ jq -M -r '.automationRunbooks[] | .name, .location, .run' config.json | while re
    printf '  {\n    "name": "%s",\n"uri": "%s",\n"runbookType": "%s",\n"description": "%s"\n  },\n' "$name" "$uri" "$type" "$description" >>automationRunbooks.json
   fi
 done
-sed -i '$ s/.$/\n]/' automationRunbooks.json
-sed -i '$ s/.$/\n]/' automationRunnowbooks.json
+printf '\n]' >>automationRunbooks.json
+printf '\n]' >>automationRunnowbooks.json
 
-cat automationModules.json
-cat automationRunbooks.json
-cat automationRunnowbooks.json
+#sed -i '$ s/.$/\n]/' automationRunbooks.json
+#sed -i '$ s/.$/\n]/' automationRunnowbooks.json
 
 echo Finished updating files.
 # xargs -I '{}' curl -sD - -o -L https://www.powershellgallery.com/api/v2/package/'{}' | awk '/location/ {print $2}'
